@@ -1,0 +1,34 @@
+{
+  "private": true,
+  "name": "",
+  "version": "0.0.1",
+  "description": "",
+  "main": "main.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lgeorgieff/js_base.git"
+  },
+  "keywords": [
+    "web-spider",
+    "web-crawler",
+    "web-search",
+    "jsspider",
+    "js-spider",
+    "js_spider"
+  ],
+  "author": {
+    "name": "Lukas Georgieff",
+    "email": "lukas.georgieff@hotmail.com"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/lgeorgieff/js_base/issues"
+  },
+  "homepage": "https://github.com/lgeorgieff/js_base#readme",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "engines": {
+    "node": ">=4.0.0"
+  }
+}
