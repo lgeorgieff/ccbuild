@@ -32,7 +32,15 @@
     "jscs": "^2.4.0"
   },
   "scripts": {
+    "postinstall": "npm run get_git_dependencies && npm run compile_closure_compiler",
+    "get_git_dependencies": "git submodule init && git submodule update",
+    "compile_closure_compiler": "if [ ! -e tools/closure-compiler/target/closure-compiler-1.0-SNAPSHOT.jar ]; then mvn clean install -DskipTests --file tools/closure-compiler/pom.xml; fi",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "if [ $(find src -name '*.js' | wc -l) -gt 0 ]; then jscs --config src/.jscsrc src/*.js; fi"
+    "lint": "if [ $(find src -name '*.js' | wc -l) -gt 0 ]; then jscs --config src/.jscsrc src/*.js; fi",
+    "precompile": "npm run compile_closure_compiler && npm run clean && mkdir build",
+    "compile": "java -jar tools/closure-compiler/target/closure-compiler-1.0-SNAPSHOT.jar --flagfile src/.closure_compiler.flagfile --js src/*.js --js src/*.json",
+    "prebuid": "npm run lint",
+    "build": "npm run compile",
+    "clean": "rm -rf build/ 2>/dev/null"
   }
 }
