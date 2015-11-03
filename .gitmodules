@@ -1,3 +1,6 @@
 [submodule "tools/closure-compiler"]
 	path = tools/closure-compiler
 	url = https://github.com/google/closure-compiler.git
+[submodule "tools/node.js-closure-compiler-externs"]
+	path = tools/node.js-closure-compiler-externs
+	url = https://github.com/dcodeIO/node.js-closure-compiler-externs.git
