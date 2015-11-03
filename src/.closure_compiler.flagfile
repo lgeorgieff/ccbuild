@@ -2,6 +2,12 @@
 
 --warning_level=VERBOSE
 
+--language_in=ECMASCRIPT6_STRICT
+--language_out=ECMASCRIPT5_STRICT
+
+--process_common_js_modules
+--common_js_entry_module=src/main.js
+
 --jscomp_error=ambiguousFunctionDecl
 --jscomp_error=checkDebuggerStatement
 --jscomp_error=checkTypes
