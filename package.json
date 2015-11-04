@@ -41,6 +41,6 @@
     "precompile": "npm run compile_closure_compiler",
     "compile": "java -jar tools/closure-compiler/target/closure-compiler-1.0-SNAPSHOT.jar --flagfile src/.closure_compiler.flagfile --js src/ > /dev/null",
     "prebuid": "npm run lint",
-    "build": "npm run compile"
+    "validate": "npm run compile"
   }
 }
