@@ -1,0 +1,120 @@
+diff --git a/contrib/Express.js b/contrib/Express.js
+index 3351247..acb4c4e 100644
+--- a/contrib/Express.js
++++ b/contrib/Express.js
+@@ -22,37 +22,37 @@
+  */
+ 
+ /**
+- * @type {function(new:Application, ...[*])}
++ * @type {function(new:Application, ...*)}
+  */
+ function express() {}
+ 
+ /**
+- * @type {function(new:Application, ...[*])}
++ * @type {function(new:Application, ...*)}
+  */
+ express.application = function() {};
+ 
+ /**
+- * @type {function(new:ExpressRequest, ...[*])}
++ * @type {function(new:ExpressRequest, ...*)}
+  */
+ express.request = function() {};
+ 
+ /**
+- * @type {function(new:ExpressResponse, ...[*])}
++ * @type {function(new:ExpressResponse, ...*)}
+  */
+ express.response = function() {};
+ 
+ /**
+- * @type {function(new:ExpressRoute, ...[*])}
++ * @type {function(new:ExpressRoute, ...*)}
+  */
+ express.Route = function() {};
+ 
+ /**
+- * @type {function(new:ExpressRouter, ...[*])}
++ * @type {function(new:ExpressRouter, ...*)}
+  */
+ express.Router = function() {};
+ 
+ /**
+- * @type {?function(...[*])}
++ * @type {?function(...*)}
+  */
+ express.errorHandler = function() {};
+ 
+diff --git a/contrib/Ws.js b/contrib/Ws.js
+index c7f1f6a..41d3bc5 100644
+--- a/contrib/Ws.js
++++ b/contrib/Ws.js
+@@ -119,7 +119,7 @@ ws.WebSocket.prototype.resume = function() {};
+ /**
+  * @param {*} data
+  * @param {Object.<string,*>=} options
+- * @param {function(...[*])=} callback
++ * @param {function(...*)=} callback
+  */
+ ws.WebSocket.prototype.send = function(data, options, callback) {};
+ 
+diff --git a/domain.js b/domain.js
+index 3349561..6136f91 100644
+--- a/domain.js
++++ b/domain.js
+@@ -64,14 +64,14 @@ domain.Domain.prototype.add = function(emitter) {};
+ domain.Domain.prototype.remove = function(emitter) {};
+ 
+ /**
+- * @param {function(...[*])} callback
+- * @return {function(...[*])}
++ * @param {function(...*)} callback
++ * @return {function(...*)}
+  */
+ domain.Domain.prototype.bind = function(callback) {};
+ 
+ /**
+- * @param {function(...[*])} callback
+- * @return {function(...[*])}
++ * @param {function(...*)} callback
++ * @return {function(...*)}
+  */
+ domain.Domain.prototype.intercept = function(callback) {};
+ 
+diff --git a/redundant/stdio.js b/redundant/stdio.js
+index 00888ec..73f2df0 100644
+--- a/redundant/stdio.js
++++ b/redundant/stdio.js
+@@ -22,7 +22,7 @@
+  */
+ 
+ /**
+- * @type {Object.<string,function(*, ...[*])>}
++ * @type {Object.<string,function(*, ...*)>}
+  */
+ var console = {};
+ 
+diff --git a/redundant/timers.js b/redundant/timers.js
+index 576ccb5..197c2c3 100644
+--- a/redundant/timers.js
++++ b/redundant/timers.js
+@@ -23,7 +23,7 @@
+  */
+ 
+ /**
+- * @param {function(...[*])} callback
++ * @param {function(...*)} callback
+  * @param {number} delay
+  * @param {...*} var_args
+  * @return {*}
+@@ -36,7 +36,7 @@ function setTimeout(callback, delay, var_args) {};
+ function clearTimeout(timeoutId) {};
+ 
+ /**
+- * @param {function(...[*])} callback
++ * @param {function(...*)} callback
+  * @param {number} delay
+  * @param {...*} var_args
+  * @return {*}
