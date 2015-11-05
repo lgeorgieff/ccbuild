@@ -29,6 +29,7 @@
     "node": ">=4.0.0"
   },
   "devDependencies": {
+    "jasmine": "^2.3.2",
     "jscs": "^2.4.0"
   },
   "scripts": {
