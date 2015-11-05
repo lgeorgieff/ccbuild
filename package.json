@@ -37,7 +37,7 @@
     "get_git_dependencies": "git submodule init && git submodule update",
     "postget_git_dependencies": "cd tools/node.js_closure_compiler_externs/ && git apply ../node.js_closure_compiler_externs_annotation_fixes.patch 2>/dev/null || true",
     "compile_closure_compiler": "if [ ! -e tools/closure_compiler/target/closure-compiler-1.0-SNAPSHOT.jar ]; then mvn clean install -DskipTests --file tools/closure_compiler/pom.xml; fi",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "JASMINE_CONFIG_PATH=test/jasmine.spec.json jasmine",
     "lint": "if [ $(find src -name '*.js' | wc -l) -gt 0 ]; then jscs --config src/.jscsrc src/; fi",
     "precompile": "npm run compile_closure_compiler",
     "compile": "java -jar tools/closure_compiler/target/closure-compiler-1.0-SNAPSHOT.jar --flagfile src/.closure_compiler.flagfile --js src/ > /dev/null",
