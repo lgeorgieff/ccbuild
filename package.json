@@ -40,7 +40,7 @@
     "test": "JASMINE_CONFIG_PATH=test/jasmine.spec.json jasmine",
     "lint": "if [ $(find src -name '*.js' | wc -l) -gt 0 ]; then jscs --config src/.jscsrc src/; fi",
     "precompile": "npm run compile_closure_compiler",
-    "compile": "java -jar tools/closure_compiler/target/closure-compiler-1.0-SNAPSHOT.jar --flagfile src/.closure_compiler.flagfile --js src/ > /dev/null",
+    "compile": "if [ $(find src -name '*.js' | wc -l) -gt 0 ]; then java -jar tools/closure_compiler/target/closure-compiler-1.0-SNAPSHOT.jar --flagfile src/.closure_compiler.flagfile --js src/ > /dev/null; fi",
     "validate": "npm run lint && npm run compile && npm run test"
   }
 }
