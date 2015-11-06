@@ -38,11 +38,11 @@
     "postget_git_dependencies": "cd tools/node.js_closure_compiler_externs/ && git apply ../node.js_closure_compiler_externs_annotation_fixes.patch 2>/dev/null || true && npm install tools/jsonlint/",
     "compile_closure_compiler": "if [ ! -e tools/closure_compiler/target/closure-compiler-1.0-SNAPSHOT.jar ]; then mvn clean install -DskipTests --file tools/closure_compiler/pom.xml; fi",
     "test": "JASMINE_CONFIG_PATH=test/jasmine.spec.json jasmine",
-    "lint_js": "if [ $(find src -name '*.js' | wc -l) -gt 0 ]; then jscs --config src/.jscsrc src/; fi",
-    "lint_json": "for jsonFile in $(find src -name '*.json' && echo package.json); do echo \">> ${jsonFile} <<\"; if ! jsonlint \"${jsonFile}\" --indent \"  \" --diff --diff-context 3 --ignore-trailing-newline; then exit 1; fi; done",
+    "lint_js": "if [ $(find src/ -name '*.js' | wc -l) -gt 0 ]; then jscs --config src/.jscsrc src/; fi",
+    "lint_json": "for jsonFile in $(find src/ -name '*.json' && echo package.json); do echo \">> ${jsonFile} <<\"; if ! jsonlint \"${jsonFile}\" --indent \"  \" --diff --diff-context 3 --ignore-trailing-newline; then exit 1; fi; done",
     "lint": "npm run lint_js && npm run lint_json",
     "precompile": "npm run compile_closure_compiler",
-    "compile": "if [ $(find src -name '*.js' | wc -l) -gt 0 ]; then java -jar tools/closure_compiler/target/closure-compiler-1.0-SNAPSHOT.jar --flagfile src/.closure_compiler.flagfile --js src/ > /dev/null; fi",
+    "compile": "if [ $(find src/ -name '*.js' | wc -l) -gt 0 ]; then java -jar tools/closure_compiler/target/closure-compiler-1.0-SNAPSHOT.jar --flagfile src/.closure_compiler.flagfile --js src/ > /dev/null; fi",
     "validate": "npm run lint && npm run compile && npm run test"
   }
 }
