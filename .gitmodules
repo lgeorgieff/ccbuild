@@ -4,3 +4,6 @@
 [submodule "tools/node.js_closure_compiler_externs"]
 	path = tools/node.js_closure_compiler_externs
 	url = https://github.com/dcodeIO/node.js-closure-compiler-externs.git
+[submodule "tools/jsonlint"]
+	path = tools/jsonlint
+	url = https://github.com/lgeorgieff/jsonlint.git
