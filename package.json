@@ -33,9 +33,11 @@
     "jscs": "^2.4.0"
   },
   "scripts": {
-    "postinstall": "npm run get_git_dependencies && npm run compile_closure_compiler",
+    "postinstall": "npm run get_git_dependencies && npm run compile_closure_compiler && npm run install_git_hooks",
     "get_git_dependencies": "git submodule init && git submodule update",
     "postget_git_dependencies": "npm install tools/jsonlint/ && cd tools/node.js_closure_compiler_externs/ && git apply ../node.js_closure_compiler_externs_annotation_fixes.patch 2>/dev/null || true",
+    "install_git_hooks": "npm run install_git_pre_commit_hook",
+    "install_git_pre_commit_hook": "if [ ! -e .git/hook/pre-commit ]; then cp tools/pre-commit.hook.git .git/hooks/pre-commit; fi",
     "compile_closure_compiler": "if [ ! -e tools/closure_compiler/target/closure-compiler-1.0-SNAPSHOT.jar ]; then mvn clean install -DskipTests --file tools/closure_compiler/pom.xml; fi",
     "test": "JASMINE_CONFIG_PATH=test/jasmine.spec.json jasmine",
     "lint_js": "if [ $(find src/ -name '*.js' | wc -l) -gt 0 ]; then jscs --config src/.jscsrc src/; fi",
