@@ -26,7 +26,8 @@
   },
   "homepage": "https://github.com/lgeorgieff/js_base#readme",
   "engines": {
-    "node": ">=4.0.0"
+    "node": ">=4.0.0",
+    "npm": ">=3.0.0"
   },
   "devDependencies": {
     "jasmine": "^2.3.2",
