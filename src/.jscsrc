@@ -132,7 +132,12 @@
   "requireSpread": true,
   "requireTemplateStrings": true,
   "jsDoc": {
-    "checkAnnotations": "jsdoc3",
+    "checkAnnotations": {
+      "preset": "jsdoc3",
+      "extra": {
+        "suppress": true
+      }
+    },
     "enforceExistence": {
       "allExcept": [
         "exports"
