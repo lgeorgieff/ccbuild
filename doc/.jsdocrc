@@ -13,7 +13,9 @@
     ],
     "excludePattern": "(^|\\/|\\\\)_"
   },
-  "plugins": [],
+  "plugins": [
+    "tools/jsdoc_plugins/closure"
+  ],
   "templates": {
     "cleverLinks": true,
     "monospaceLinks": false
