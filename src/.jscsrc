@@ -152,7 +152,7 @@
     "requireReturnTypes": true,
     "checkTypes": true,
     "requireNewlineAfterDescription": true,
-    "checkRedundantAccess": "enforceLeadingUnderscore",
+    "checkRedundantAccess": true,
     "leadingUnderscoreAccess": "protected",
     "requireDescriptionCompleteSentence": true,
     "requireParamDescription": true,
