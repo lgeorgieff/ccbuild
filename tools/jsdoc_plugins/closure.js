@@ -116,16 +116,22 @@ let currentFileName = '';
  */
 let currentLineNumber = 0;
 /**
- * An indicator whether the current comment was already handled by the registered callback for <tt>onTagged</tt> or not.
- * For some reason the <tt>onTagged</tt> callback is invoked 2 times. This is one way to prevent the registered callback
- * to be executed a second time. It is set to false in <tt>jsdocCommentFound</tt> and set to <tt>true</tt> in
- * <tt>onTagged</tt>.
+ * Stores an ID to the currently processed comment to prevent duplicate warning/error messages.
  *
- * @type {boolean}
+ * @type {string}
  *
  * @private
  */
-let commentHandled = false;
+let currentCommentId = '';
+
+/**
+ * Stores comment IDs of all handled comments including suppress tags.
+ *
+ * @type {Set<string>}
+ *
+ * @private
+ */
+let handledSuppressTags = new Set();
 
 /**
  * Get all values set as suppressions in the <tt>@suppress</tt> tag.
@@ -198,8 +204,8 @@ module.exports.defineTags = (dictionary) => {
         mustHaveValue: true,
         mustNotHaveDescription: true,
         onTagged: (doclet, suppressTag) => {
-            if (!commentHandled) validateSuppressTag(suppressTag);
-            commentHandled = true;
+            if (!handledSuppressTags.has(currentCommentId)) validateSuppressTag(suppressTag);
+            handledSuppressTags.add(currentCommentId);
         }
     });
 };
@@ -219,6 +225,6 @@ module.exports.handlers = {
     jsdocCommentFound: (comment) => {
         currentFileName = comment.filename;
         currentLineNumber = comment.lineno;
-        commentHandled = false;
+        currentCommentId = `${comment.filename}:${comment.lineno}`;
     }
 };
