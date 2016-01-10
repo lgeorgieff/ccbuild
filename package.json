@@ -9,12 +9,6 @@
     "url": "git+https://github.com/lgeorgieff/js_base.git"
   },
   "keywords": [
-    "web-spider",
-    "web-crawler",
-    "web-search",
-    "jsspider",
-    "js-spider",
-    "js_spider"
   ],
   "author": {
     "name": "Lukas Georgieff",
@@ -24,7 +18,7 @@
   "bugs": {
     "url": "https://github.com/lgeorgieff/js_base/issues"
   },
-  "homepage": "https://github.com/lgeorgieff/js_base#readme",
+  "homepage": "https://github.com/lgeorgieff/js_base#README.md",
   "engines": {
     "node": ">=4.0.0",
     "npm": ">=3.0.0"
