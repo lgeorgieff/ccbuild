@@ -138,11 +138,6 @@
         "suppress": true
       }
     },
-    "enforceExistence": {
-      "allExcept": [
-        "exports"
-      ]
-    },
     "checkParamExistence": true,
     "checkParamNames": true,
     "requireParamTypes": true,
