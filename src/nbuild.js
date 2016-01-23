@@ -158,6 +158,8 @@ function parseCliArgs (args) {
             process.exit(0);
             break;
         case '--contrib-path':
+            console.log(CC.compiler.CONTRIB_PATH);
+            process.exit(0);
             break;
         default:
             break;
