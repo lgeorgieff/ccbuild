@@ -1,12 +1,12 @@
 {
   "private": true,
-  "name": "",
+  "name": "nbuild",
   "version": "0.0.1",
   "description": "",
   "main": "main.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/lgeorgieff/js_base.git"
+    "url": "git+https://github.com/lgeorgieff/nbuild.git"
   },
   "author": {
     "name": "Lukas Georgieff",
@@ -14,9 +14,9 @@
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/lgeorgieff/js_base/issues"
+    "url": "https://github.com/lgeorgieff/nbuild/issues"
   },
-  "homepage": "https://github.com/lgeorgieff/js_base#README.md",
+  "homepage": "https://github.com/lgeorgieff/nbuild#README.md",
   "engines": {
     "node": ">=4.0.0",
     "npm": ">=3.0.0"
