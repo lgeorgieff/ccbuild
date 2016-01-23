@@ -50,5 +50,30 @@ function getSelfName () {
     return getPropertyValueFromPackageJson ('name');
 }
 
+/**
+ * Removes an array representing a set without duplicates.
+ *
+ * @template T
+ * @returns {Array<T>} The new set.
+ * @param {Array<T>} arr The original array.
+ * @param {function(T, T): boolean=} comp An optional comparison function. If no one is set `===` is used.
+ */
+function arrayToSet (arr, comp) {
+    var internalComp = comp;
+    if (!internalComp) {
+        internalComp = function (l, r) {
+            return l === r;
+        };
+    }
+
+    return arr.filter(function (item, index) {
+        for (var i = 0; i !== index; ++i) {
+            if (internalComp(arr[i], item)) return false;
+        }
+        return true;
+    });
+}
+
 module.exports.getSelfVersion = getSelfVersion;
 module.exports.getSelfName = getSelfName;
+module.exports.arrayToSet = arrayToSet;

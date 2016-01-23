@@ -142,6 +142,12 @@ function parseCliArgs (args) {
             break;
         case '--config':
         case '-c':
+            if (i + 1 === args.length) {
+                deferred.reject(new Error('-c|--config requires a PATH parameter'));
+            } else {
+                if (!result.hasOwnProperty('configs')) result.configs = [];
+                result.configs.push(path.resolve(args[++i]));
+            }
             break;
         case '--config-help':
             getConfigFileHelp().then(function (configHelp) {
@@ -168,6 +174,8 @@ function parseCliArgs (args) {
             break;
         }
     }
+    if (result.configs !== undefined) result.configs = utils.arrayToSet(result.configs);
+    deferred.resolve(result);
     return deferred.promise;
 }
 
