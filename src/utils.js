@@ -6,23 +6,22 @@
 
 /**
  * @private
- *
- * @const
  */
 var rpj = require('read-package-json');
 
 /**
  * @private
- *
- * @const
+ * @suppress {duplicate}
  */
 var Q = require('q');
 
 /**
+ * Read a property of this package's package.json file.
+ *
  * @private
  *
- * @returns {Promise}
- * @param {string} propertyName
+ * @returns {Promise} A promise that holds the read value.
+ * @param {string} propertyName The property name that is read in package.json.
  */
 function getPropertyValueFromPackageJson (propertyName) {
     var deferred = Q.defer();

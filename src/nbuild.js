@@ -3,21 +3,24 @@
 /**
  * @private
  *
- * @const
+ * @suppress {duplicate}
+ */
+var path = require('path');
+
+/**
+ * @private
  */
 var CC = require('google-closure-compiler');
 
 /**
  * @private
  *
- * @const
+ * @suppress {duplicate}
  */
 var Q = require('q');
 
 /**
  * @private
- *
- * @const
  */
 var utils = require('./utils');
 
@@ -29,12 +32,12 @@ var utils = require('./utils');
  * @returns {Promise} A promise that holds the usage text as a string value.
  */
 function getUsage () {
-    var deferred =  Q.defer();
+    var deferred = Q.defer();
     utils.getSelfName().then(function (selfName) {
         deferred.resolve(
-            'Usage: ' + selfName + ' [-h|--help] [-v|--version] [--closure-help]\n'+
+            'Usage: ' + selfName + ' [-h|--help] [-v|--version] [--closure-help]\n' +
                 '           [--closure-version] [--compiler-path] [--contrib-path]\n' +
-                '           [-c|--config PATH] [--config-help]\n\n' +
+                '           [-c|--config PATH]... [--config-help]\n\n' +
                 'Checks and compiles JavaScript files via the Closure Compiler.\n\n' +
                 '  -h|--help           Display this message and exit.\n' +
                 '  -v|--version        Display version information and exit.\n' +
@@ -62,7 +65,7 @@ function getUsage () {
  * @returns {Promise} A promise that holds the help text for the config file format as a string value.
  */
 function getConfigFileHelp () {
-    var deferred =  Q.defer();
+    var deferred = Q.defer();
     utils.getSelfName().then(function (selfName) {
         deferred.resolve(
             'The configuration files for ' + selfName + ' use the JSON format and are of the\n' +
@@ -113,7 +116,7 @@ function getConfigFileHelp () {
  */
 function parseCliArgs (args) {
     var deferred = Q.defer();
-    
+
     var result = {};
     for (var i = 2; i < args.length; ++i) {
         switch (args[i]) {
@@ -165,7 +168,6 @@ function parseCliArgs (args) {
             break;
         }
     }
-    
     return deferred.promise;
 }
 
@@ -174,13 +176,23 @@ function parseCliArgs (args) {
  *
  * @private
  */
-function main() {
+function main () {
     parseCliArgs(process.argv).then(function (cliArgs) {
         console.dir(cliArgs);
+        // TODO: if configs is undefined or empty check all config files in .
     }).catch(function (err) {
-        console.error(err);
-        process.exit(2);
+        utils.getSelfName().then(function (selfName) {
+            console.error(err + '\n');
+            console.error('For more information call ' + selfName + ' --help');
+            process.exit(2);
+        }).catch(function (err) {
+            console.error(err);
+            process.exit(2);
+        });
     });
 }
 
 main();
+
+// TODO: add externs for Q
+// TODO: fix @template when running with generate_doc
