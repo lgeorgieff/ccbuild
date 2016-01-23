@@ -129,8 +129,6 @@
     "self"
   ],
   "requireDotNotation": true,
-  "requireSpread": true,
-  "requireTemplateStrings": true,
   "jsDoc": {
     "checkAnnotations": {
       "preset": "jsdoc3",
@@ -149,7 +147,6 @@
     "requireNewlineAfterDescription": true,
     "checkRedundantAccess": true,
     "leadingUnderscoreAccess": "protected",
-    "requireDescriptionCompleteSentence": true,
     "requireParamDescription": true,
     "requireReturnDescription": true
   }
