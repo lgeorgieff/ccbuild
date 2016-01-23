@@ -42,4 +42,14 @@ function getSelfVersion () {
     return getPropertyValueFromPackageJson ('version');
 }
 
+/**
+ * Get the name defined in package.json.
+ *
+ * @returns {Promise} A promise holding the version of this app's package.json file.
+ */
+function getSelfName () {
+    return getPropertyValueFromPackageJson ('name');
+}
+
 module.exports.getSelfVersion = getSelfVersion;
+module.exports.getSelfName = getSelfName;
