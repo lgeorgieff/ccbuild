@@ -42,5 +42,10 @@
     "precompile": "npm run compile_closure_compiler",
     "compile": "if [ $(find src/ -name '*.js' | wc -l) -gt 0 ]; then java -jar tools/closure_compiler/target/closure-compiler-1.0-SNAPSHOT.jar --flagfile src/.closure_compiler.flagfile --js src/ > /dev/null; fi",
     "validate": "npm run lint && npm run compile && npm run test"
+  },
+  "dependencies": {
+    "google-closure-compiler": "^20151216.2.0",
+    "q": "^1.4.1",
+    "read-package-json": "^2.0.3"
   }
 }
