@@ -154,6 +154,8 @@ function parseCliArgs (args) {
         case '--closure-version':
             break;
         case '--compiler-path':
+            console.log(CC.compiler.COMPILER_PATH);
+            process.exit(0);
             break;
         case '--contrib-path':
             break;
