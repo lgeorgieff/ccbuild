@@ -133,7 +133,8 @@
     "checkAnnotations": {
       "preset": "jsdoc3",
       "extra": {
-        "suppress": true
+        "suppress": true,
+        "template": true
       }
     },
     "checkParamExistence": true,
