@@ -23,15 +23,22 @@ var Q = require('q');
 
 /**
  * @private
+ *
+ * @suppress {duplicate}
  */
 var utils = require('./utils');
+
+/**
+ * @private
+ */
+var configReader = require('./config_reader');
 
 /**
  * Get the usage text.
  *
  * @private
  *
- * @returns {Promise} A promise that holds the usage text as a string value.
+ * @returns {Promise<string>} A promise that holds the usage text as a string value.
  */
 function getUsage () {
     var deferred = Q.defer();
@@ -64,7 +71,7 @@ function getUsage () {
  *
  * @private
  *
- * @returns {Promise} A promise that holds the help text for the config file format as a string value.
+ * @returns {Promise<string>} A promise that holds the help text for the config file format as a string value.
  */
 function getConfigFileHelp () {
     var deferred = Q.defer();
@@ -113,7 +120,7 @@ function getConfigFileHelp () {
  *
  * @private
  *
- * @returns {Promise} A promise containing an object with all parsed properties.
+ * @returns {Promise<Object>} A promise containing an object with all parsed properties.
  * @param {Array<string>} args An array with all CLI arguments.
  */
 function parseCliArgs (args) {
@@ -184,8 +191,14 @@ function parseCliArgs (args) {
  */
 function main () {
     parseCliArgs(process.argv).then(function (cliArgs) {
-        console.dir(cliArgs);
-        // TODO: if configs is undefined or empty check all config files in .
+        if (cliArgs.configs) {
+            console.dir(cliArgs);
+        } else {
+            configReader.getLocalConfigFiles().then(function (configFiles) {
+                cliArgs.configs = configFiles;
+                console.dir(cliArgs);
+            });
+        }
     }).catch(function (err) {
         utils.getSelfName().then(function (selfName) {
             console.error(err + '\n');

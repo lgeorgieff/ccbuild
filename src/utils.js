@@ -27,7 +27,7 @@ var CC = require('google-closure-compiler');
  *
  * @private
  *
- * @returns {Promise} A promise that holds the read value.
+ * @returns {Promise<*>} A promise that holds the read value.
  * @param {string} propertyName The property name that is read in package.json.
  */
 function getPropertyValueFromPackageJson (propertyName) {
@@ -42,7 +42,7 @@ function getPropertyValueFromPackageJson (propertyName) {
 /**
  * Get the version defined in package.json.
  *
- * @returns {Promise} A promise holding the version of this app's package.json file.
+ * @returns {Promise<string>} A promise holding the version of this app's package.json file.
  */
 function getSelfVersion () {
     return getPropertyValueFromPackageJson ('version');
@@ -51,7 +51,7 @@ function getSelfVersion () {
 /**
  * Get the name defined in package.json.
  *
- * @returns {Promise} A promise holding the version of this app's package.json file.
+ * @returns {Promise<string>} A promise holding the version of this app's package.json file.
  */
 function getSelfName () {
     return getPropertyValueFromPackageJson ('name');
@@ -60,7 +60,7 @@ function getSelfName () {
 /**
  * Get the version of the closure compiler.
  *
- * @returns {Promise} A promise holding the version of the used Closure Compiler.
+ * @returns {Promise<string>} A promise holding the version of the used Closure Compiler.
  */
 function getCCVersion () {
     var deferred = Q.defer();
@@ -79,7 +79,7 @@ function getCCVersion () {
 /**
  * Get the help for the closure compiler.
  *
- * @returns {Promise} A promise holding the help message for the Closure Compiler.
+ * @returns {Promise<string>} A promise holding the help message for the Closure Compiler.
  */
 function getCCHelp () {
     var deferred = Q.defer();
