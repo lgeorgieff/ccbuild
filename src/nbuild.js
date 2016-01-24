@@ -163,6 +163,13 @@ function parseCliArgs (args) {
         case '--closure-help':
             break;
         case '--closure-version':
+            utils.getCCVersion().then(function (version) {
+                console.log(version);
+                process.exit(0);
+            }).catch(function (err) {
+                deferred.reject(err);
+            });
+            i = args.length;
             break;
         case '--compiler-path':
             console.log(CC.compiler.COMPILER_PATH);

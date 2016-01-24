@@ -16,6 +16,13 @@ var rpj = /** @type {function(...*): Promise} */ (require('read-package-json'));
 var Q = require('q');
 
 /**
+ * @private
+ *
+ * @suppress {duplicate}
+ */
+var CC = require('google-closure-compiler');
+
+/**
  * Read a property of this package's package.json file.
  *
  * @private
@@ -51,6 +58,25 @@ function getSelfName () {
 }
 
 /**
+ * Get the version of the closure compiler.
+ *
+ * @returns {Promise} A promise holding the version of the used Closure Compiler.
+ */
+function getCCVersion () {
+    var deferred = Q.defer();
+    var compiler = new CC.compiler(['--version']);
+    compiler.run(function (code, stdout, stderr) {
+        if (code !== 0 || stderr) {
+            var err = new Error(code + (stderr ? ': ' + stderr : ''));
+            deferred.reject(err);
+        }
+        deferred.resolve(stdout);
+    });
+
+    return deferred.promise;
+}
+
+/**
  * Removes an array representing a set without duplicates.
  *
  * @template T
@@ -77,3 +103,4 @@ function arrayToSet (arr, comp) {
 module.exports.getSelfVersion = getSelfVersion;
 module.exports.getSelfName = getSelfName;
 module.exports.arrayToSet = arrayToSet;
+module.exports.getCCVersion = getCCVersion;
