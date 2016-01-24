@@ -161,6 +161,13 @@ function parseCliArgs (args) {
             i = args.length;
             break;
         case '--closure-help':
+            utils.getCCHelp().then(function (help) {
+                console.log(help);
+                process.exit(0);
+            }).catch(function (err) {
+                deferred.reject(err);
+            });
+            i = args.length;
             break;
         case '--closure-version':
             utils.getCCVersion().then(function (version) {

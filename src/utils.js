@@ -77,6 +77,25 @@ function getCCVersion () {
 }
 
 /**
+ * Get the help for the closure compiler.
+ *
+ * @returns {Promise} A promise holding the help message for the Closure Compiler.
+ */
+function getCCHelp () {
+    var deferred = Q.defer();
+    var compiler = new CC.compiler(['--help']);
+    compiler.run(function (code, stdout, stderr) {
+        if (code !== 0 || stderr) {
+            var err = new Error(code + (stderr ? ': ' + stderr : ''));
+            deferred.reject(err);
+        }
+        deferred.resolve(stdout);
+    });
+
+    return deferred.promise;
+}
+
+/**
  * Removes an array representing a set without duplicates.
  *
  * @template T
@@ -104,3 +123,4 @@ module.exports.getSelfVersion = getSelfVersion;
 module.exports.getSelfName = getSelfName;
 module.exports.arrayToSet = arrayToSet;
 module.exports.getCCVersion = getCCVersion;
+module.exports.getCCHelp = getCCHelp;
