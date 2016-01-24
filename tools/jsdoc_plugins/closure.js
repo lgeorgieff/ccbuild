@@ -5,7 +5,7 @@
  */
 
 /**
- * The logger module for jsdoc that is used by this plugin to signal warnings and errors.
+ * The logger module for JSDoc that is used by this plugin to signal warnings and errors.
  *
  * @private
  */
@@ -107,7 +107,7 @@ const SUPPRESSIONS_URL = 'https://github.com/google/closure-compiler/blob/master
  */
 let currentFileName = '';
 /**
- * Stores the line number of the currently parsed jsdoc comment. This line number can be used for giving better
+ * Stores the line number of the currently parsed JSDoc comment. This line number can be used for giving better
  * error/warning messages. This varaible is set in the <tt>jsdocCommentFound</tt> handler.
  *
  * @type {number}
@@ -162,7 +162,7 @@ function getSuppressions (suppressValue, separators) {
 }
 
 /**
- * A helper function to log warnings. Internally the jsdoc logger is used to generate the actual warning.
+ * A helper function to log warnings. Internally the JSDoc logger is used to generate the actual warning.
  *
  * @param {string} message The warning message.
  *
@@ -176,7 +176,7 @@ function logWarning (message) {
  * Validate the <tt>@suppress</tt> tag for correct syntax and all suppressions.
  * In error case a warning is printed - but the parsing process will continue.
  *
- * @param {Object} suppressTag The <tt>@suppress</tt> tag which was parsed by jsdoc and is passed in the
+ * @param {Object} suppressTag The <tt>@suppress</tt> tag which was parsed by JSDoc and is passed in the
  *        <tt>onTagged</tt> event.
  *
  * @private
@@ -195,9 +195,9 @@ function validateSuppressTag (suppressTag) {
 }
 
 /**
- * Define an additional jsdoc tag called <tt>@suppress</tt>.
+ * Define two additional JSDoc tags called <tt>@suppress</tt> and <tt>template</tt>.
  *
- * @param {{defineTag: function(string, Object)}} dictionary The dictionary used by jsdoc. It includes all supported tags.
+ * @param {{defineTag: function(string, Object)}} dictionary The dictionary used by JSDoc. It includes all supported tags.
  */
 module.exports.defineTags = (dictionary) => {
     dictionary.defineTag('suppress', {
@@ -207,6 +207,12 @@ module.exports.defineTags = (dictionary) => {
             if (!handledSuppressTags.has(currentCommentId)) validateSuppressTag(suppressTag);
             handledSuppressTags.add(currentCommentId);
         }
+    });
+    // The @template tag is not checked further, since the Closure Compiler will check the corresponding template type
+    // anyway.
+    dictionary.defineTag('template', {
+        mustHaveValue: true,
+        mustNotHaveDescription: true
     });
 };
 
@@ -220,7 +226,7 @@ module.exports.handlers = {
     /**
      *  This handler is invoked every time before a tag is parsed, i.e before <tt>onTagged</tt> is invoked.
      *
-     * @param {{filename: string, lineno: number}} comment The currently found jsdoc comment.
+     * @param {{filename: string, lineno: number}} comment The currently found JSDoc comment.
      */
     jsdocCommentFound: (comment) => {
         currentFileName = comment.filename;
