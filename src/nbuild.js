@@ -9,6 +9,8 @@ var path = require('path');
 
 /**
  * @private
+ *
+ * @suppress {duplicate}
  */
 var CC = require('google-closure-compiler');
 
@@ -201,6 +203,3 @@ function main () {
 }
 
 main();
-
-// TODO: add externs for Q
-// TODO: fix @template when running with generate_doc

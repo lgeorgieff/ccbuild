@@ -7,7 +7,7 @@
 /**
  * @private
  */
-var rpj = require('read-package-json');
+var rpj = /** @type {function(...*): Promise} */ (require('read-package-json'));
 
 /**
  * @private
