@@ -89,7 +89,7 @@ function getCCHelp () {
             var err = new Error(code + (stderr ? ': ' + stderr : ''));
             deferred.reject(err);
         }
-        deferred.resolve(stdout);
+        deferred.resolve(stdout + '\n');
     });
 
     return deferred.promise;
