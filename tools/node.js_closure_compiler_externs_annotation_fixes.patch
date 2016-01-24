@@ -1,3 +1,31 @@
+diff --git a/buffer.js b/buffer.js
+index f14fd15..179ceb7 100644
+--- a/buffer.js
++++ b/buffer.js
+@@ -28,9 +28,6 @@
+  END_NODE_INCLUDE
+  */
+ 
+-/**
+- * @type {Object.<string,*>}
+- */
+ var buffer = {};
+ 
+ /**
+diff --git a/child_process.js b/child_process.js
+index d881932..404e80a 100644
+--- a/child_process.js
++++ b/child_process.js
+@@ -28,9 +28,6 @@
+  END_NODE_INCLUDE
+  */
+ 
+-/**
+- * @type {Object.<string,*>}
+- */
+ var child_process = {};
+ 
+ /**
 diff --git a/contrib/Express.js b/contrib/Express.js
 index 3351247..acb4c4e 100644
 --- a/contrib/Express.js
@@ -47,6 +75,20 @@ index 3351247..acb4c4e 100644
   */
  express.errorHandler = function() {};
  
+diff --git a/contrib/ProtoBuf.js b/contrib/ProtoBuf.js
+index b218f74..2434dcc 100644
+--- a/contrib/ProtoBuf.js
++++ b/contrib/ProtoBuf.js
+@@ -26,9 +26,6 @@
+  END_NODE_INCLUDE
+  */
+ 
+-/**
+- * {@type Object.<string.*>}
+- */
+ var ProtoBuf = {};
+ 
+ /**
 diff --git a/contrib/Ws.js b/contrib/Ws.js
 index c7f1f6a..41d3bc5 100644
 --- a/contrib/Ws.js
@@ -60,11 +102,63 @@ index c7f1f6a..41d3bc5 100644
   */
  ws.WebSocket.prototype.send = function(data, options, callback) {};
  
+diff --git a/crypto.js b/crypto.js
+index 28e9a8f..75a254b 100644
+--- a/crypto.js
++++ b/crypto.js
+@@ -28,9 +28,6 @@
+  END_NODE_INCLUDE
+  */
+ 
+-/**
+- * @type {Object.<string,*>}
+- */
+ var crypto = {};
+ 
+ /**
+diff --git a/dgram.js b/dgram.js
+index 45e3322..cb72c26 100644
+--- a/dgram.js
++++ b/dgram.js
+@@ -28,9 +28,6 @@
+  END_NODE_INCLUDE
+  */
+ 
+-/**
+- * @type {Object.<string,*>}
+- */
+ var dgram = {};
+ 
+ /**
+diff --git a/dns.js b/dns.js
+index 516e03d..c2c4393 100644
+--- a/dns.js
++++ b/dns.js
+@@ -28,9 +28,6 @@
+  END_NODE_INCLUDE
+  */
+ 
+-/**
+- * @type {Object.<string,*>}
+- */
+ var dns = {};
+ 
+ /**
 diff --git a/domain.js b/domain.js
-index 3349561..6136f91 100644
+index 3349561..b3badb1 100644
 --- a/domain.js
 +++ b/domain.js
-@@ -64,14 +64,14 @@ domain.Domain.prototype.add = function(emitter) {};
+@@ -22,9 +22,6 @@
+  * @author Daniel Wirtz <dcode@dcode.io>
+  */
+ 
+-/**
+- * @type {Object.<string,*>}
+- */
+ var domain = {};
+ 
+ /**
+@@ -64,14 +61,14 @@ domain.Domain.prototype.add = function(emitter) {};
  domain.Domain.prototype.remove = function(emitter) {};
  
  /**
@@ -83,6 +177,90 @@ index 3349561..6136f91 100644
   */
  domain.Domain.prototype.intercept = function(callback) {};
  
+diff --git a/events.js b/events.js
+index bdd012a..64619a1 100644
+--- a/events.js
++++ b/events.js
+@@ -28,9 +28,6 @@ var events = require('events');
+ END_NODE_INCLUDE
+  */
+ 
+-/**
+- * @type {Object.<string,*>}
+- */
+ var events = {};
+ 
+ /**
+diff --git a/net.js b/net.js
+index 57bf9d0..5a2f68e 100644
+--- a/net.js
++++ b/net.js
+@@ -28,9 +28,6 @@
+  END_NODE_INCLUDE
+  */
+ 
+-/**
+- * @type {Object.<string,*>}
+- */
+ var net = {};
+ 
+ /**
+diff --git a/path.js b/path.js
+index 596f66b..fc3f3ac 100644
+--- a/path.js
++++ b/path.js
+@@ -27,9 +27,6 @@
+  END_NODE_INCLUDE
+  */
+ 
+-/**
+- * @type {Object.<string,*>}
+- */
+ var path = {};
+ 
+ /**
+diff --git a/punycode.js b/punycode.js
+index cf96ea1..5dc797c 100644
+--- a/punycode.js
++++ b/punycode.js
+@@ -28,9 +28,6 @@
+  END_NODE_INCLUDE
+  */
+ 
+-/**
+- * @type {Object.<string,*>}
+- */
+ var punycode = {};
+ 
+ /**
+diff --git a/querystring.js b/querystring.js
+index 7c0c17a..fc2b7e0 100644
+--- a/querystring.js
++++ b/querystring.js
+@@ -28,9 +28,6 @@
+  END_NODE_INCLUDE
+  */
+ 
+-/**
+- * @type {Object.<string,*>}
+- */
+ var querystring = {};
+ 
+ /**
+diff --git a/readline.js b/readline.js
+index 0c2b009..280cbc3 100644
+--- a/readline.js
++++ b/readline.js
+@@ -27,9 +27,6 @@
+  END_NODE_INCLUDE
+  */
+ 
+-/**
+- * @type {Object.<string,*>}
+- */
+ var readline = {};
+ 
+ /**
 diff --git a/redundant/stdio.js b/redundant/stdio.js
 index 00888ec..73f2df0 100644
 --- a/redundant/stdio.js
@@ -118,3 +296,101 @@ index 576ccb5..197c2c3 100644
   * @param {number} delay
   * @param {...*} var_args
   * @return {*}
+diff --git a/repl.js b/repl.js
+index 02f0bc6..2466826 100644
+--- a/repl.js
++++ b/repl.js
+@@ -28,9 +28,6 @@
+  END_NODE_INCLUDE
+  */
+ 
+-/**
+- * @type {Object.<string,*>}
+- */
+ var repl = {};
+ 
+ /**
+diff --git a/tls.js b/tls.js
+index 0d3980f..10520c2 100644
+--- a/tls.js
++++ b/tls.js
+@@ -28,9 +28,6 @@
+  END_NODE_INCLUDE
+  */
+ 
+-/**
+- * @type {Object.<string,*>}
+- */
+ var tls = {};
+ 
+ /**
+diff --git a/tty.js b/tty.js
+index 9e20b0b..f128e4a 100644
+--- a/tty.js
++++ b/tty.js
+@@ -28,9 +28,6 @@
+  END_NODE_INCLUDE
+  */
+ 
+-/**
+- * @type {Object.<string,*>}
+- */
+ var tty = {};
+ 
+ /**
+diff --git a/url.js b/url.js
+index d3f2878..b9d1761 100644
+--- a/url.js
++++ b/url.js
+@@ -28,9 +28,6 @@
+  END_NODE_INCLUDE
+  */
+ 
+-/**
+- * @type {Object.<string,*>}
+- */
+ var url = {};
+ 
+ /**
+diff --git a/util.js b/util.js
+index ab1288b..9ebfd1c 100644
+--- a/util.js
++++ b/util.js
+@@ -28,9 +28,6 @@
+  END_NODE_INCLUDE
+  */
+ 
+-/**
+- * @type {Object.<string,*>}
+- */
+ var util = {};
+ 
+ /**
+diff --git a/vm.js b/vm.js
+index 8abe142..3e8289a 100644
+--- a/vm.js
++++ b/vm.js
+@@ -28,9 +28,6 @@
+  END_NODE_INCLUDE
+  */
+ 
+-/**
+- * @type {Object.<string,*>}
+- */
+ var vm = {};
+ 
+ /**
+diff --git a/zlib.js b/zlib.js
+index 30b95b7..72e2f95 100644
+--- a/zlib.js
++++ b/zlib.js
+@@ -28,9 +28,6 @@
+  END_NODE_INCLUDE
+  */
+ 
+-/**
+- * @type {Object.<string,*>}
+- */
+ var zlib = {};
+ 
+ /**
