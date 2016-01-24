@@ -120,27 +120,25 @@ function parseCliArgs (args) {
     var deferred = Q.defer();
 
     var result = {};
-    for (var i = 2; i < args.length; ++i) {
+    var i = 2;
+    var printFromPromiseAndExit = function (promise) {
+        promise().then(function (toBePrinted) {
+            console.log(toBePrinted);
+            process.exit(0);
+        }).catch(function (err) {
+            deferred.reject(err);
+        });
+        i = args.length;
+    };
+    for (; i < args.length; ++i) {
         switch (args[i]) {
         case '--help':
         case '-h':
-            getUsage().then(function (usage) {
-                console.log(usage);
-                process.exit(0);
-            }).catch(function (err) {
-                deferred.reject(err);
-            });
-            i = args.length;
+            printFromPromiseAndExit(getUsage);
             break;
         case '--version':
         case '-v':
-            utils.getSelfVersion().then(function (version) {
-                console.log(version);
-                process.exit(0);
-            }).catch(function (err) {
-                deferred.reject(err);
-            });
-            i = args.length;
+            printFromPromiseAndExit(utils.getSelfVersion);
             break;
         case '--config':
         case '-c':
@@ -152,31 +150,13 @@ function parseCliArgs (args) {
             }
             break;
         case '--config-help':
-            getConfigFileHelp().then(function (configHelp) {
-                console.log(configHelp);
-                process.exit(0);
-            }).catch(function (err) {
-                deferred.reject(err);
-            });
-            i = args.length;
+            printFromPromiseAndExit(getConfigFileHelp);
             break;
         case '--closure-help':
-            utils.getCCHelp().then(function (help) {
-                console.log(help);
-                process.exit(0);
-            }).catch(function (err) {
-                deferred.reject(err);
-            });
-            i = args.length;
+            printFromPromiseAndExit(utils.getCCHelp);
             break;
         case '--closure-version':
-            utils.getCCVersion().then(function (version) {
-                console.log(version);
-                process.exit(0);
-            }).catch(function (err) {
-                deferred.reject(err);
-            });
-            i = args.length;
+            printFromPromiseAndExit(utils.getCCVersion);
             break;
         case '--compiler-path':
             console.log(CC.compiler.COMPILER_PATH);
@@ -187,6 +167,8 @@ function parseCliArgs (args) {
             process.exit(0);
             break;
         default:
+            deferred.reject('The option "' + args[i] + '" is not supported');
+            i = args.length;
             break;
         }
     }
