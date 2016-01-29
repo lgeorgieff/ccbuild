@@ -5,25 +5,25 @@
  */
 
 /**
- * @private
+ * @ignore
  * @suppress {duplicate}
  */
 var util = require('util');
 
 /**
- * @private
+ * @ignore
+ * @suppress {duplicate}
  */
 var rpj = /** @type {function(...*): Promise} */ (require('read-package-json'));
 
 /**
- * @private
+ * @ignore
  * @suppress {duplicate}
  */
 var Q = require('q');
 
 /**
- * @private
- *
+ * @ignore
  * @suppress {duplicate}
  */
 var CC = require('google-closure-compiler');
@@ -35,8 +35,6 @@ var CC = require('google-closure-compiler');
  *
  * @returns {Promise<*>} A promise that holds the read value.
  * @param {string} propertyName The property name that is read in package.json.
- *
- * @suppress {visibility}
  */
 function getPropertyValueFromPackageJson (propertyName) {
     var deferred = Q.defer();
@@ -69,8 +67,6 @@ function getSelfName () {
  * Get the version of the closure compiler.
  *
  * @returns {Promise<string>} A promise holding the version of the used Closure Compiler.
- *
- * @suppress {visibility}
  */
 function getCCVersion () {
     var deferred = Q.defer();
@@ -90,8 +86,6 @@ function getCCVersion () {
  * Get the help for the closure compiler.
  *
  * @returns {Promise<string>} A promise holding the help message for the Closure Compiler.
- *
- * @suppress {visibility}
  */
 function getCCHelp () {
     var deferred = Q.defer();
@@ -136,8 +130,6 @@ function arrayToSet (arr, comp) {
  *
  * @returns {boolean} `true` if the `arg` is an array which only contains string values. `false` otherwise.
  * @param {*} arr The potential string array.
- *
- * @suppress {visibility}
  */
 function isStringArray (arr) {
     if (util.isArray(arr)) {

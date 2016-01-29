@@ -7,36 +7,31 @@
  */
 
 /**
- * @private
- *
+ * @ignore
  * @suppress {duplicate}
  */
 var fs = require('fs');
 
 /**
- * @private
- *
+ * @ignore
  * @suppress {duplicate}
  */
 var path = require('path');
 
 /**
- * @private
- *
+ * @ignore
  * @suppress {duplicate}
  */
 var util = require('util');
 
 /**
- * @private
- *
+ * @ignore
  * @suppress {duplicate}
  */
 var Q = require('q');
 
 /**
- * @private
- *
+ * @ignore
  * @suppress {duplicate}
  */
 var utils = require('./utils');
@@ -51,8 +46,6 @@ var DEFAULT_CONFIG_EXTENSION = '.nbuild';
  * Get the paths for all local config files.
  *
  * @return {Promise<Array<string>>} A promise that holds an array of strings.
- *
- * @suppress {visibility}
  */
 function getLocalConfigFiles () {
     var deferred = Q.defer();
@@ -122,8 +115,6 @@ function ConfigurationNormalizer (config, basePath) {
  * @param {*} stringArray The potential string array.
  * @param {string} propertyName The property name of the owner object of the passed string array.
  * @throws {Error} Thrown if `sringArray` is not a string array.
- *
- * @suppress {visibility}
  */
 ConfigurationNormalizer._mapStringArray = function (stringArray, propertyName) {
     if (utils.isStringArray(stringArray)) {
@@ -164,8 +155,6 @@ ConfigurationNormalizer._mapBooleanProperty = function (booleanValue, nextPath, 
  *
  * @returns {Array<string>} the array with all the resolved paths.
  * @param {Array<string>} paths An array of paths.
- *
- * @suppress {visibility}
  */
 ConfigurationNormalizer.prototype._resolvePaths = function (paths) {
     var self = this;
@@ -185,8 +174,6 @@ ConfigurationNormalizer.prototype._resolvePaths = function (paths) {
  * @param {string=} compilationUnit The compilation unit this build options belong to. If no value is passed, the passed
  *        buildOptions are treated as global buildOptions of a configuration file.
  * @throws {Error} Thrown if the passed buildOptions argument is invalid.
- *
- * @suppress {visibility}
  */
 ConfigurationNormalizer._normalizeBuildOptions = function (buildOptions, compilationUnit) {
     if (buildOptions === undefined || buildOptions === null) return [];
@@ -246,8 +233,6 @@ ConfigurationNormalizer._normalizeBuildOptions = function (buildOptions, compila
  *
  * @returns {Object} An array representing the normalized buildOptions.
  * @throws {Error} Thrown if the passed buildOptions argument is invalid.
- *
- * @suppress {visibility}
  */
 ConfigurationNormalizer.prototype.normalize = function () {
     var self = this;

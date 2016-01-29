@@ -1,35 +1,32 @@
 #!/usr/bin/env node
 
 /**
- * @private
- *
+ * @ignore
  * @suppress {duplicate}
  */
 var path = require('path');
 
 /**
- * @private
- *
+ * @ignore
  * @suppress {duplicate}
  */
 var CC = require('google-closure-compiler');
 
 /**
- * @private
- *
+ * @ignore
  * @suppress {duplicate}
  */
 var Q = require('q');
 
 /**
- * @private
- *
+ * @ignore
  * @suppress {duplicate}
  */
 var utils = require('./utils');
 
 /**
- * @private
+ * @ignore
+ * @suppress {duplicate}
  */
 var configReader = require('./config_reader');
 
