@@ -3,14 +3,24 @@ var Q = {};
 /**
  * @constructor
  */
-function Deferred () {};
+function QDeferred () {};
 
-Deferred.prototype.reject = function (args) {};
+QDeferred.prototype.reject = function (args) {};
 
-Deferred.prototype.resolve = function (args) {};
+QDeferred.prototype.resolve = function (args) {};
 
 /**
- * @returns {Deferred}
+ * @type {string}
+ */
+QDeferred.prototype.state;
+
+/**
+ * @type {string}
+ */
+QDeferred.prototype.reason;
+
+/**
+ * @returns {QDeferred}
  */
 Q.defer = function () {};
 
@@ -27,3 +37,9 @@ QPromise.prototype.catch = function (args) {};
  * @returns {QPromise}
  */
 Q.promise = function() {};
+
+/**
+ * @returns {*}
+ * @param {Array<QDeferred>} promises
+ */
+Q.allSettled = function(promises) {};
