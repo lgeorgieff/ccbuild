@@ -353,7 +353,7 @@ index d3f2878..b9d1761 100644
  
  /**
 diff --git a/util.js b/util.js
-index ab1288b..9ebfd1c 100644
+index ab1288b..1d72c3a 100644
 --- a/util.js
 +++ b/util.js
 @@ -28,9 +28,6 @@
@@ -366,6 +366,28 @@ index ab1288b..9ebfd1c 100644
  var util = {};
  
  /**
+@@ -118,3 +115,21 @@ util.pump = function(readableStream, writableStream, callback) {};
+  * @param {Function} superConstructor
+  */
+ util.inherits = function(constructor, superConstructor) {};
++
++/**
++ * @returns {boolean}
++ * @param {*} arg
++ */
++util.isString = function (arg) {};
++
++/**
++ * @returns {boolean}
++ * @param {*} arg
++ */
++util.isObject = function (arg) {};
++
++/**
++ * @returns {boolean}
++ * @param {*} arg
++ */
++util.isBoolean = function (arg) {};
 diff --git a/vm.js b/vm.js
 index 8abe142..3e8289a 100644
 --- a/vm.js
