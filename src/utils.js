@@ -6,6 +6,12 @@
 
 /**
  * @private
+ * @suppress {duplicate}
+ */
+var util = require('util');
+
+/**
+ * @private
  */
 var rpj = /** @type {function(...*): Promise} */ (require('read-package-json'));
 
@@ -29,6 +35,8 @@ var CC = require('google-closure-compiler');
  *
  * @returns {Promise<*>} A promise that holds the read value.
  * @param {string} propertyName The property name that is read in package.json.
+ *
+ * @suppress {visibility}
  */
 function getPropertyValueFromPackageJson (propertyName) {
     var deferred = Q.defer();
@@ -45,7 +53,7 @@ function getPropertyValueFromPackageJson (propertyName) {
  * @returns {Promise<string>} A promise holding the version of this app's package.json file.
  */
 function getSelfVersion () {
-    return getPropertyValueFromPackageJson ('version');
+    return /** @type {Promise<string>} */ (getPropertyValueFromPackageJson ('version'));
 }
 
 /**
@@ -54,13 +62,15 @@ function getSelfVersion () {
  * @returns {Promise<string>} A promise holding the version of this app's package.json file.
  */
 function getSelfName () {
-    return getPropertyValueFromPackageJson ('name');
+    return /** @type {Promise<string>} */ (getPropertyValueFromPackageJson ('name'));
 }
 
 /**
  * Get the version of the closure compiler.
  *
  * @returns {Promise<string>} A promise holding the version of the used Closure Compiler.
+ *
+ * @suppress {visibility}
  */
 function getCCVersion () {
     var deferred = Q.defer();
@@ -80,6 +90,8 @@ function getCCVersion () {
  * Get the help for the closure compiler.
  *
  * @returns {Promise<string>} A promise holding the help message for the Closure Compiler.
+ *
+ * @suppress {visibility}
  */
 function getCCHelp () {
     var deferred = Q.defer();
@@ -119,8 +131,24 @@ function arrayToSet (arr, comp) {
     });
 }
 
+/**
+ * Check whether the passed argument is an array that only contains string values.
+ *
+ * @returns {boolean} `true` if the `arg` is an array which only contains string values. `false` otherwise.
+ * @param {*} arr The potential string array.
+ *
+ * @suppress {visibility}
+ */
+function isStringArray (arr) {
+    if (util.isArray(arr)) {
+        return arr.filter(item => !util.isString(item)).length !== arr.length;
+    }
+    return false;
+}
+
 module.exports.getSelfVersion = getSelfVersion;
 module.exports.getSelfName = getSelfName;
 module.exports.arrayToSet = arrayToSet;
 module.exports.getCCVersion = getCCVersion;
 module.exports.getCCHelp = getCCHelp;
+module.exports.isStringArray = isStringArray;

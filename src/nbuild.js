@@ -191,6 +191,8 @@ function parseCliArgs (args) {
  */
 function main () {
     parseCliArgs(process.argv).then(function (cliArgs) {
+        // TODO: when compiling set cwd to __dirname of current config file
+
         if (cliArgs.configs) {
             console.dir(cliArgs);
         } else {
