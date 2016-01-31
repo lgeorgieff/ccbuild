@@ -180,9 +180,15 @@ ConfigurationNormalizer._normalizeBuildOptions = function (buildOptions, compila
 
     if (util.isArray(buildOptions)) {
         if (utils.isStringArray(buildOptions)) {
-            // TODO: normalize --option=value into ['--option', 'value']
-
-            return /** @type {Array<string>} */ (buildOptions);
+            return buildOptions.reduce(function (accumulator, currentOption) {
+                if (currentOption.startsWith('--') && currentOption.indexOf('=') !== -1) {
+                    var parts = currentOption.split('=');
+                    accumulator.push(parts[0], parts.slice(1).join('='));
+                } else {
+                    accumulator.push(currentOption);
+                }
+                return accumulator;
+            }, []);
         } else {
             if (util.isString(compilationUnit)) {
                 throw new Error('"buildOptions" of ' + compilationUnit + '" must be an object or a string array, ' +

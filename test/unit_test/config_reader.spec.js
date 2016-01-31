@@ -225,6 +225,8 @@ describe('ConfigurationNormalizer', function () {
         expect(configNormalizer.normalize.bind(configNormalizer)).toThrow(jasmine.any(Error));
     });
 
+    xit('normalize build options with = characters', function () { });
+
     xit('merge buildOptions', function () {});
 
     xit('load default configuration', function () {});
