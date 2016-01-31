@@ -177,13 +177,16 @@ ConfigurationNormalizer.prototype._resolvePaths = function (paths) {
  */
 ConfigurationNormalizer._normalizeBuildOptions = function (buildOptions, compilationUnit) {
     if (buildOptions === undefined || buildOptions === null) return [];
-
     if (util.isArray(buildOptions)) {
         if (utils.isStringArray(buildOptions)) {
             return buildOptions.reduce(function (accumulator, currentOption) {
                 if (currentOption.startsWith('--') && currentOption.indexOf('=') !== -1) {
                     var parts = currentOption.split('=');
-                    accumulator.push(parts[0], parts.slice(1).join('='));
+                    if (parts.length === 1) {
+                        accumulator.push(currentOption);
+                    } else {
+                        accumulator.push(parts[0], parts.slice(1).join('='));
+                    }
                 } else {
                     accumulator.push(currentOption);
                 }

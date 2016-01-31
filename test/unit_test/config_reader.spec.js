@@ -14,7 +14,11 @@ var fs = require('fs');
 
 var configReader = require('../../src/config_reader');
 
-const EMPTY_CONFIG = {sources: [], externs: [], buildOptions: [], compilationUnits: {}, next: {}};
+/**
+ * @ignore
+ * @const
+ */
+var EMPTY_CONFIG = {sources: [], externs: [], buildOptions: [], compilationUnits: {}, next: {}};
 
 describe('ConfigurationNormalizer', function () {
     it('normalize undefined', function () {
@@ -266,7 +270,7 @@ describe('ConfigurationNormalizer', function () {
             done();
         }).catch(function (err) {
             done.fail(err);
-        }).done(function() {
+        }).done(function () {
             configFilePaths.forEach(function (filePath) {
                 fs.unlinkSync(filePath);
             });
@@ -277,7 +281,77 @@ describe('ConfigurationNormalizer', function () {
         });
     });
 
-    xit('normalize build options with = characters', function () { });
+    it('normalize build options with = characters', function () {
+        var config = Object.assign({}, EMPTY_CONFIG);
+        config.buildOptions = [
+            '--js=file1.js',
+            '--js=file2.js',
+            '--js', 'file3.js'
+        ];
+        var configNormalizer = new configReader.ConfigurationNormalizer(config);
+        var normalizedConfiguration = configNormalizer.normalize();
+        expect(normalizedConfiguration.buildOptions).toBeDefined();
+        expect(normalizedConfiguration.buildOptions).toEqual(jasmine.any(Array));
+        expect(normalizedConfiguration.buildOptions.length).toBe(6);
+        expect(normalizedConfiguration.buildOptions)
+            .toEqual(['--js', 'file1.js', '--js', 'file2.js', '--js', 'file3.js']);
+        
+        config.buildOptions = [
+            '--js=file1.js',
+            '--js=file2.js',
+            '--js', 'file3.js',
+            '--externs=externs1.js',
+            '--externs', 'externs1.js',
+            '--externs=externs2.js'
+        ];
+        configNormalizer = new configReader.ConfigurationNormalizer(config);
+        normalizedConfiguration = configNormalizer.normalize();
+        expect(normalizedConfiguration.buildOptions).toBeDefined();
+        expect(normalizedConfiguration.buildOptions).toEqual(jasmine.any(Array));
+        expect(normalizedConfiguration.buildOptions.length).toBe(12);
+        expect(normalizedConfiguration.buildOptions)
+            .toEqual(['--js', 'file1.js', '--js', 'file2.js', '--js', 'file3.js', '--externs', 'externs1.js',
+                      '--externs', 'externs1.js', '--externs', 'externs2.js']);
+
+        config.buildOptions = [
+            '--js=file1.js',
+            '--js=file2.js',
+            '--js', 'file3.js',
+            '--externs=externs1.js',
+            '--externs', 'externs1.js',
+            '--externs=externs2.js',
+            '--js=fil=e4.js'
+        ];
+        configNormalizer = new configReader.ConfigurationNormalizer(config);
+        normalizedConfiguration = configNormalizer.normalize();
+        expect(normalizedConfiguration.buildOptions).toBeDefined();
+        expect(normalizedConfiguration.buildOptions).toEqual(jasmine.any(Array));
+        expect(normalizedConfiguration.buildOptions.length).toBe(14);
+        expect(normalizedConfiguration.buildOptions)
+            .toEqual(['--js', 'file1.js', '--js', 'file2.js', '--js', 'file3.js', '--externs', 'externs1.js',
+                      '--externs', 'externs1.js', '--externs', 'externs2.js', '--js', 'fil=e4.js']);
+
+        config.buildOptions = [
+            '--js=file1.js',
+            '--js=file2.js',
+            '--js', 'file3.js',
+            '--externs=externs1.js',
+            '--externs', 'externs1.js',
+            '--externs=externs2.js',
+            '--js=fil=e4.js',
+            '--js=fil=e4.js=',
+            '--js='
+        ];
+        configNormalizer = new configReader.ConfigurationNormalizer(config);
+        normalizedConfiguration = configNormalizer.normalize();
+        expect(normalizedConfiguration.buildOptions).toBeDefined();
+        expect(normalizedConfiguration.buildOptions).toEqual(jasmine.any(Array));
+        expect(normalizedConfiguration.buildOptions.length).toBe(18);
+        expect(normalizedConfiguration.buildOptions)
+            .toEqual(['--js', 'file1.js', '--js', 'file2.js', '--js', 'file3.js', '--externs', 'externs1.js',
+                      '--externs', 'externs1.js', '--externs', 'externs2.js', '--js', 'fil=e4.js', '--js', 'fil=e4.js=',
+                      '--js', '']);
+    });
 
     xit('merge buildOptions', function () {});
 
