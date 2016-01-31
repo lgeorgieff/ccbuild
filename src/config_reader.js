@@ -139,7 +139,7 @@ ConfigurationNormalizer._mapStringArray = function (stringArray, propertyName) {
  * @throws {Error} Thrown if `booleanValue` is not a boolean value.
  */
 ConfigurationNormalizer._mapBooleanProperty = function (booleanValue, nextPath, propertyName) {
-    if (booleanValue === undefined || booleanValue === null) {
+    if (booleanValue == null) {
         return false;
     }
     if (!util.isBoolean(booleanValue)) {
@@ -225,7 +225,7 @@ ConfigurationNormalizer._normalizeBuildOptions = function (buildOptions, compila
                                 'object!\nBut found ' + buildOptions[key] + '!');
             }
             return accumulator;
-        }, []);
+        }, []) || [];
     } else {
         var errorMessage;
         if (util.isString(compilationUnit)) {
@@ -261,21 +261,24 @@ ConfigurationNormalizer.prototype.normalize = function () {
                     ConfigurationNormalizer._mapStringArray(self._config.compilationUnits[key].externs, 'externs'));
             self._config.compilationUnits[key].buildOptions =
                 ConfigurationNormalizer._normalizeBuildOptions(self._config.compilationUnits[key].buildOptions, key);
-        }, {});
+        }, {}) || {};
     } else {
         result.compilationUnits = {};
     }
     if (util.isObject(this._config.next)) {
         result.next = Object.keys(this._config.next).reduce(function (accumulator, key) {
             var resolvedPath = path.resolve(self._basePath, key);
+            accumulator[resolvedPath] = {};
             accumulator[resolvedPath].inheritSources =
-                ConfigurationNormalizer._mapBooleanProperty(result[key].inheritSources, key, 'inheritSources');
+                ConfigurationNormalizer._mapBooleanProperty(
+                    self._config.next[key].inheritSources, key, 'inheritSources');
             accumulator[resolvedPath].inheritExterns =
-                ConfigurationNormalizer._mapBooleanProperty(result[key].inheritExterns, key, 'inheritExterns');
+                ConfigurationNormalizer._mapBooleanProperty(
+                    self._config.next[key].inheritExterns, key, 'inheritExterns');
             accumulator[resolvedPath].inheritBuildOptions =
                 ConfigurationNormalizer._mapBooleanProperty(
-                    result[key].inheritBuildOptions, key, 'inheritBuildOptions');
-        }, {});
+                    self._config.next[key].inheritBuildOptions, key, 'inheritBuildOptions');
+        }, {}) || {};
     } else {
         result.next = {};
     }
@@ -331,21 +334,21 @@ function mergeConfigurations (configuration, configurationPath, parentConfigurat
     if (!parentConfiguration && !configuration) return (new ConfigurationNormalizer()).normalize();
     if (!parentConfiguration) return configuration;
     if (!configuration) return parentConfiguration;
-
     var resultSources;
-    if (parentConfiguration.next[configurationPath].inheritSources) {
+    if (parentConfiguration.next[configurationPath] && parentConfiguration.next[configurationPath].inheritSources) {
         resultSources = utils.mergeArrays(parentConfiguration.sources, configuration.sources);
     } else {
         resultSources = configuration.sources;
     }
     var resultExterns;
-    if (parentConfiguration.next[configurationPath].inheritExterns) {
+    if (parentConfiguration.next[configurationPath] && parentConfiguration.next[configurationPath].inheritExterns) {
         resultExterns = utils.mergeArrays(parentConfiguration.externs, configuration.externs);
     } else {
         resultExterns = configuration.externs;
     }
     var resultBuildOptions;
-    if (parentConfiguration.next[configurationPath].inheritBuildOptions) {
+    if (parentConfiguration.next[configurationPath] &&
+        parentConfiguration.next[configurationPath].inheritBuildOptions) {
         resultBuildOptions = utils.mergeArrays(parentConfiguration.buildOptions, configuration.buildOptions);
     } else {
         resultBuildOptions = configuration.buildOptions;
@@ -368,22 +371,24 @@ function mergeConfigurations (configuration, configurationPath, parentConfigurat
  *        current configuration file. This is used for inehritung configuration settings.
  */
 function readAndParseConfiguration (configPath, parentConfig) {
-    return new Promise((resolve, reject) => {
-        fs.readFile(configPath, 'utf8', (err, data) => {
-            if (err) {
-                reject(err);
-            } else {
-                try {
-                    var configObject = /** @type {Object} */ (JSON.parse(/** @type {string} */ (data)));
-                    var configNormalizer = new ConfigurationNormalizer(configObject, configPath);
-                    var normalizedConfig = configNormalizer.normalize();
-                    resolve(mergeConfigurations(normalizedConfig, configPath, parentConfig));
-                } catch (jsonError) {
-                    reject(new Error('Could not read the configuration file "' + configPath + '"!\n' + jsonError));
-                }
+    var deferred = Q.defer();
+
+    fs.readFile(configPath, 'utf8', (err, data) => {
+        if (err) {
+            deferred.reject(err);
+        } else {
+            try {
+                var configObject = /** @type {Object} */ (JSON.parse(/** @type {string} */ (data)));
+                var configNormalizer = new ConfigurationNormalizer(configObject, configPath);
+                var normalizedConfig = configNormalizer.normalize();
+                deferred.resolve(mergeConfigurations(normalizedConfig, configPath, parentConfig));
+            } catch (jsonError) {
+                deferred.reject(new Error('Could not read the configuration file "' + configPath + '"!\n' + jsonError));
             }
-        });
+        }
     });
+
+    return deferred.promise;
 }
 
 module.exports.getLocalConfigFiles = getLocalConfigFiles;
