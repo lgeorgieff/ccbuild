@@ -135,7 +135,7 @@ function arrayToSet (arr, comp) {
  */
 function isStringArray (arr) {
     if (util.isArray(arr)) {
-        return arr.filter(item => !util.isString(item)).length !== arr.length;
+        return arr.filter(item => util.isString(item)).length === arr.length;
     }
     return false;
 }
