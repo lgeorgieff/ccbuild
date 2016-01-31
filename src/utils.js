@@ -134,10 +134,9 @@ function arrayToSet (arr, comp) {
  * @param {*} arr The potential string array.
  */
 function isStringArray (arr) {
-    if (util.isArray(arr)) {
-        return arr.filter(item => util.isString(item)).length === arr.length;
-    }
-    return false;
+    if (!arr || !util.isArray(arr)) return false;
+    for (var i = 0; i !== arr.length; ++i) if (!util.isString(arr[i])) return false;
+    return true;
 }
 
 /**
