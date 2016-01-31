@@ -1,5 +1,9 @@
 'use strict';
 
+/**
+ * @ignore
+ * @suppress {dupicate}
+ */
 var utils = require('../../src/utils');
 
 describe('array functions', function () {

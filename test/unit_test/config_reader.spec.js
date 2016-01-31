@@ -1,9 +1,16 @@
 'use strict';
 
 /**
+ * @ignore
  * @suppress {duplicate}
  */
 var path = require('path');
+
+/**
+ * @ignore
+ * @suppress {duplicate}
+ */
+var fs = require('fs');
 
 var configReader = require('../../src/config_reader');
 
@@ -225,6 +232,51 @@ describe('ConfigurationNormalizer', function () {
         expect(configNormalizer.normalize.bind(configNormalizer)).toThrow(jasmine.any(Error));
     });
 
+    it('getLocalConfigFiles', function (done) {
+        var configFilePaths = ['.nbuild', 'nbuild.nbuild', 'config.nbuild', 'config', 'nbuild', 'conig.nbuildx',
+                               'conig.build'];
+        var loadedConfigFilePaths = ['.nbuild', 'nbuild.nbuild', 'config.nbuild']
+                .map(function (fileName) {
+                    return path.resolve(fileName);
+                });
+        var testDirectory = 'test_data';
+        var createConfigs = function (directoryPath) {
+            var filePaths = configFilePaths;
+            if (directoryPath) {
+                directoryPath.split(path.sep).reduce(function (accumulator, currentDirectory) {
+                    var nextDirectory = path.join(accumulator, currentDirectory);
+                    if (!fs.existsSync(nextDirectory)) fs.mkdirSync(nextDirectory);
+                    return nextDirectory;
+                }, '');
+                filePaths = filePaths.map(function (filePath) {
+                    return path.join(directoryPath, filePath);
+                });
+            }
+            filePaths.forEach(function (filePath) {
+                fs.writeFileSync(filePath, '');
+            });
+        };
+
+        createConfigs(process.cwd());
+        createConfigs(testDirectory);
+
+        configReader.getLocalConfigFiles().then(function (configFilePaths) {
+            expect(configFilePaths.length).toBe(loadedConfigFilePaths.length);
+            expect(configFilePaths).toEqual(jasmine.arrayContaining(loadedConfigFilePaths));
+            done();
+        }).catch(function (err) {
+            done.fail(err);
+        }).done(function() {
+            configFilePaths.forEach(function (filePath) {
+                fs.unlinkSync(filePath);
+            });
+            configFilePaths.forEach(function (filePath) {
+                fs.unlinkSync(path.join(testDirectory, filePath));
+            });
+            fs.rmdirSync(testDirectory);
+        });
+    });
+
     xit('normalize build options with = characters', function () { });
 
     xit('merge buildOptions', function () {});
@@ -236,4 +288,6 @@ describe('ConfigurationNormalizer', function () {
     xit('load multiple configurattions', function () {});
 
     xit('load configuration hierarchy', function () {});
+
+    xit('load circular configuration hierarchy', function () {});
 });

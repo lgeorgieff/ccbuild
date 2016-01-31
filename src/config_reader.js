@@ -77,7 +77,7 @@ function getLocalConfigFiles () {
             }).map(function (configPathPromise) {
                 return configPathPromise.value;
             }));
-            if (errorReason) deferred.reject(configFiles);
+            if (errorReason) deferred.reject(errorReason);
             else deferred.resolve(configFiles);
         });
     });
