@@ -180,6 +180,8 @@ ConfigurationNormalizer._normalizeBuildOptions = function (buildOptions, compila
 
     if (util.isArray(buildOptions)) {
         if (utils.isStringArray(buildOptions)) {
+            // TODO: normalize --option=value into ['--option', 'value']
+
             return /** @type {Array<string>} */ (buildOptions);
         } else {
             if (util.isString(compilationUnit)) {
@@ -272,14 +274,91 @@ ConfigurationNormalizer.prototype.normalize = function () {
 };
 
 /**
- * Reads and parses a confugration file.
+ * @typedef {{
+ *             unitName: !string,
+ *             globalSources: !Array<string>,
+ *             unitSources: !Array<string>,
+ *             globalExterns: !Array<string>,
+ *             unitExterns: !Array<string>,
+ *             globalBuildOptions: !Array<string>,
+ *             unitBuildOptions: !Array<string>
+ *          }}
+ */
+var CompilerConfiguration;
+
+/**
+ * Transforms the passed unit configuration to a valid configuration for the Closure Compiler.
+ *
+ * @returns {Array<string>} An array of strings that describes all the compiler arguments based on the passed
+ *          configuration for the compilation unit.
+ * @param {CompilerConfiguration} unitConfiguration An object containing the entire configuration settings for one
+ *        compilation unit.
+ */
+function getCompilerArguments (unitConfiguration) {
+    var buildOptions = utils.mergeArguments(unitConfiguration.globalBuildOptions, unitConfiguration.unitBuildOptions);
+    buildOptions = utils.removeArgumentsFromArgumentsArray(buildOptions, ['--js', '--externs']);
+    var externs = utils.mergeArrays(unitConfiguration.globalExterns, unitConfiguration.unitExterns,
+                                    utils.getValuesFromArgumentsArray(buildOptions, '--externs'));
+    var sources = utils.mergeArrays(unitConfiguration.globalSources, unitConfiguration.unitSources,
+                                    utils.getValuesFromArgumentsArray(buildOptions, '--sources'));
+
+    return buildOptions.concat(utils.valuesToArgumentsArray(externs, '--externs'))
+        .concat(utils.valuesToArgumentsArray(sources, '--sources'));
+}
+
+/**
+ * Merges a configuration file with its parent configuration file according to the settings in `inheritSources`,
+ * `inheritExterns` and `inheritBuildOptions`.
  *
  * @private
  *
+ * @returns {Object} The merged configuration object.
+ * @param {?Object} configuration The current valid configuration object.
+ * @param {string} configurationPath The path of the current valid configuration object.
+ * @param {Object=} parentConfiguration An optional parent configuration object of the current valid configuration
+ *        object.
+ */
+function mergeConfigurations (configuration, configurationPath, parentConfiguration) {
+    if (!parentConfiguration && !configuration) return (new ConfigurationNormalizer()).normalize();
+    if (!parentConfiguration) return configuration;
+    if (!configuration) return parentConfiguration;
+
+    var resultSources;
+    if (parentConfiguration.next[configurationPath].inheritSources) {
+        resultSources = utils.mergeArrays(parentConfiguration.sources, configuration.sources);
+    } else {
+        resultSources = configuration.sources;
+    }
+    var resultExterns;
+    if (parentConfiguration.next[configurationPath].inheritExterns) {
+        resultExterns = utils.mergeArrays(parentConfiguration.externs, configuration.externs);
+    } else {
+        resultExterns = configuration.externs;
+    }
+    var resultBuildOptions;
+    if (parentConfiguration.next[configurationPath].inheritBuildOptions) {
+        resultBuildOptions = utils.mergeArrays(parentConfiguration.buildOptions, configuration.buildOptions);
+    } else {
+        resultBuildOptions = configuration.buildOptions;
+    }
+    return {
+        sources: resultSources,
+        externs: resultExterns,
+        buildOptions: resultBuildOptions,
+        compilationUnits: configuration.compilationUnits,
+        next: configuration.next
+    };
+}
+
+/**
+ * Reads and parses a confugration file.
+ *
  * @returns {Promise<Object|Error>} A promise that holds the parsed configuration object or an error object.
  * @param {string} configPath The path to the configuration file that should be read and parsed.
+ * @param {Object=} parentConfig An optional configuration object that represents the parent configuration of the
+ *        current configuration file. This is used for inehritung configuration settings.
  */
-function readAndParseConfig (configPath) {
+function readAndParseConfiguration (configPath, parentConfig) {
     return new Promise((resolve, reject) => {
         fs.readFile(configPath, 'utf8', (err, data) => {
             if (err) {
@@ -288,7 +367,8 @@ function readAndParseConfig (configPath) {
                 try {
                     var configObject = /** @type {Object} */ (JSON.parse(/** @type {string} */ (data)));
                     var configNormalizer = new ConfigurationNormalizer(configObject, configPath);
-                    resolve(configNormalizer.normalize());
+                    var normalizedConfig = configNormalizer.normalize();
+                    resolve(mergeConfigurations(normalizedConfig, configPath, parentConfig));
                 } catch (jsonError) {
                     reject(new Error('Could not read the configuration file "' + configPath + '"!\n' + jsonError));
                 }
@@ -299,3 +379,5 @@ function readAndParseConfig (configPath) {
 
 module.exports.getLocalConfigFiles = getLocalConfigFiles;
 module.exports.ConfigurationNormalizer = ConfigurationNormalizer;
+module.exports.readAndParseConfiguration = readAndParseConfiguration;
+module.exports.getCompilerArguments = getCompilerArguments;

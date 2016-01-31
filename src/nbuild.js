@@ -182,20 +182,86 @@ function parseCliArgs (args) {
 }
 
 /**
+ * Invokes the Closure Compiler with the passed arguments. All global and local settings are merged and passed as merged
+ * arguments to the Closure Compiler.
+ *
+ * @private
+ *
+ * @param {CompilerConfiguration} compilerConfiguration An objet that contains the compiler configuration for a
+ *        particular compilation unit.
+ */
+function compile (compilerConfiguration) {
+    var deferred = Q.defer();
+    var compilerArguments = configReader.getCompilerArguments(compilerConfiguration);
+    var compiler = new CC.compiler(compilerArguments);
+    compiler.run(function (code, stdout, stderr) {
+        if (code !== 0) {
+            var err = new Error(code + (stderr ? ': ' + stderr : ''));
+            deferred.reject(err);
+        } else {
+            deferred.resolve(stdout + '\n');
+        }
+    });
+    return deferred.promise;
+}
+
+/**
+ * Invokes the compilation process for each configuration file specified via the CLI and via the next property in the
+ * configuration files themselves.
+ *
+ * @private
+ *
+ * @param {{configs: Array<string>}} cliArgs An object containing all CLI arguments.
+ */
+function processConfigs (cliArgs) {
+    console.dir(cliArgs);
+
+    var processedConfigFiles = [];
+    var processConfig = function (configFilePath, parentConfig) {
+        // We ignore duplicate configuration files. This can be for example the case if the same configuration file is
+        // specified viw the CLI argument --config|-c and vie the next property in a parent configuration file.
+        if (processedConfigFiles.indexOf(configFilePath) === -1) {
+            configReader.readAndParseConfiguration(configFilePath, parentConfig).then(function (configObject) {
+                process.chdir(configFilePath);
+                Object.keys(configObject.compilationUnits).forEach(function (compilationUnit) {
+                    compile({
+                        unitName: compilationUnit,
+                        globalSources: configObject.sources,
+                        unitSources: configObject.compilationUnits[compilationUnit].sources,
+                        globalExterns: configObject.externs,
+                        unitExterns: configObject.compilationUnits[compilationUnit].externs,
+                        globalBuildOptions: configObject.buildOptions,
+                        unitBuildOptions: configObject.compilationUnits[compilationUnit].buildOptions
+                    });
+                });
+                processedConfigFiles.push(configFilePath);
+
+                configObject.forEach(function (nextConfigFilePath) {
+                    processConfig(nextConfigFilePath, configObject);
+                });
+            }).catch(function (err) {
+                console.error(err);
+                process.exit(1);
+            });
+        }
+    };
+
+    cliArgs.configs.forEach(processConfig);
+}
+
+/**
  * The entry point of this script.
  *
  * @private
  */
 function main () {
     parseCliArgs(process.argv).then(function (cliArgs) {
-        // TODO: when compiling set cwd to __dirname of current config file
-
         if (cliArgs.configs) {
-            console.dir(cliArgs);
+            processConfigs(/** @type {{configs: Array<string>}} */(cliArgs));
         } else {
             configReader.getLocalConfigFiles().then(function (configFiles) {
                 cliArgs.configs = configFiles;
-                console.dir(cliArgs);
+                processConfigs(/** @type {{configs: Array<string>}} */(cliArgs));
             });
         }
     }).catch(function (err) {
