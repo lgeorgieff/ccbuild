@@ -12,6 +12,12 @@ var path = require('path');
  */
 var fs = require('fs');
 
+/**
+ * @ignore
+ * @suppress {duplicate}
+ */
+var util = require('util');
+
 var configReader = require('../../src/config_reader');
 
 /**
@@ -21,6 +27,23 @@ var configReader = require('../../src/config_reader');
 var EMPTY_CONFIG = {sources: [], externs: [], buildOptions: [], compilationUnits: {}, next: {}};
 
 describe('ConfigurationNormalizer', function () {
+    beforeEach(function () {
+        this.resourcesToDelete = [];
+    });
+
+    afterEach(function () {
+        if (util.isArray(this.resourcesToDelete)) {
+            this.resourcesToDelete.forEach(function (resource) {
+                try {
+                    if (fs.statSync(resource).isDirectory()) fs.rmdirSync(resource);
+                    else fs.unlinkSync(resource);
+                } catch (err) {
+                    console.error(err);
+                }
+            });
+        }
+    });
+
     it('normalize undefined', function () {
         var configNormalizer = new configReader.ConfigurationNormalizer();
         var normalizedConfig = configNormalizer.normalize();
@@ -270,15 +293,11 @@ describe('ConfigurationNormalizer', function () {
             done();
         }).catch(function (err) {
             done.fail(err);
-        }).done(function () {
-            configFilePaths.forEach(function (filePath) {
-                fs.unlinkSync(filePath);
-            });
-            configFilePaths.forEach(function (filePath) {
-                fs.unlinkSync(path.join(testDirectory, filePath));
-            });
-            fs.rmdirSync(testDirectory);
         });
+        Array.prototype.push.apply(this.resourcesToDelete, configFilePaths);
+        Array.prototype.push.apply(this.resourcesToDelete, configFilePaths.map(function (filePath) {
+            return path.join(testDirectory, filePath);
+        }));
     });
 
     it('normalize build options with = characters', function () {
@@ -295,7 +314,7 @@ describe('ConfigurationNormalizer', function () {
         expect(normalizedConfiguration.buildOptions.length).toBe(6);
         expect(normalizedConfiguration.buildOptions)
             .toEqual(['--js', 'file1.js', '--js', 'file2.js', '--js', 'file3.js']);
-        
+
         config.buildOptions = [
             '--js=file1.js',
             '--js=file2.js',
@@ -353,13 +372,135 @@ describe('ConfigurationNormalizer', function () {
                       '--js', '']);
     });
 
-    xit('merge buildOptions', function () {});
+    it('merge buildOptions inherit', function (done) {
+        var testConfigPath = 'merge_buildOptions.nbuild';
+        var config1 = {
+            buildOptions: [
+                '--js=file1.js',
+                '--js=file2.js',
+                '--js', 'file3.js',
+                '--externs=externs1.js',
+                '--externs', 'externs1.js',
+                '--externs=externs2.js',
+                '--js=fil=e4.js=',
+                '--version'
+            ],
+            next: {
+            }
+        };
+        config1.next[testConfigPath] = {
+            inheritBuildOptions: true
+        };
+        var configNormalizer = new configReader.ConfigurationNormalizer(config1);
+        config1 = configNormalizer.normalize();
 
-    xit('load default configuration', function () {});
+        var config2 = {
+            buildOptions: [
+                '--js=file3.js',
+                '--js=file4.js',
+                '--js', 'file5.js',
+                '--debug',
+                '--externs=externs2.js',
+                '--externs', 'externs3.js',
+                '--externs=externs4.js'
+            ]
+        };
+
+        configNormalizer = new configReader.ConfigurationNormalizer(config2);
+        config2 = configNormalizer.normalize();
+        fs.writeFileSync(testConfigPath, JSON.stringify(config2, null, 2), 'utf8');
+
+        configReader.readAndParseConfiguration(testConfigPath, config1).then(function (mergedConfig) {
+            expect(mergedConfig).toBeDefined();
+            expect(mergedConfig.sources).toEqual([]);
+            expect(mergedConfig.externs).toEqual([]);
+            expect(mergedConfig.compilationUnits).toEqual({});
+            expect(mergedConfig.next).toBeDefined();
+            var nextPath = path.resolve(testConfigPath);
+            expect(mergedConfig.next[nextPath]).toBeUndefined();
+            var expectedBuildOptions = [
+                '--js', 'file1.js',
+                '--js', 'file2.js',
+                '--js', 'file3.js',
+                '--externs', 'externs1.js',
+                '--externs', 'externs1.js',
+                '--externs', 'externs2.js',
+                '--js', 'fil=e4.js=',
+                '--version',
+                '--js', 'file4.js',
+                '--js', 'file5.js',
+                '--debug',
+                '--externs', 'externs3.js',
+                '--externs', 'externs4.js'
+            ];
+            expect(mergedConfig.buildOptions.length).toBe(expectedBuildOptions.length);
+            expect(mergedConfig.buildOptions).toEqual(jasmine.arrayContaining(expectedBuildOptions));
+            done();
+        }).catch(function (err) {
+            done.fail(err);
+        });
+        this.resourcesToDelete.push(testConfigPath);
+    });
+
+    it('merge buildOptions no-inherit', function () {
+        var testConfigPath = 'merge_buildOptions.nbuild';
+        var config1 = {
+            buildOptions: [
+                '--js=file1.js',
+                '--js=file2.js',
+                '--js', 'file3.js',
+                '--externs=externs1.js',
+                '--externs', 'externs1.js',
+                '--externs=externs2.js',
+                '--js=fil=e4.js=',
+                '--version'
+            ],
+            next: {
+            }
+        };
+        config1.next[testConfigPath] = {
+            inheritBuildOptions: false
+        };
+        var configNormalizer = new configReader.ConfigurationNormalizer(config1);
+        config1 = configNormalizer.normalize();
+
+        var config2 = {
+            buildOptions: [
+                '--js=file3.js',
+                '--js=file4.js',
+                '--js', 'file5.js',
+                '--debug',
+                '--externs=externs2.js',
+                '--externs', 'externs3.js',
+                '--externs=externs4.js'
+            ]
+        };
+
+        configNormalizer = new configReader.ConfigurationNormalizer(config2);
+        config2 = configNormalizer.normalize();
+        fs.writeFileSync(testConfigPath, JSON.stringify(config2, null, 2), 'utf8');
+
+        configReader.readAndParseConfiguration(testConfigPath, config1).then(function (mergedConfig) {
+            expect(mergedConfig).toBeDefined();
+            expect(mergedConfig.sources).toEqual([]);
+            expect(mergedConfig.externs).toEqual([]);
+            expect(mergedConfig.compilationUnits).toEqual({});
+            expect(mergedConfig.next).toBeDefined();
+            var nextPath = path.resolve(testConfigPath);
+            expect(mergedConfig.next[nextPath]).toBeUndefined();
+            expect(mergedConfig.buildOptions.length).toEqual([]);
+            done();
+        }).catch(function (err) {
+            done.fail(err);
+        });
+        this.resourcesToDelete.push(testConfigPath);
+    });
+
+    xit('compilation units', function () {});
 
     xit('load configuration', function () {});
 
-    xit('load multiple configurattions', function () {});
+    xit('load multiple configurations', function () {});
 
     xit('load configuration hierarchy', function () {});
 

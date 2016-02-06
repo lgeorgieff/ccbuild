@@ -261,6 +261,7 @@ ConfigurationNormalizer.prototype.normalize = function () {
                     ConfigurationNormalizer._mapStringArray(self._config.compilationUnits[key].externs, 'externs'));
             self._config.compilationUnits[key].buildOptions =
                 ConfigurationNormalizer._normalizeBuildOptions(self._config.compilationUnits[key].buildOptions, key);
+            return accumulator;
         }, {}) || {};
     } else {
         result.compilationUnits = {};
@@ -278,6 +279,7 @@ ConfigurationNormalizer.prototype.normalize = function () {
             accumulator[resolvedPath].inheritBuildOptions =
                 ConfigurationNormalizer._mapBooleanProperty(
                     self._config.next[key].inheritBuildOptions, key, 'inheritBuildOptions');
+            return accumulator;
         }, {}) || {};
     } else {
         result.next = {};
@@ -349,7 +351,7 @@ function mergeConfigurations (configuration, configurationPath, parentConfigurat
     var resultBuildOptions;
     if (parentConfiguration.next[configurationPath] &&
         parentConfiguration.next[configurationPath].inheritBuildOptions) {
-        resultBuildOptions = utils.mergeArrays(parentConfiguration.buildOptions, configuration.buildOptions);
+        resultBuildOptions = utils.mergeArguments(parentConfiguration.buildOptions, configuration.buildOptions);
     } else {
         resultBuildOptions = configuration.buildOptions;
     }
@@ -372,6 +374,7 @@ function mergeConfigurations (configuration, configurationPath, parentConfigurat
  */
 function readAndParseConfiguration (configPath, parentConfig) {
     var deferred = Q.defer();
+    var absoluteConfigPath = path.resolve(configPath);
 
     fs.readFile(configPath, 'utf8', (err, data) => {
         if (err) {
@@ -379,9 +382,9 @@ function readAndParseConfiguration (configPath, parentConfig) {
         } else {
             try {
                 var configObject = /** @type {Object} */ (JSON.parse(/** @type {string} */ (data)));
-                var configNormalizer = new ConfigurationNormalizer(configObject, configPath);
+                var configNormalizer = new ConfigurationNormalizer(configObject, path.dirname(absoluteConfigPath));
                 var normalizedConfig = configNormalizer.normalize();
-                deferred.resolve(mergeConfigurations(normalizedConfig, configPath, parentConfig));
+                deferred.resolve(mergeConfigurations(normalizedConfig, absoluteConfigPath, parentConfig));
             } catch (jsonError) {
                 deferred.reject(new Error('Could not read the configuration file "' + configPath + '"!\n' + jsonError));
             }
