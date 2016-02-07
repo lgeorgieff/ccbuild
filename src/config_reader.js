@@ -251,21 +251,24 @@ ConfigurationNormalizer.prototype.normalize = function () {
     result.sources = this._resolvePaths(ConfigurationNormalizer._mapStringArray(this._config.sources, 'sources'));
     result.externs = this._resolvePaths(ConfigurationNormalizer._mapStringArray(this._config.externs, 'externs'));
     result.buildOptions = ConfigurationNormalizer._normalizeBuildOptions(this._config.buildOptions);
+
     if (util.isObject(this._config.compilationUnits)) {
         result.compilationUnits = Object.keys(this._config.compilationUnits).reduce(function (accumulator, key) {
-            self._config.compilationUnits[key].sources =
+            accumulator[key] = {};
+            accumulator[key].sources =
                 self._resolvePaths(
                     ConfigurationNormalizer._mapStringArray(self._config.compilationUnits[key].sources, 'sources'));
-            self._config.compilationUnits[key].externs =
+            accumulator[key].externs =
                 self._resolvePaths(
                     ConfigurationNormalizer._mapStringArray(self._config.compilationUnits[key].externs, 'externs'));
-            self._config.compilationUnits[key].buildOptions =
+            accumulator[key].buildOptions =
                 ConfigurationNormalizer._normalizeBuildOptions(self._config.compilationUnits[key].buildOptions, key);
             return accumulator;
         }, {}) || {};
     } else {
         result.compilationUnits = {};
     }
+
     if (util.isObject(this._config.next)) {
         result.next = Object.keys(this._config.next).reduce(function (accumulator, key) {
             var resolvedPath = path.resolve(self._basePath, key);
