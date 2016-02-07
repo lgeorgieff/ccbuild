@@ -23,7 +23,7 @@ var configReader = require('../../src/config_reader');
 describe('config_reader', function () {
     beforeEach(function () {
         /**
-         * @ignore
+         * @private
          * @const
          */
         this.EMPTY_CONFIG = {sources: [], externs: [], buildOptions: [], compilationUnits: {}, next: {}};
@@ -885,15 +885,190 @@ describe('config_reader', function () {
         this.resourcesToDelete.push(testConfigPath);
     });
 
-    xit('get compiler arguments', function () {});
+    it('get compiler arguments', function () {
+        var sources1 = [
+            path.resolve('file1.js'),
+            path.resolve('/tmp/file2.js'),
+            path.resolve('./some/other/path/file2.js')
+        ];
+        var externs1 = [
+            path.resolve('externs1.js'),
+            path.resolve('/tmp/externs2.js'),
+            path.resolve('./some/other/path/externs2.js')
+        ];
+        var buildOptions1 = [
+            '--debug',
+            '--language_in', 'ECMASCRIPT6_STRICT'
+        ];
+        var sources2 = [
+            path.resolve('file3.js'),
+            path.resolve('/tmp/file2.js'),
+            path.resolve('./some/other/path/file4.js'),
+            path.resolve('file1.js'),
+            path.resolve('./some/other/path/file2.js')
+        ];
+        var externs2 = [
+            path.resolve('externs3.js'),
+            path.resolve('/tmp/externs2.js'),
+            path.resolve('./some/other/path/externs2.js'),
+            path.resolve('externs1.js')
+        ];
+        var buildOptions2 = [
+            '--debug',
+            '--language_out', 'ECMASCRIPT6_STRICT',
+            '--version'
+        ];
+        var compilationUnit1 = {
+            sources: [
+                path.resolve('unit_file1.js'),
+                path.resolve('/tmp/unit_file2.js')
+            ],
+            externs: [
+                path.resolve('./some/path/unit_externs1.js'),
+                path.resolve('/tmp/unit_externs2.js')
+            ]
+        };
+        var compilationUnit2 = {
+            sources: [
+                path.resolve('unit1_file1.js'),
+                path.resolve('/tmp/file2.js'),
+                path.resolve('/tmp/unit1_file2.js')
+            ],
+            externs: [
+                path.resolve('./some/other/path/externs2.js'),
+                path.resolve('/tmp/unit1_externs2.js'),
+                path.resolve('externs3.js')
+            ]
+        };
+        var compilationUnit3 = {
+            externs: [
+                path.resolve('./some/path/unit2_externs9.js'),
+                path.resolve('/tmp/unit2_externs2.js'),
+                path.resolve('file1.js')
+            ],
+            buildOptions: [
+                '--debug',
+                '--language_out', 'ECMASCRIPT6_STRICT',
+                '--version',
+                '--transpile_only'
+            ]
+        };
 
-    xit('load configuration', function () {});
+        var unitConfiguration1 = {
+            globalSources: sources1,
+            unitSources: compilationUnit1.sources,
+            globalExterns: externs1,
+            unitExterns: compilationUnit1.externs,
+            globalBuildOptions: buildOptions1,
+            unitBuildOptions: []
+        };
+        var compilerArguments = configReader.getCompilerArguments (unitConfiguration1);
+        var expectedCompilerArguments = [
+            '--js', path.resolve('file1.js'),
+            '--js', path.resolve('/tmp/file2.js'),
+            '--js', path.resolve('./some/other/path/file2.js'),
+            '--externs', path.resolve('externs1.js'),
+            '--externs', path.resolve('/tmp/externs2.js'),
+            '--externs', path.resolve('./some/other/path/externs2.js'),
+            '--debug',
+            '--language_in', 'ECMASCRIPT6_STRICT',
+            '--js', path.resolve('unit_file1.js'),
+            '--js', path.resolve('/tmp/unit_file2.js'),
+            '--externs', path.resolve('./some/path/unit_externs1.js'),
+            '--externs', path.resolve('/tmp/unit_externs2.js')
+        ];
+        expect(compilerArguments).toEqual(jasmine.any(Array));
+        expect(compilerArguments.length).toBe(expectedCompilerArguments.length);
+        expect(compilerArguments).toEqual(jasmine.arrayContaining(expectedCompilerArguments));
+        var checkArgumentBefore = function (argumentArray, argument, argumentBefore) {
+            var indexArgument = argumentArray.indexOf(argument);
+            expect(indexArgument).toBeGreaterThan(0);
+            expect(argumentArray[indexArgument - 1]).toEqual(argumentBefore);
+        };
+        checkArgumentBefore(compilerArguments, path.resolve('file1.js'), '--js');
+        checkArgumentBefore(compilerArguments, path.resolve('/tmp/file2.js'), '--js');
+        checkArgumentBefore(compilerArguments, path.resolve('./some/other/path/file2.js'), '--js');
+        checkArgumentBefore(compilerArguments, path.resolve('unit_file1.js'), '--js');
+        checkArgumentBefore(compilerArguments, path.resolve('/tmp/unit_file2.js'), '--js');
+        checkArgumentBefore(compilerArguments, path.resolve('externs1.js'), '--externs');
+        checkArgumentBefore(compilerArguments, path.resolve('/tmp/externs2.js'), '--externs');
+        checkArgumentBefore(compilerArguments, path.resolve('./some/other/path/externs2.js'), '--externs');
+        checkArgumentBefore(compilerArguments, path.resolve('./some/path/unit_externs1.js'), '--externs');
+        checkArgumentBefore(compilerArguments, path.resolve('/tmp/unit_externs2.js'), '--externs');
+        checkArgumentBefore(compilerArguments, 'ECMASCRIPT6_STRICT', '--language_in');
 
-    xit('load multiple configurations', function () {});
+        var unitConfiguration2 = {
+            globalSources: sources2,
+            unitSources: compilationUnit2.sources,
+            globalExterns: externs2,
+            unitExterns: compilationUnit2.externs,
+            globalBuildOptions: buildOptions2,
+            unitBuildOptions: []
+        };
+        compilerArguments = configReader.getCompilerArguments (unitConfiguration2);
+        expectedCompilerArguments = [
+            '--js', path.resolve('file3.js'),
+            '--js', path.resolve('/tmp/file2.js'),
+            '--js', path.resolve('./some/other/path/file4.js'),
+            '--js', path.resolve('file1.js'),
+            '--js', path.resolve('./some/other/path/file2.js'),
+            '--externs', path.resolve('externs3.js'),
+            '--externs', path.resolve('/tmp/externs2.js'),
+            '--externs', path.resolve('./some/other/path/externs2.js'),
+            '--externs', path.resolve('externs1.js'),
+            '--debug',
+            '--language_out', 'ECMASCRIPT6_STRICT',
+            '--version',
+            '--js', path.resolve('unit1_file1.js'),
+            '--js', path.resolve('/tmp/unit1_file2.js'),
+            '--externs', path.resolve('/tmp/unit1_externs2.js')
+        ];
+        expect(compilerArguments).toEqual(jasmine.any(Array));
+        expect(compilerArguments.length).toBe(expectedCompilerArguments.length);
+        expect(compilerArguments).toEqual(jasmine.arrayContaining(expectedCompilerArguments));
+        checkArgumentBefore(compilerArguments, path.resolve('file3.js'), '--js');
+        checkArgumentBefore(compilerArguments, path.resolve('/tmp/file2.js'), '--js');
+        checkArgumentBefore(compilerArguments, path.resolve('./some/other/path/file4.js'), '--js');
+        checkArgumentBefore(compilerArguments, path.resolve('file1.js'), '--js');
+        checkArgumentBefore(compilerArguments, path.resolve('./some/other/path/file2.js'), '--js');
+        checkArgumentBefore(compilerArguments, path.resolve('unit1_file1.js'), '--js');
+        checkArgumentBefore(compilerArguments, path.resolve('/tmp/unit1_file2.js'), '--js');
+        checkArgumentBefore(compilerArguments, path.resolve('externs3.js'), '--externs');
+        checkArgumentBefore(compilerArguments, path.resolve('/tmp/externs2.js'), '--externs');
+        checkArgumentBefore(compilerArguments, path.resolve('./some/other/path/externs2.js'), '--externs');
+        checkArgumentBefore(compilerArguments, path.resolve('externs1.js'), '--externs');
+        checkArgumentBefore(compilerArguments, path.resolve('/tmp/unit1_externs2.js'), '--externs');
+        checkArgumentBefore(compilerArguments, 'ECMASCRIPT6_STRICT', '--language_out');
 
-    xit('load configuration hierarchy', function () {});
-
-    xit('load circular configuration hierarchy', function () {});
-
-    xit('relative paths', function () {});
+        var unitConfiguration3 = {
+            globalSources: sources2,
+            unitSources: [],
+            globalExterns: externs2,
+            unitExterns: compilationUnit3.externs,
+            globalBuildOptions: buildOptions2,
+            unitBuildOptions: compilationUnit3.buildOptions
+        };
+        compilerArguments = configReader.getCompilerArguments (unitConfiguration3);
+        expectedCompilerArguments = [
+            '--js', path.resolve('file3.js'),
+            '--js', path.resolve('/tmp/file2.js'),
+            '--js', path.resolve('./some/other/path/file4.js'),
+            '--js', path.resolve('file1.js'),
+            '--js', path.resolve('./some/other/path/file2.js'),
+            '--externs', path.resolve('externs3.js'),
+            '--externs', path.resolve('/tmp/externs2.js'),
+            '--externs', path.resolve('./some/other/path/externs2.js'),
+            '--externs', path.resolve('externs1.js'),
+            '--debug',
+            '--language_out', 'ECMASCRIPT6_STRICT',
+            '--version',
+            '--externs', path.resolve('./some/path/unit2_externs9.js'),
+            '--externs', path.resolve('/tmp/unit2_externs2.js'),
+            '--externs', path.resolve('file1.js'),
+            '--transpile_only'
+        ];
+        expect(compilerArguments).toEqual(jasmine.any(Array));
+        expect(compilerArguments.length).toBe(expectedCompilerArguments.length);
+        expect(compilerArguments).toEqual(jasmine.arrayContaining(expectedCompilerArguments));
+    });
 });

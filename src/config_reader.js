@@ -317,10 +317,10 @@ function getCompilerArguments (unitConfiguration) {
     var externs = utils.mergeArrays(unitConfiguration.globalExterns, unitConfiguration.unitExterns,
                                     utils.getValuesFromArgumentsArray(buildOptions, '--externs'));
     var sources = utils.mergeArrays(unitConfiguration.globalSources, unitConfiguration.unitSources,
-                                    utils.getValuesFromArgumentsArray(buildOptions, '--sources'));
+                                    utils.getValuesFromArgumentsArray(buildOptions, '--js'));
 
     return buildOptions.concat(utils.valuesToArgumentsArray(externs, '--externs'))
-        .concat(utils.valuesToArgumentsArray(sources, '--sources'));
+        .concat(utils.valuesToArgumentsArray(sources, '--js'));
 }
 
 /**

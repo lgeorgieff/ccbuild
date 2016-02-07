@@ -214,8 +214,6 @@ function compile (compilerConfiguration) {
  * @param {{configs: Array<string>}} cliArgs An object containing all CLI arguments.
  */
 function processConfigs (cliArgs) {
-    console.dir(cliArgs);
-
     var processedConfigFiles = [];
     var processConfig = function (configFilePath, parentConfig) {
         // We ignore duplicate configuration files. This can be for example the case if the same configuration file is
@@ -257,11 +255,11 @@ function processConfigs (cliArgs) {
 function main () {
     parseCliArgs(process.argv).then(function (cliArgs) {
         if (cliArgs.configs) {
-            processConfigs(/** @type {{configs: Array<string>}} */(cliArgs));
+            processConfigs(/** @type {{configs: Array<string>}} */ (cliArgs));
         } else {
             configReader.getLocalConfigFiles().then(function (configFiles) {
                 cliArgs.configs = configFiles;
-                processConfigs(/** @type {{configs: Array<string>}} */(cliArgs));
+                processConfigs(/** @type {{configs: Array<string>}} */ (cliArgs));
             });
         }
     }).catch(function (err) {
