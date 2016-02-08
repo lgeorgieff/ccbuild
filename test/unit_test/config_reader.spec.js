@@ -297,6 +297,7 @@ describe('config_reader', function () {
         Array.prototype.push.apply(this.resourcesToDelete, configFilePaths.map(function (filePath) {
             return path.join(testDirectory, filePath);
         }));
+        this.resourcesToDelete.push(testDirectory);
     });
 
     it('normalize build options with = characters', function () {
