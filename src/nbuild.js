@@ -28,6 +28,12 @@ var utils = require('./utils');
  * @ignore
  * @suppress {duplicate}
  */
+var util = require('util');
+
+/**
+ * @ignore
+ * @suppress {duplicate}
+ */
 var configReader = require('./config_reader');
 
 /**
@@ -206,6 +212,23 @@ function compile (compilerConfiguration) {
 }
 
 /**
+ * Generate a heading line for a compilation unit.
+ *
+ * @private
+ *
+ * @returns {string} The heading line for a compilation unit.
+ * @param {string} unitName The name of the compilation unit the generated heading will be used for.
+ * @param {number=} maxLength An optional maximum length of the line. The default is 79.
+ */
+function getHeading (unitName, maxLength) {
+    var result = '=== ' + unitName + ' ===';
+    var maximumLength = 79;
+    if (util.isNumber(maxLength)) maximumLength = maxLength;
+    while (result.length < maximumLength) result += '=';
+    return result;
+}
+
+/**
  * Invokes the compilation process for each configuration file specified via the CLI and via the next property in the
  * configuration files themselves.
  *
@@ -220,7 +243,7 @@ function processConfigs (cliArgs) {
         // specified viw the CLI argument --config|-c and vie the next property in a parent configuration file.
         if (processedConfigFiles.indexOf(configFilePath) === -1) {
             configReader.readAndParseConfiguration(configFilePath, parentConfig).then(function (configObject) {
-                process.chdir(configFilePath);
+                process.chdir(path.dirname(configFilePath));
                 Object.keys(configObject.compilationUnits).forEach(function (compilationUnit) {
                     compile({
                         unitName: compilationUnit,
@@ -230,11 +253,17 @@ function processConfigs (cliArgs) {
                         unitExterns: configObject.compilationUnits[compilationUnit].externs,
                         globalBuildOptions: configObject.buildOptions,
                         unitBuildOptions: configObject.compilationUnits[compilationUnit].buildOptions
+                    }).then(function (compiledCode) {
+                        console.log(getHeading(compilationUnit));
+                        console.log(compiledCode);
+                    }).catch(function (err) {
+                        console.log(getHeading(compilationUnit));
+                        console.error(err);
+                        process.exit(1);
                     });
                 });
                 processedConfigFiles.push(configFilePath);
-
-                configObject.forEach(function (nextConfigFilePath) {
+                Object.keys(configObject.next).forEach(function (nextConfigFilePath) {
                     processConfig(nextConfigFilePath, configObject);
                 });
             }).catch(function (err) {
