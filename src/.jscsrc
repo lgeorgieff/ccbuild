@@ -1,4 +1,7 @@
 {
+  "excludeFiles": [
+    "test/unit_test/data/**"
+  ],
   "disallowMultipleSpaces": true,
   "disallowMultipleLineBreaks": true,
   "validateLineBreaks": "LF",
