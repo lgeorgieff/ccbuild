@@ -193,6 +193,9 @@ function parseCliArgs (args) {
  *
  * @private
  *
+ * @returns {Promise<{stdout: string, stderr: string}>} A promise holding the stderr and stdout of the compilation
+ *          process.
+ *
  * @param {CompilerConfiguration} compilerConfiguration An objet that contains the compiler configuration for a
  *        particular compilation unit.
  */
@@ -205,7 +208,7 @@ function compile (compilerConfiguration) {
             var err = new Error(code + (stderr ? ': ' + stderr : ''));
             deferred.reject(err);
         } else {
-            deferred.resolve(stdout + '\n');
+            deferred.resolve({stdout: stdout + '\n', stderr: stderr});
         }
     });
     return deferred.promise;
@@ -253,9 +256,12 @@ function processConfigs (cliArgs) {
                         unitExterns: configObject.compilationUnits[compilationUnit].externs,
                         globalBuildOptions: configObject.buildOptions,
                         unitBuildOptions: configObject.compilationUnits[compilationUnit].buildOptions
-                    }).then(function (compiledCode) {
+                    }).then(function (output) {
                         console.log(getHeading(compilationUnit));
-                        console.log(compiledCode);
+                        console.log(output.stdout);
+                        if (output.stderr) {
+                            console.error(output.stderr);
+                        }
                     }).catch(function (err) {
                         console.log(getHeading(compilationUnit));
                         console.error(err);
