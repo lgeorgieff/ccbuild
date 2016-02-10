@@ -87,13 +87,41 @@ describe('nbuild', function () {
         this.resourcesToDelete.push(configPath);
     });
 
-    xit('compile with single config -- error', function () {
+    it('compile with single config -- error', function (done) {
         var config = {
-            sources: [],
-            externs: [],
-            buildOptions: [],
-            compilationUnits: {}
+            sources: ['./data/source1.js'],
+            externs: ['data/externs1.js'],
+            buildOptions: [
+                '--compilation_level', 'ADVANCED_OPTIMIZATIONS',
+                '--warning_level', 'VERBOSE',
+                '--env', 'CUSTOM',
+                '--flagfile', './data/test_flagfile'
+            ],
+            compilationUnits: {
+                unit1: {
+                    sources: ['data/source2.js']
+                }
+            }
         };
+
+        var configPath = path.join(__dirname, 'config1.nbuild');
+        fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
+        // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
+        child_process.exec('node ./src/nbuild.js --config ./test/unit_test/config1.nbuild',
+                           function (err, stdout, stderr) {
+                               if (!err) {
+                                   done.fail(new Error('Expected that compilation process will fail!'));
+                               } else {
+                                   expect(err).toEqual(jasmine.any(Error));
+                                   expect(stdout)
+                                       .toBe('=== unit1 =============================================================' +
+                                             '========\n');
+                                   expect(stderr.length).toBeGreaterThan(0);
+                                   done();
+                               }
+                           });
+        // jscs:enable requireCamelCaseOrUpperCaseIdentifiers
+        this.resourcesToDelete.push(configPath);
     });
 
     xit('compile with multiple default configs', function () {
