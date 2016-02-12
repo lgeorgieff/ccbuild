@@ -241,6 +241,12 @@ function getHeading (unitName, maxLength) {
  */
 function processConfigs (cliArgs) {
     var processedConfigFiles = [];
+    /**
+     * @private
+     *
+     * @param {string} configFilePath The file path of the configuration file to be processed.
+     * @param {Object=} parentConfig The parsed parent configuration - if present.
+     */
     var processConfig = function (configFilePath, parentConfig) {
         // We ignore duplicate configuration files. This can be for example the case if the same configuration file is
         // specified viw the CLI argument --config|-c and vie the next property in a parent configuration file.
@@ -279,7 +285,9 @@ function processConfigs (cliArgs) {
         }
     };
 
-    cliArgs.configs.forEach(processConfig);
+    cliArgs.configs.forEach(function (configFilePath) {
+        processConfig(configFilePath);
+    });
 }
 
 /**
