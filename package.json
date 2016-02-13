@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "nbuild",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "",
   "main": "main.js",
   "repository": {
@@ -22,7 +22,7 @@
     "npm": ">=3.0.0"
   },
   "dependencies": {
-    "google-closure-compiler": "^20151216.2.0",
+    "google-closure-compiler": "^20160208.1.0",
     "q": "^1.4.1",
     "read-package-json": "^2.0.3"
   },
