@@ -107,14 +107,14 @@ function getConfigFileHelp () {
                 '      "sources": [<extern file paths to be used only for this compilation unit>],\n' +
                 '      "buildOptions": [<options to be used only for this compilation unit>]\n' +
                 '    },\n' +
-                '  }\n' +
+                '  },\n' +
                 '  "next": {\n' +
-                '    "file path to the next config relative to this config": {\n' +
+                '    "<file path to the next config relative to this config>": {\n' +
                 '      "inheritSources": <boolean>,\n' +
                 '      "inheritExterns": <boolean>,\n' +
                 '      "inheritBuildOptions": <boolean>\n' +
-                '    }\n' +
-                '    "file path to another config relative to this config": {\n' +
+                '    },\n' +
+                '    "<file path to another config relative to this config>": {\n' +
                 '      "inheritSources": <boolean>,\n' +
                 '      "inheritExterns": <boolean>,\n' +
                 '      "inheritBuildOptions": <boolean>\n' +
