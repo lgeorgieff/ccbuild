@@ -40,7 +40,7 @@ var utils = require('./utils');
  * @type {string}
  * @const
  */
-var DEFAULT_CONFIG_EXTENSION = '.nbuild';
+var DEFAULT_CONFIG_EXTENSION = '.ccbuild';
 
 /**
  * Get the paths for all local config files.

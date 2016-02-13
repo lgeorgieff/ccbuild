@@ -1,5 +1,5 @@
 {
-  "name": "nbuild",
+  "name": "ccbuild",
   "version": "1.0.0",
   "description": "This package provides a thin layer for the Google Closure Compiler package that allows additional configuration such as compilation units and inheritance of configuration files. The offered functionality is a VERY LIGHTWEIGHT make system for Node.js.",
   "keywords": [
@@ -12,7 +12,7 @@
   "main": "main.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/lgeorgieff/nbuild.git"
+    "url": "git+https://github.com/lgeorgieff/ccbuild.git"
   },
   "author": {
     "name": "Lukas Georgieff",
@@ -20,9 +20,9 @@
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/lgeorgieff/nbuild/issues"
+    "url": "https://github.com/lgeorgieff/ccbuild/issues"
   },
-  "homepage": "https://github.com/lgeorgieff/nbuild",
+  "homepage": "https://github.com/lgeorgieff/ccbuild",
   "engines": {
     "node": ">=4.0.0",
     "npm": ">=3.0.0"

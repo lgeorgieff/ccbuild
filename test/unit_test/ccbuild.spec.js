@@ -28,7 +28,7 @@ var child_process = require('child_process');
 
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 60000;
 
-describe('nbuild', function () {
+describe('ccbuild', function () {
     beforeEach(function () {
         this.resourcesToDelete = [];
     });
@@ -70,10 +70,10 @@ describe('nbuild', function () {
             }
         };
 
-        var configPath = path.join(__dirname, 'config1.nbuild');
+        var configPath = path.join(__dirname, 'config1.ccbuild');
         fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
         // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
-        child_process.exec('node ./src/nbuild.js --config ./test/unit_test/config1.nbuild',
+        child_process.exec('node ./src/ccbuild.js --config ./test/unit_test/config1.ccbuild',
                            function (err, stdout, stderr) {
                                if (err) {
                                    done.fail(err);
@@ -110,10 +110,10 @@ describe('nbuild', function () {
             }
         };
 
-        var configPath = path.join(__dirname, 'config1.nbuild');
+        var configPath = path.join(__dirname, 'config1.ccbuild');
         fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
         // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
-        child_process.exec('node ./src/nbuild.js --config ./test/unit_test/config1.nbuild',
+        child_process.exec('node ./src/ccbuild.js --config ./test/unit_test/config1.ccbuild',
                            function (err, stdout, stderr) {
                                if (!err) {
                                    done.fail(new Error('Expected that compilation process will fail!'));
@@ -167,14 +167,14 @@ describe('nbuild', function () {
                 }
             }
         };
-        var configPath1 = path.join(__dirname, 'config1.nbuild');
+        var configPath1 = path.join(__dirname, 'config1.ccbuild');
         fs.writeFileSync(configPath1, JSON.stringify(config1, null, 2));
-        var configPath2 = path.join(__dirname, 'config2.nbuild');
+        var configPath2 = path.join(__dirname, 'config2.ccbuild');
         fs.writeFileSync(configPath2, JSON.stringify(config2, null, 2));
-        var configPath3 = path.join(__dirname, 'config3.nbuild');
+        var configPath3 = path.join(__dirname, 'config3.ccbuild');
         fs.writeFileSync(configPath3, JSON.stringify(config3, null, 2));
         // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
-        child_process.exec('node ../../src/nbuild.js', {cwd: __dirname},
+        child_process.exec('node ../../src/ccbuild.js', {cwd: __dirname},
                            function (err, stdout, stderr) {
                                if (err) {
                                    done.fail(err);
@@ -233,14 +233,14 @@ describe('nbuild', function () {
                 }
             }
         };
-        var configPath1 = path.join(__dirname, 'config1.nbuild');
+        var configPath1 = path.join(__dirname, 'config1.ccbuild');
         fs.writeFileSync(configPath1, JSON.stringify(config1, null, 2));
         var configPath2 = path.join(__dirname, 'config2');
         fs.writeFileSync(configPath2, JSON.stringify(config2, null, 2));
         var configPath3 = path.join(__dirname, 'config3');
         fs.writeFileSync(configPath3, JSON.stringify(config3, null, 2));
         // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
-        child_process.exec('node ../../src/nbuild.js -c ' + configPath2 + ' --config ' + configPath3, {cwd: __dirname},
+        child_process.exec('node ../../src/ccbuild.js -c ' + configPath2 + ' --config ' + configPath3, {cwd: __dirname},
                            function (err, stdout, stderr) {
                                if (err) {
                                    done.fail(err);
@@ -263,7 +263,7 @@ describe('nbuild', function () {
     });
 
     it('compile with mulit-level inheritance -- success ', function (done) {
-        var configPath1 = path.join(__dirname, 'config1.nbuild');
+        var configPath1 = path.join(__dirname, 'config1.ccbuild');
         var configPath2 = path.join(__dirname, 'config2');
         var configPath3 = path.join(__dirname, 'config3');
 
@@ -305,7 +305,7 @@ describe('nbuild', function () {
         fs.writeFileSync(configPath3, JSON.stringify(config3, null, 2));
 
         // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
-        child_process.exec('node ./src/nbuild.js -c ' + configPath1,
+        child_process.exec('node ./src/ccbuild.js -c ' + configPath1,
                            function (err, stdout, stderr) {
                                if (err) {
                                    done.fail(err);
@@ -324,7 +324,7 @@ describe('nbuild', function () {
     });
 
     it('compile with mulit-level inheritance -- error ', function (done) {
-        var configPath1 = path.join(__dirname, 'config1.nbuild');
+        var configPath1 = path.join(__dirname, 'config1.ccbuild');
         var configPath2 = path.join(__dirname, 'config2');
         var configPath3 = path.join(__dirname, 'config3');
 
@@ -366,7 +366,7 @@ describe('nbuild', function () {
         fs.writeFileSync(configPath3, JSON.stringify(config3, null, 2));
 
         // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
-        child_process.exec('node ./src/nbuild.js -c ' + configPath1,
+        child_process.exec('node ./src/ccbuild.js -c ' + configPath1,
                            function (err, stdout, stderr) {
                                if (!err) {
                                    done.fail(new Error('Expected that compilation process will fail!'));
@@ -386,9 +386,9 @@ describe('nbuild', function () {
     });
 
     it('compile with config hierarchy -- success', function (done) {
-        var configPath1 = path.join(__dirname, 'config1.nbuild');
-        var configPath2 = path.join(__dirname, 'data', 'config2.nbuild');
-        var configPath3 = path.join(__dirname, 'data', 'configs', 'config3.nbuild');
+        var configPath1 = path.join(__dirname, 'config1.ccbuild');
+        var configPath2 = path.join(__dirname, 'data', 'config2.ccbuild');
+        var configPath3 = path.join(__dirname, 'data', 'configs', 'config3.ccbuild');
         var temporaryConfigDirectory = path.join(__dirname, 'data', 'configs');
         try {
             fs.mkdirSync(temporaryConfigDirectory);
@@ -450,7 +450,7 @@ describe('nbuild', function () {
         fs.writeFileSync(configPath3, JSON.stringify(config3, null, 2));
 
         // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
-        child_process.exec('node ./src/nbuild.js -c ' + configPath1,
+        child_process.exec('node ./src/ccbuild.js -c ' + configPath1,
                            function (err, stdout, stderr) {
                                if (err) {
                                    done.fail(err);
@@ -474,9 +474,9 @@ describe('nbuild', function () {
     });
 
     it('compile with config hierarchy -- error', function (done) {
-        var configPath1 = path.join(__dirname, 'config1.nbuild');
-        var configPath2 = path.join(__dirname, 'data', 'config2.nbuild');
-        var configPath3 = path.join(__dirname, 'data', 'configs', 'config3.nbuild');
+        var configPath1 = path.join(__dirname, 'config1.ccbuild');
+        var configPath2 = path.join(__dirname, 'data', 'config2.ccbuild');
+        var configPath3 = path.join(__dirname, 'data', 'configs', 'config3.ccbuild');
         var temporaryConfigDirectory = path.join(__dirname, 'data', 'configs');
         try {
             fs.mkdirSync(temporaryConfigDirectory);
@@ -538,7 +538,7 @@ describe('nbuild', function () {
         fs.writeFileSync(configPath3, JSON.stringify(config3, null, 2));
 
         // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
-        child_process.exec('node ./src/nbuild.js -c ' + configPath1,
+        child_process.exec('node ./src/ccbuild.js -c ' + configPath1,
                            function (err, stdout, stderr) {
                                if (!err) {
                                    done.fail(new Error('Expected that compilation process will fail!'));
@@ -562,9 +562,9 @@ describe('nbuild', function () {
     });
 
     it('compile with circular config hierarchy', function (done) {
-        var configPath1 = path.join(__dirname, 'config1.nbuild');
-        var configPath2 = path.join(__dirname, 'data', 'config2.nbuild');
-        var configPath3 = path.join(__dirname, 'data', 'configs', 'config3.nbuild');
+        var configPath1 = path.join(__dirname, 'config1.ccbuild');
+        var configPath2 = path.join(__dirname, 'data', 'config2.ccbuild');
+        var configPath3 = path.join(__dirname, 'data', 'configs', 'config3.ccbuild');
         var temporaryConfigDirectory = path.join(__dirname, 'data', 'configs');
         try {
             fs.mkdirSync(temporaryConfigDirectory);
@@ -628,7 +628,7 @@ describe('nbuild', function () {
         fs.writeFileSync(configPath3, JSON.stringify(config3, null, 2));
 
         // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
-        child_process.exec('node ./src/nbuild.js -c ' + configPath1,
+        child_process.exec('node ./src/ccbuild.js -c ' + configPath1,
                            function (err, stdout, stderr) {
                                if (!err) {
                                    done.fail(new Error('Expected that compilation process will fail!'));

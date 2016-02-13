@@ -259,9 +259,9 @@ describe('config_reader', function () {
     });
 
     it('getLocalConfigFiles', function (done) {
-        var configFilePaths = ['.nbuild', 'nbuild.nbuild', 'config.nbuild', 'config', 'nbuild', 'conig.nbuildx',
+        var configFilePaths = ['.ccbuild', 'ccbuild.ccbuild', 'config.ccbuild', 'config', 'ccbuild', 'conig.ccbuildx',
                                'conig.build'];
-        var loadedConfigFilePaths = ['.nbuild', 'nbuild.nbuild', 'config.nbuild']
+        var loadedConfigFilePaths = ['.ccbuild', 'ccbuild.ccbuild', 'config.ccbuild']
                 .map(function (fileName) {
                     return path.resolve(fileName);
                 });
@@ -373,7 +373,7 @@ describe('config_reader', function () {
     });
 
     it('merge buildOptions inherit', function (done) {
-        var testConfigPath = 'merge_buildOptions.nbuild';
+        var testConfigPath = 'merge_buildOptions.ccbuild';
         var config1 = {
             buildOptions: [
                 '--js=file1.js',
@@ -443,7 +443,7 @@ describe('config_reader', function () {
     });
 
     it('merge buildOptions no-inherit', function () {
-        var testConfigPath = 'merge_buildOptions.nbuild';
+        var testConfigPath = 'merge_buildOptions.ccbuild';
         var config1 = {
             buildOptions: [
                 '--js=file1.js',
@@ -506,7 +506,7 @@ describe('config_reader', function () {
     });
 
     it('compilation units inherit', function (done) {
-        var testConfigPath = 'merge_buildOptions.nbuild';
+        var testConfigPath = 'merge_buildOptions.ccbuild';
         var config1 = {
             sources: [
                 'file1.js',
@@ -698,7 +698,7 @@ describe('config_reader', function () {
     });
 
     it('compilation units no-inherit', function (done) {
-        var testConfigPath = 'merge_buildOptions.nbuild';
+        var testConfigPath = 'merge_buildOptions.ccbuild';
         var config1 = {
             sources: [
                 'file1.js',

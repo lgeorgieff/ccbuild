@@ -1,9 +1,9 @@
-# nbuild
-_nbuild_ offers a thin layer on top of the [google-closure-compiler](https://www.npmjs.com/package/google-closure-compiler) package to set up a VERY LIGHTWEIGHT make system for [Node.js](https://nodejs.org/en/). The main idea behind _nbuild_ is a set of configuration files that define compilation units of JavaScript sources and are also able to reference child configuration files and to inherit particular values.
+# ccbuild
+_ccbuild_ offers a thin layer on top of the [google-closure-compiler](https://www.npmjs.com/package/google-closure-compiler) package to set up a VERY LIGHTWEIGHT make system for [Node.js](https://nodejs.org/en/). The main idea behind _ccbuild_ is a set of configuration files that define compilation units of JavaScript sources and are also able to reference child configuration files and to inherit particular values.
 
-# nbuild options
+# ccbuild options
 ```
-Usage: nbuild [-h|--help] [-v|--version] [--closure-help]
+Usage: ccbuild [-h|--help] [-v|--version] [--closure-help]
            [--closure-version] [--compiler-path] [--contrib-path]
            [-c|--config PATH]... [--config-help]
 
@@ -16,18 +16,18 @@ Checks and compiles JavaScript files via the Closure Compiler.
   --compiler-path     Display the path to the Closure Compiler and exit.
   --contrib-path      Display the path to the contrib directory of the
                       Closure Compiler and exit.
-  -c|--config PATH    Path to the configuration file nbuild should
-                      use. If no configuration is specified nbuild
+  -c|--config PATH    Path to the configuration file ccbuild should
+                      use. If no configuration is specified ccbuild
                       checks the current directory for all files with the file
-                      extension ".nbuild". For every matched configuration file
-                      nbuild performs a run.
+                      extension ".ccbuild". For every matched configuration file
+                      ccbuild performs a run.
  --config-help        Display a help message for the configuration file format
                       and exit.
 ```
 
 # Configuration Files
-_nbuild_ operates on configuration files, i.e. without any configuration file nothing will happen. Usually the configuration files should be named in the form of *.nbuild.
-If no configuration file is specified via CLI the `$CWD` is searched for all files of the form *.nbuild. If at least one if found, it will be processed. In case multiple files are found, all of them are processed. To specify any configuration file via CLI, the option -c <FILE PATH> or --config <FILE PATH> must be used. IT is possible to specify multiple configuration files. In case at least one configuration file is specified via CLI, `$CWD` is not searched for any default configuration file. A configuration file may reference another configuration file. In case circular references are found, a second run on a configuration file that was already processed will not be started. All relative paths in the fields _sources_, _externs_ and the _next_ property are resolved against the `__dirnmae` of the configuration file in which they are defined.
+_ccbuild_ operates on configuration files, i.e. without any configuration file nothing will happen. Usually the configuration files should be named in the form of *.ccbuild.
+If no configuration file is specified via CLI the `$CWD` is searched for all files of the form *.ccbuild. If at least one if found, it will be processed. In case multiple files are found, all of them are processed. To specify any configuration file via CLI, the option -c <FILE PATH> or --config <FILE PATH> must be used. IT is possible to specify multiple configuration files. In case at least one configuration file is specified via CLI, `$CWD` is not searched for any default configuration file. A configuration file may reference another configuration file. In case circular references are found, a second run on a configuration file that was already processed will not be started. All relative paths in the fields _sources_, _externs_ and the _next_ property are resolved against the `__dirnmae` of the configuration file in which they are defined.
 
 A configuration file is of the following form:
 
