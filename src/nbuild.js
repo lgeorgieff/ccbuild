@@ -37,6 +37,16 @@ var util = require('util');
 var configReader = require('./config_reader');
 
 /**
+ * This module wide variable is used to indicate whether an compilation error occurred for one of the compilation units
+ * or not. In case a compilation error occurred, this variable is used to use the exit code 1 when quitting this script.
+ *
+ * @private
+ *
+ * @type {boolean}
+ */
+var compilationErrorDetected = false;
+
+/**
  * Get the usage text.
  *
  * @private
@@ -271,7 +281,7 @@ function processConfigs (cliArgs) {
                     }).catch(function (err) {
                         console.log(getHeading(compilationUnit));
                         console.error(err);
-                        process.exit(1);
+                        compilationErrorDetected = true;
                     });
                 });
                 processedConfigFiles.push(configFilePath);
@@ -314,6 +324,10 @@ function main () {
             console.error(err);
             process.exit(2);
         });
+    });
+
+    process.on('exit', function () {
+        process.exitCode = Number(compilationErrorDetected);
     });
 }
 
