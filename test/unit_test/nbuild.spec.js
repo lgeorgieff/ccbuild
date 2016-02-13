@@ -390,7 +390,11 @@ describe('nbuild', function () {
         var configPath2 = path.join(__dirname, 'data', 'config2.nbuild');
         var configPath3 = path.join(__dirname, 'data', 'configs', 'config3.nbuild');
         var temporaryConfigDirectory = path.join(__dirname, 'data', 'configs');
-        fs.mkdirSync(temporaryConfigDirectory);
+        try {
+            fs.mkdirSync(temporaryConfigDirectory);
+        } catch (err) {
+            console.error(err);
+        }
 
         var config1 = {
             sources: ['./data/source1.js'],
@@ -474,7 +478,11 @@ describe('nbuild', function () {
         var configPath2 = path.join(__dirname, 'data', 'config2.nbuild');
         var configPath3 = path.join(__dirname, 'data', 'configs', 'config3.nbuild');
         var temporaryConfigDirectory = path.join(__dirname, 'data', 'configs');
-        fs.mkdirSync(temporaryConfigDirectory);
+        try {
+            fs.mkdirSync(temporaryConfigDirectory);
+        } catch (err) {
+            console.error(err);
+        }
 
         var config1 = {
             sources: ['./data/source1.js'],
@@ -553,5 +561,95 @@ describe('nbuild', function () {
         this.resourcesToDelete.push(temporaryConfigDirectory);
     });
 
-    xit('compile with circular config hierarchy', function () {});
+    it('compile with circular config hierarchy', function (done) {
+        var configPath1 = path.join(__dirname, 'config1.nbuild');
+        var configPath2 = path.join(__dirname, 'data', 'config2.nbuild');
+        var configPath3 = path.join(__dirname, 'data', 'configs', 'config3.nbuild');
+        var temporaryConfigDirectory = path.join(__dirname, 'data', 'configs');
+        try {
+            fs.mkdirSync(temporaryConfigDirectory);
+        } catch (err) {
+            console.error(err);
+        }
+
+        var config1 = {
+            sources: ['./data/source1.js'],
+            externs: ['data/externs1.js'],
+            buildOptions: [
+                '--compilation_level', 'ADVANCED_OPTIMIZATIONS',
+                '--warning_level', 'VERBOSE',
+                '--env', 'CUSTOM'
+            ],
+            compilationUnits: {
+                unit1: {
+                    buildOptions: ['--flagfile', './data/test_flagfile']
+                }
+            },
+            next: {}
+        };
+        config1.next[path.relative(path.dirname(configPath1), configPath2)] = {
+            inheritSources: true,
+            inheritExterns: false,
+            inheritBuildOptions: true
+        };
+        var config2 = {
+            sources: ['./data/source1.js'],
+            externs: ['data/externs1.js'],
+            buildOptions: config1.buildOptions,
+            compilationUnits: {
+                unit2: {
+                    sources: ['source2.js'],
+                    externs: ['./externs2.js'],
+                    buildOptions: ['--flagfile', './test_flagfile']
+                }
+            },
+            next: {}
+        };
+        config2.next[path.relative(path.dirname(configPath2), configPath3)] = {
+            inheritBuildOptions: true
+        };
+        var config3 = {
+            sources: ['../source1.js'],
+            externs: ['../externs1.js'],
+            buildOptions: config1.buildOptions,
+            compilationUnits: {
+                unit3: {
+                    sources: ['../source3.js', '../source4.js'],
+                    externs: ['../externs2.js', '../externs3.js'],
+                    buildOptions: ['--flagfile', '../test_flagfile']
+                }
+            },
+            next: {}
+        };
+        config3.next[configPath3] = {};
+
+        fs.writeFileSync(configPath1, JSON.stringify(config1, null, 2));
+        fs.writeFileSync(configPath2, JSON.stringify(config2, null, 2));
+        fs.writeFileSync(configPath3, JSON.stringify(config3, null, 2));
+
+        // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
+        child_process.exec('node ./src/nbuild.js -c ' + configPath1,
+                           function (err, stdout, stderr) {
+                               if (!err) {
+                                   done.fail(new Error('Expected that compilation process will fail!'));
+                               } else {
+                                   expect(err).toEqual(jasmine.any(Error));
+                                   expect(stdout.indexOf('=== unit1 =================================================' +
+                                                         '====================\n')).not.toBe(-1);
+                                   expect(stdout.indexOf('=== unit2 =================================================' +
+                                                         '====================\n')).not.toBe(-1);
+                                   expect(stdout.indexOf('=== unit3 =================================================' +
+                                                         '====================\n')).not.toBe(-1);
+                                   expect(stderr.length).toBeGreaterThan(0);
+                                   expect(stderr.indexOf('Discovered circular dependency to "' + configPath3 + '"!'))
+                                       .not.toBe(-1);
+                                   done();
+                               }
+                           });
+        // jscs:enable requireCamelCaseOrUpperCaseIdentifiers
+        this.resourcesToDelete.push(configPath1);
+        this.resourcesToDelete.push(configPath2);
+        this.resourcesToDelete.push(configPath3);
+        this.resourcesToDelete.push(temporaryConfigDirectory);
+    });
 });

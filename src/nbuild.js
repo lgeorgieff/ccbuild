@@ -292,6 +292,8 @@ function processConfigs (cliArgs) {
                 console.error(err);
                 process.exit(1);
             });
+        } else {
+            console.error('Discovered circular dependency to "' + configFilePath + '"!');
         }
     };
 
