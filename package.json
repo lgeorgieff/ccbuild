@@ -22,7 +22,7 @@
   "bugs": {
     "url": "https://github.com/lgeorgieff/nbuild/issues"
   },
-  "homepage": "https://github.com/lgeorgieff/nbuild#README.md",
+  "homepage": "https://github.com/lgeorgieff/nbuild",
   "engines": {
     "node": ">=4.0.0",
     "npm": ">=3.0.0"
