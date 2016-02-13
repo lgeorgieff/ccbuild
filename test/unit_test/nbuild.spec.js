@@ -262,17 +262,128 @@ describe('nbuild', function () {
         this.resourcesToDelete.push(configPath3);
     });
 
-    xit('compile with config hierarchy', function () {
-        // use relative paths
+    it('compile with mulit-level inheritance -- success ', function (done) {
+        var configPath1 = path.join(__dirname, 'config1.nbuild');
+        var configPath2 = path.join(__dirname, 'config2');
+        var configPath3 = path.join(__dirname, 'config3');
 
-        var config = {
-            sources: [],
-            externs: [],
-            buildOptions: [],
-            compilationUnits: {},
+        var config1 = {
+            sources: ['./data/source1.js'],
+            externs: ['data/externs1.js'],
+            buildOptions: [
+                '--compilation_level', 'ADVANCED_OPTIMIZATIONS',
+                '--warning_level', 'VERBOSE',
+                '--env', 'CUSTOM'
+            ],
             next: {}
         };
+        config1.next[configPath2] = {
+            inheritSources: true,
+            inheritExterns: true,
+            inheritBuildOptions: true
+        };
+        var config2 = {
+            externs: ['./data/externs2.js'],
+            buildOptions: ['--flagfile', './data/test_flagfile'],
+            next: {}
+        };
+        config2.next[configPath3] = {
+            inheritSources: true,
+            inheritExterns: true,
+            inheritBuildOptions: true
+        };
+        var config3 = {
+            compilationUnits: {
+                unit1: {
+                    sources: ['data/source2.js']
+                }
+            }
+        };
+
+        fs.writeFileSync(configPath1, JSON.stringify(config1, null, 2));
+        fs.writeFileSync(configPath2, JSON.stringify(config2, null, 2));
+        fs.writeFileSync(configPath3, JSON.stringify(config3, null, 2));
+
+        // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
+        child_process.exec('node ./src/nbuild.js -c ' + configPath1,
+                           function (err, stdout, stderr) {
+                               if (err) {
+                                   done.fail(err);
+                               } else {
+                                   expect(stdout.length).toBeGreaterThan(0);
+                                   expect(stdout.indexOf('=== unit1 =================================================' +
+                                                         '====================\n')).not.toBe(-1);
+                                   expect(stderr.length).toBeGreaterThan(0);
+                                   done();
+                               }
+                           });
+        // jscs:enable requireCamelCaseOrUpperCaseIdentifiers
+        this.resourcesToDelete.push(configPath1);
+        this.resourcesToDelete.push(configPath2);
+        this.resourcesToDelete.push(configPath3);
     });
 
-    xit('compilation errors', function () {});
+    it('compile with mulit-level inheritance -- error ', function (done) {
+        var configPath1 = path.join(__dirname, 'config1.nbuild');
+        var configPath2 = path.join(__dirname, 'config2');
+        var configPath3 = path.join(__dirname, 'config3');
+
+        var config1 = {
+            sources: ['./data/source1.js'],
+            externs: ['data/externs1.js'],
+            buildOptions: [
+                '--compilation_level', 'ADVANCED_OPTIMIZATIONS',
+                '--warning_level', 'VERBOSE',
+                '--env', 'CUSTOM'
+            ],
+            next: {}
+        };
+        config1.next[configPath2] = {
+            inheritSources: true,
+            inheritExterns: false,
+            inheritBuildOptions: true
+        };
+        var config2 = {
+            externs: ['./data/externs2.js'],
+            buildOptions: ['--flagfile', './data/test_flagfile'],
+            next: {}
+        };
+        config2.next[configPath3] = {
+            inheritSources: true,
+            inheritExterns: true,
+            inheritBuildOptions: true
+        };
+        var config3 = {
+            compilationUnits: {
+                unit1: {
+                    sources: ['data/source2.js']
+                }
+            }
+        };
+
+        fs.writeFileSync(configPath1, JSON.stringify(config1, null, 2));
+        fs.writeFileSync(configPath2, JSON.stringify(config2, null, 2));
+        fs.writeFileSync(configPath3, JSON.stringify(config3, null, 2));
+
+        // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
+        child_process.exec('node ./src/nbuild.js -c ' + configPath1,
+                           function (err, stdout, stderr) {
+                               if (!err) {
+                                   done.fail(new Error('Expected that compilation process will fail!'));
+                               } else {
+                                   expect(err).toEqual(jasmine.any(Error));
+                                   expect(stdout)
+                                       .toBe('=== unit1 =============================================================' +
+                                             '========\n');
+                                   expect(stderr.length).toBeGreaterThan(0);
+                                   done();
+                               }
+                           });
+        // jscs:enable requireCamelCaseOrUpperCaseIdentifiers
+        this.resourcesToDelete.push(configPath1);
+        this.resourcesToDelete.push(configPath2);
+        this.resourcesToDelete.push(configPath3);
+    });
+
+    xit('compile with config hierarchy', function () {});
 });
