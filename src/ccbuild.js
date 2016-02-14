@@ -59,7 +59,7 @@ function getUsage () {
         deferred.resolve(
             'Usage: ' + selfName + ' [-h|--help] [-v|--version] [--closure-help]\n' +
                 '           [--closure-version] [--compiler-path] [--contrib-path]\n' +
-                '           [-c|--config PATH]... [--config-help]\n\n' +
+                '           [--ignore-warnings] [-c|--config PATH]... [--config-help]\n\n' +
                 'Checks and compiles JavaScript files via the Closure Compiler.\n\n' +
                 '  -h|--help           Display this message and exit.\n' +
                 '  -v|--version        Display version information and exit.\n' +
@@ -74,7 +74,8 @@ function getUsage () {
                 '                      extension ".nbuild". For every matched configuration file\n' +
                 '                      ' + selfName + ' performs a run.\n' +
                 ' --config-help        Display a help message for the configuration file format\n' +
-                '                      and exit.\n');
+                '                      and exit.\n' +
+                ' --ignore-warnings    Compilation warnings are not shown on stderr.\n');
     }).catch(deferred.reject);
     return deferred.promise;
 }
@@ -186,6 +187,9 @@ function parseCliArgs (args) {
             console.log(CC.compiler.CONTRIB_PATH);
             process.exit(0);
             break;
+        case '--ignore-warnings':
+            result.ignoreWarnings = true;
+            break;
         default:
             deferred.reject('The option "' + args[i] + '" is not supported');
             i = args.length;
@@ -275,7 +279,7 @@ function processConfigs (cliArgs) {
                     }).then(function (output) {
                         console.log(getHeading(compilationUnit));
                         console.log(output.stdout);
-                        if (output.stderr) {
+                        if (!cliArgs.ignoreWarnigns && output.stderr) {
                             console.error(output.stderr);
                         }
                     }).catch(function (err) {
