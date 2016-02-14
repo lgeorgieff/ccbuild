@@ -1,0 +1,59 @@
+{
+  "name": "ccbuild",
+  "version": "1.0.1",
+  "description": "This package provides a thin layer for the Google Closure Compiler package that allows additional configuration such as compilation units and inheritance of configuration files. The offered functionality is a VERY LIGHTWEIGHT make system for Node.js.",
+  "keywords": [
+    "Google Closure Compiler",
+    "make system",
+    "build system",
+    "compilation",
+    "compiler"
+  ],
+  "bin": {
+    "ccbuild": "src/ccbuild.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lgeorgieff/ccbuild.git"
+  },
+  "author": {
+    "name": "Lukas Georgieff",
+    "email": "lukas.georgieff@hotmail.com"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/lgeorgieff/ccbuild/issues"
+  },
+  "homepage": "https://github.com/lgeorgieff/ccbuild",
+  "engines": {
+    "node": ">=4.0.0",
+    "npm": ">=3.0.0"
+  },
+  "dependencies": {
+    "google-closure-compiler": "^20160208.1.0",
+    "q": "^1.4.1",
+    "read-package-json": "^2.0.3"
+  },
+  "devDependencies": {
+    "jasmine": "^2.3.2",
+    "jscs": "^2.4.0",
+    "jsdoc": "^3.4.0"
+  },
+  "scripts": {
+    "postinstall": "npm run install_fixes && npm run compile_closure_compiler && npm run install_git_hooks",
+    "install_fixes": "npm install tools/jsonlint/ && cd tools/node.js_closure_compiler_externs/ && git apply ../node.js_closure_compiler_externs_annotation_fixes.patch 2>/dev/null || true",
+    "install_git_hooks": "npm run install_git_pre_commit_hook",
+    "install_git_pre_commit_hook": "if [ ! -e .git/hook/pre-commit ]; then cp tools/pre-commit.hook.git .git/hooks/pre-commit; fi",
+    "compile_closure_compiler": "if [ ! -e tools/closure_compiler/build/compiler.jar ]; then cd tools/closure_compiler/ && ant; fi",
+    "test": "JASMINE_CONFIG_PATH=test/jasmine.spec.json jasmine",
+    "lint_js": "if [ $(find src/ -name '*.js' | wc -l) -gt 0 ] || [ $(find test/ -name '*.js' | wc -l) -gt 0 ]; then jscs --config src/.jscsrc src/ test/; fi",
+    "lint_json": "for jsonFile in $(find src/ -name '*.json' && echo package.json && echo doc/.jsdocrc && echo src/.jscsrc && echo test/jasmine.spec.json); do echo \">> ${jsonFile} <<\"; if ! jsonlint \"${jsonFile}\" --indent \"  \" --diff --diff-context 3 --ignore-trailing-newlines 1 --ignore-empty-lines 1; then exit 1; fi; done",
+    "lint": "npm run lint_js && npm run lint_json",
+    "generate_doc": "npm run clean && jsdoc --configure doc/.jsdocrc src",
+    "clean": "if [ -d doc/gen ]; then rm -rf doc/gen; fi",
+    "precompile": "npm run compile_closure_compiler",
+    "compile": "if [ $(find src/ -name '*.js' | wc -l) -gt 0 ]; then java -jar tools/closure_compiler/build/compiler.jar --flagfile src/.closure_compiler.flagfile --js src/ > /dev/null; fi",
+    "validate": "npm run lint && npm run compile && npm run test",
+    "publish": "./tools/publish.sh"
+  }
+}
