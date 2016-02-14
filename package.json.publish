@@ -13,7 +13,7 @@
       "doc/",
       "LICENSE",
       "README.md",
-      "package.dev.json",
+      "package.json.dev",
       "src/",
       "test/"
   ],
