@@ -1,7 +1,7 @@
 ### This script uses the correct package.json file and publishes the entire package.
 
 rm package.json
-ln -s package.json.publish package.json
+cp package.json.publish package.json
 
 npm publish
 
