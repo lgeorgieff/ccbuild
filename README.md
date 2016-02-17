@@ -6,7 +6,7 @@ _ccbuild_ offers a thin layer on top of the [google-closure-compiler](https://ww
 Usage: ccbuild [-h|--help] [-v|--version] [--closure-help]
            [--closure-version] [--compiler-path] [--contrib-path]
            [--ignore-warnings] [-ignore-errors] [-c|--config PATH]...
-           [--config-help]
+           [--ignore-compiled-code] [--stop-on-error] [--config-help]
 
 Checks and compiles JavaScript files via the Closure Compiler.
 
@@ -20,14 +20,20 @@ Checks and compiles JavaScript files via the Closure Compiler.
   -c|--config PATH        Path to the configuration file ccbuild
                           should use. If no configuration is specified
                           ccbuild checks the current directory for
-                          all files with the file extension ".nbuild". For
+                          all files with the file extension ".ccbuild". For
                           every matched configuration file ccbuild
                           performs a run.
  --config-help            Display a help message for the configuration file
                           format and exit.
  --ignore-warnings        Compilation warnings are not shown on stderr.
- --ignore-errrors         Compilation errors are not shown on stderr.
+ --ignore-errors          Compilation errors are not shown on stderr.
  --ignore-compiled-code   The compiled code is not shown on stdout.
+ --stop-on-error          All compilation processes are stopped in case a
+                          compilation error occurs. ccbuild will exit with
+                          the exit code 1.
+ --stop-on-warning        All compilation processes are stopped in case a
+                          compilation warning occurs. ccbuild will exit with
+                          the exit code 1.
 ```
 
 # Configuration Files

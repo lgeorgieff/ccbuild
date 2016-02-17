@@ -60,7 +60,7 @@ function getUsage () {
             'Usage: ' + selfName + ' [-h|--help] [-v|--version] [--closure-help]\n' +
                 '           [--closure-version] [--compiler-path] [--contrib-path]\n' +
                 '           [--ignore-warnings] [-ignore-errors] [-c|--config PATH]...\n' +
-                '           [--config-help]\n\n' +
+                '           [--ignore-compiled-code] [--stop-on-error] [--config-help]\n\n' +
                 'Checks and compiles JavaScript files via the Closure Compiler.\n\n' +
                 '  -h|--help               Display this message and exit.\n' +
                 '  -v|--version            Display version information and exit.\n' +
@@ -72,14 +72,20 @@ function getUsage () {
                 '  -c|--config PATH        Path to the configuration file ' + selfName + '\n' +
                 '                          should use. If no configuration is specified\n' +
                 '                          ' + selfName + ' checks the current directory for\n' +
-                '                          all files with the file extension ".nbuild". For\n' +
+                '                          all files with the file extension ".ccbuild". For\n' +
                 '                          every matched configuration file ' + selfName + '\n' +
                 '                          performs a run.\n' +
                 ' --config-help            Display a help message for the configuration file\n' +
                 '                          format and exit.\n' +
                 ' --ignore-warnings        Compilation warnings are not shown on stderr.\n' +
-                ' --ignore-errrors         Compilation errors are not shown on stderr.\n' +
-                ' --ignore-compiled-code   The compiled code is not shown on stdout.\n');
+                ' --ignore-errors          Compilation errors are not shown on stderr.\n' +
+                ' --ignore-compiled-code   The compiled code is not shown on stdout.\n' +
+                ' --stop-on-error          All compilation processes are stopped in case a\n' +
+                '                          compilation error occurs. ' + selfName + ' will\n' +
+                '                          exit with the exit code 1.\n' +
+                ' --stop-on-warning        All compilation processes are stopped in case a\n' +
+                '                          compilation warning occurs. ' + selfName + ' will\n' +
+                '                          exit with the exit code 1.\n');
     }).catch(deferred.reject);
     return deferred.promise;
 }
@@ -200,6 +206,12 @@ function parseCliArgs (args) {
         case '--ignore-compiled-code':
             result.ignoreCompiledCode = true;
             break;
+        case '--stop-on-error':
+            result.stopOnError = true;
+            break;
+        case '--stop-on-warning':
+            result.stopOnWarning = true;
+            break;
         default:
             deferred.reject('The option "' + args[i] + '" is not supported');
             i = args.length;
@@ -296,11 +308,13 @@ function processConfigs (cliArgs) {
                         if (!cliArgs.ignoreWarnings && output.stderr) {
                             console.error(output.stderr);
                         }
+                        if (cliArgs.stopOnWarning) process.exit(1);
                     }).catch(function (err) {
                         if (!cliArgs.ignoreErrors) {
                             console.error(getHeading(compilationUnit));
                             console.error(err);
                         }
+                        if (cliArgs.stopOnError) process.exit(1);
                         compilationErrorDetected = true;
                     });
                 });
