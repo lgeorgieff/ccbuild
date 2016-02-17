@@ -132,7 +132,7 @@ describe('ccbuild', function () {
                                              '====================\n')).not.toBe(-1);
                                    expect(stdout.indexOf('=== unit3 =================================================' +
                                              '====================\n')).not.toBe(-1);
-                                   expect(stderr.length).toBeGreaterThan(0);
+                                   expect(stderr.length).toBe(0);
                                    done();
                                }
                            });
@@ -767,5 +767,167 @@ describe('ccbuild', function () {
         this.resourcesToDelete.push(configPath2);
         this.resourcesToDelete.push(configPath3);
         this.resourcesToDelete.push(temporaryConfigDirectory);
+    });
+
+    it('compile with --ignore-compiled-code -- success', function (done) {
+        var config = {
+            sources: ['./data/source1.js'],
+            externs: ['data/externs1.js'],
+            buildOptions: [
+                '--compilation_level', 'ADVANCED_OPTIMIZATIONS',
+                '--warning_level', 'VERBOSE',
+                '--env', 'CUSTOM',
+                '--flagfile', './data/test_flagfile'
+            ],
+            compilationUnits: {
+                unit1: {
+                },
+                unit3: {
+                    sources: ['./data/source3.js', './data/source4.js'],
+                    externs: ['./data/externs2.js', 'data/externs3.js']
+                }
+            }
+        };
+
+        var configPath = path.join(__dirname, 'config1.ccbuild');
+        fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
+        // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
+        child_process.exec('node ./src/ccbuild.js --config ./test/unit_test/config1.ccbuild --ignore-compiled-code',
+                           function (err, stdout, stderr) {
+                               if (err) {
+                                   done.fail(err);
+                               } else {
+                                   expect(stdout.length).toBe(0);
+                                   expect(stderr.length).toBe(0);
+                                   done();
+                               }
+                           });
+        // jscs:enable requireCamelCaseOrUpperCaseIdentifiers
+        this.resourcesToDelete.push(configPath);
+    });
+
+    it('compile with --ignore-compiled-code -- warning', function (done) {
+        var config = {
+            sources: ['./data/source1.js'],
+            externs: ['data/externs1.js'],
+            buildOptions: [
+                '--compilation_level', 'ADVANCED_OPTIMIZATIONS',
+                '--warning_level', 'VERBOSE',
+                '--env', 'CUSTOM',
+                '--flagfile', './data/test_flagfile'
+            ],
+            compilationUnits: {
+                unit1: {
+                },
+                unit2: {
+                    sources: ['data/source2.js'],
+                    externs: ['./data/externs2.js']
+                },
+                unit3: {
+                    sources: ['./data/source3.js', './data/source4.js'],
+                    externs: ['./data/externs2.js', 'data/externs3.js']
+                }
+            }
+        };
+
+        var configPath = path.join(__dirname, 'config1.ccbuild');
+        fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
+        // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
+        child_process.exec('node ./src/ccbuild.js --config ./test/unit_test/config1.ccbuild --ignore-compiled-code',
+                           function (err, stdout, stderr) {
+                               if (err) {
+                                   done.fail(err);
+                               } else {
+                                   expect(stdout).toBe('=== unit2 ===================================================' +
+                                                       '==================\n');
+                                   expect(stderr.length).toBeGreaterThan(0);
+                                   done();
+                               }
+                           });
+        // jscs:enable requireCamelCaseOrUpperCaseIdentifiers
+        this.resourcesToDelete.push(configPath);
+    });
+
+    it('compile with --ignore-compiled-code -- warning & --ignore-warnings', function (done) {
+        var config = {
+            sources: ['./data/source1.js'],
+            externs: ['data/externs1.js'],
+            buildOptions: [
+                '--compilation_level', 'ADVANCED_OPTIMIZATIONS',
+                '--warning_level', 'VERBOSE',
+                '--env', 'CUSTOM',
+                '--flagfile', './data/test_flagfile'
+            ],
+            compilationUnits: {
+                unit1: {
+                },
+                unit2: {
+                    sources: ['data/source2.js'],
+                    externs: ['./data/externs2.js']
+                },
+                unit3: {
+                    sources: ['./data/source3.js', './data/source4.js'],
+                    externs: ['./data/externs2.js', 'data/externs3.js']
+                }
+            }
+        };
+
+        var configPath = path.join(__dirname, 'config1.ccbuild');
+        fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
+        // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
+        child_process.exec('node ./src/ccbuild.js --config ./test/unit_test/config1.ccbuild --ignore-compiled-code ' +
+                           '--ignore-warnings',
+                           function (err, stdout, stderr) {
+                               if (err) {
+                                   done.fail(err);
+                               } else {
+                                   expect(stdout.length).toBe(0);
+                                   expect(stderr.length).toBe(0);
+                                   done();
+                               }
+                           });
+        // jscs:enable requireCamelCaseOrUpperCaseIdentifiers
+        this.resourcesToDelete.push(configPath);
+    });
+
+    it('compile with --ignore-compiled-code -- error', function (done) {
+        var config = {
+            sources: ['./data/source1.js'],
+            externs: ['data/externs1.js'],
+            buildOptions: [
+                '--compilation_level', 'ADVANCED_OPTIMIZATIONS',
+                '--warning_level', 'VERBOSE',
+                '--env', 'CUSTOM',
+                '--flagfile', './data/test_flagfile'
+            ],
+            compilationUnits: {
+                unit1: {
+                },
+                unit2: {
+                    sources: ['data/source2.js']
+                },
+                unit3: {
+                    sources: ['./data/source3.js', './data/source4.js'],
+                    externs: ['./data/externs2.js', 'data/externs3.js']
+                }
+            }
+        };
+
+        var configPath = path.join(__dirname, 'config1.ccbuild');
+        fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
+        // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
+        child_process.exec('node ./src/ccbuild.js --config ./test/unit_test/config1.ccbuild --ignore-compiled-code',
+                           function (err, stdout, stderr) {
+                               if (!err) {
+                                   done.fail(new Error('Expected that compilation process will fail!'));
+                               } else {
+                                   expect(stderr.indexOf('=== unit2 =================================================' +
+                                                         '====================\n')).toBe(0);
+                                   expect(stdout.length).toBe(0);
+                                   done();
+                               }
+                           });
+        // jscs:enable requireCamelCaseOrUpperCaseIdentifiers
+        this.resourcesToDelete.push(configPath);
     });
 });

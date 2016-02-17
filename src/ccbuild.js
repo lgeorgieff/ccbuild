@@ -62,22 +62,24 @@ function getUsage () {
                 '           [--ignore-warnings] [-ignore-errors] [-c|--config PATH]...\n' +
                 '           [--config-help]\n\n' +
                 'Checks and compiles JavaScript files via the Closure Compiler.\n\n' +
-                '  -h|--help           Display this message and exit.\n' +
-                '  -v|--version        Display version information and exit.\n' +
-                '  --closure-help      Display the usage for the Closure Compiler and exit.\n' +
-                '  --closure-version   Display the version of the Closure Compiler and exit.\n' +
-                '  --compiler-path     Display the path to the Closure Compiler and exit.\n' +
-                '  --contrib-path      Display the path to the contrib directory of the\n' +
-                '                      Closure Compiler and exit.\n' +
-                '  -c|--config PATH    Path to the configuration file ' + selfName + ' should\n' +
-                '                      use. If no configuration is specified ' + selfName + '\n' +
-                '                      checks the current directory for all files with the file\n' +
-                '                      extension ".nbuild". For every matched configuration file\n' +
-                '                      ' + selfName + ' performs a run.\n' +
-                ' --config-help        Display a help message for the configuration file format\n' +
-                '                      and exit.\n' +
-                ' --ignore-warnings    Compilation warnings are not shown on stderr.\n' +
-                ' --ignore-errrors     Compilation errors are not shown on stderr.\n');
+                '  -h|--help               Display this message and exit.\n' +
+                '  -v|--version            Display version information and exit.\n' +
+                '  --closure-help          Display the usage for the Closure Compiler and exit.\n' +
+                '  --closure-version       Display the version of the Closure Compiler and exit.\n' +
+                '  --compiler-path         Display the path to the Closure Compiler and exit.\n' +
+                '  --contrib-path          Display the path to the contrib directory of the\n' +
+                '                          Closure Compiler and exit.\n' +
+                '  -c|--config PATH        Path to the configuration file ' + selfName + '\n' +
+                '                          should use. If no configuration is specified\n' +
+                '                          ' + selfName + ' checks the current directory for\n' +
+                '                          all files with the file extension ".nbuild". For\n' +
+                '                          every matched configuration file ' + selfName + '\n' +
+                '                          performs a run.\n' +
+                ' --config-help            Display a help message for the configuration file\n' +
+                '                          format and exit.\n' +
+                ' --ignore-warnings        Compilation warnings are not shown on stderr.\n' +
+                ' --ignore-errrors         Compilation errors are not shown on stderr.\n' +
+                ' --ignore-compiled-code   Compilation errors are not shown on stderr.\n');
     }).catch(deferred.reject);
     return deferred.promise;
 }
@@ -195,6 +197,9 @@ function parseCliArgs (args) {
         case '--ignore-errors':
             result.ignoreErrors = true;
             break;
+        case '--ignore-compiled-code':
+            result.ignoreCompiledCode = true;
+            break;
         default:
             deferred.reject('The option "' + args[i] + '" is not supported');
             i = args.length;
@@ -282,9 +287,13 @@ function processConfigs (cliArgs) {
                         globalBuildOptions: configObject.buildOptions,
                         unitBuildOptions: configObject.compilationUnits[compilationUnit].buildOptions
                     }).then(function (output) {
-                        console.log(getHeading(compilationUnit));
-                        console.log(output.stdout);
-                        if (!cliArgs.ignoreWarnigns && output.stderr) {
+                        if (!cliArgs.ignoreCompiledCode || (!cliArgs.ignoreWarnings && output.stderr)) {
+                            console.log(getHeading(compilationUnit));
+                        }
+                        if (!cliArgs.ignoreCompiledCode) {
+                            console.log(output.stdout);
+                        }
+                        if (!cliArgs.ignoreWarnings && output.stderr) {
                             console.error(output.stderr);
                         }
                     }).catch(function (err) {
