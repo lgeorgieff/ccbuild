@@ -5,24 +5,29 @@ _ccbuild_ offers a thin layer on top of the [google-closure-compiler](https://ww
 ```
 Usage: ccbuild [-h|--help] [-v|--version] [--closure-help]
            [--closure-version] [--compiler-path] [--contrib-path]
-           [-c|--config PATH]... [--config-help]
+           [--ignore-warnings] [-ignore-errors] [-c|--config PATH]...
+           [--config-help]
 
 Checks and compiles JavaScript files via the Closure Compiler.
 
-  -h|--help           Display this message and exit.
-  -v|--version        Display version information and exit.
-  --closure-help      Display the usage for the Closure Compiler and exit.
-  --closure-version   Display the version of the Closure Compiler and exit.
-  --compiler-path     Display the path to the Closure Compiler and exit.
-  --contrib-path      Display the path to the contrib directory of the
-                      Closure Compiler and exit.
-  -c|--config PATH    Path to the configuration file ccbuild should
-                      use. If no configuration is specified ccbuild
-                      checks the current directory for all files with the file
-                      extension ".ccbuild". For every matched configuration file
-                      ccbuild performs a run.
- --config-help        Display a help message for the configuration file format
-                      and exit.
+  -h|--help               Display this message and exit.
+  -v|--version            Display version information and exit.
+  --closure-help          Display the usage for the Closure Compiler and exit.
+  --closure-version       Display the version of the Closure Compiler and exit.
+  --compiler-path         Display the path to the Closure Compiler and exit.
+  --contrib-path          Display the path to the contrib directory of the
+                          Closure Compiler and exit.
+  -c|--config PATH        Path to the configuration file ccbuild
+                          should use. If no configuration is specified
+                          ccbuild checks the current directory for
+                          all files with the file extension ".nbuild". For
+                          every matched configuration file ccbuild
+                          performs a run.
+ --config-help            Display a help message for the configuration file
+                          format and exit.
+ --ignore-warnings        Compilation warnings are not shown on stderr.
+ --ignore-errrors         Compilation errors are not shown on stderr.
+ --ignore-compiled-code   Compilation errors are not shown on stderr.
 ```
 
 # Configuration Files
