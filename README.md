@@ -27,7 +27,7 @@ Checks and compiles JavaScript files via the Closure Compiler.
                           format and exit.
  --ignore-warnings        Compilation warnings are not shown on stderr.
  --ignore-errrors         Compilation errors are not shown on stderr.
- --ignore-compiled-code   Compilation errors are not shown on stderr.
+ --ignore-compiled-code   The compiled code is not shown on stdout.
 ```
 
 # Configuration Files

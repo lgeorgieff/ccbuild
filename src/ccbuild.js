@@ -79,7 +79,7 @@ function getUsage () {
                 '                          format and exit.\n' +
                 ' --ignore-warnings        Compilation warnings are not shown on stderr.\n' +
                 ' --ignore-errrors         Compilation errors are not shown on stderr.\n' +
-                ' --ignore-compiled-code   Compilation errors are not shown on stderr.\n');
+                ' --ignore-compiled-code   The compiled code is not shown on stdout.\n');
     }).catch(deferred.reject);
     return deferred.promise;
 }
