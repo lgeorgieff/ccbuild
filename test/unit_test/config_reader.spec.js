@@ -283,7 +283,7 @@ describe('config_reader', function () {
             });
         };
 
-        createConfigs(process.cwd());
+        createConfigs('.');
         createConfigs(testDirectory);
 
         configReader.getLocalConfigFiles().then(function (configFilePaths) {
