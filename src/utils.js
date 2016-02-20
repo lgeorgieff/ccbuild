@@ -1,8 +1,4 @@
-/**
- * This module contains several utility functions for this package.
- *
- * @module utils
- */
+'use strict';
 
 /**
  * @ignore

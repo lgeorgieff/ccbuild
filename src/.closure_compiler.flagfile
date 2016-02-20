@@ -51,6 +51,8 @@
 --jscomp_off=strictModuleDepCheck
 --jscomp_off=typeInvalidation
 
+--extra_annotation_name=emits
+
 --env CUSTOM
 
 --externs=./tools/node.js_closure_compiler_externs/zlib.js

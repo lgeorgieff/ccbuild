@@ -12,6 +12,7 @@
   "bin": {
     "ccbuild": "src/ccbuild.js"
   },
+  "main": "src/lib.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/lgeorgieff/ccbuild.git"

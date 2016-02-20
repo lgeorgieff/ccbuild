@@ -1,12 +1,6 @@
 'use strict';
 
 /**
- * This module contains several functions for getting and parsing the configuration files for this app.
- *
- * @module config_reader
- */
-
-/**
  * @ignore
  * @suppress {duplicate}
  */
