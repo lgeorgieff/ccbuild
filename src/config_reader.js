@@ -33,6 +33,7 @@ var utils = require('./utils');
 /**
  * @type {string}
  * @const
+ * @default '.ccbuild'
  */
 var DEFAULT_CONFIG_EXTENSION = '.ccbuild';
 
