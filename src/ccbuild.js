@@ -63,7 +63,7 @@ function main () {
         console.log(compilerPath);
         process.exit(0);
     });
-    ccbuild.on('compilerPath', function (contribPath) {
+    ccbuild.on('contribPath', function (contribPath) {
         console.log(contribPath);
         process.exit(0);
     });
