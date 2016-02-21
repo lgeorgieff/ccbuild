@@ -76,5 +76,43 @@ A configuration file is of the following form:
 Note: buildOptions can be either an array of strings or an object as specified
 at https://www.npmjs.com/package/google-closure-compiler#specifying-options.
 
+# Use ccbuild programmatically
+I n addition to use _ccbuild_ as an executable, you may alos use it directly from your code. Therefore it offers the type CCBuild that implements the _events.EventEmitter_ interface of Node.js. You may specify all supported arguments as an array of strings and pass it to the constructor of CCBuild. Afterwards CCBuild starts processing and emits the following events:
+ * argsError
+ * help
+ * version
+ * configHelp
+ * closureHelp
+ * closureVersion
+ * compilerPath
+ * contribPath
+ * configError
+ * circularDependencyError
+ * compilationError
+ * compiled
+
+The following example illustratest how you can use CCBuild in your code:
+```javascript
+    var ccbuild = new CCBuild(process.argv);
+    ccbuild.on('compilerPath', function (compilerPath) {
+        console.log(compilerPath);
+        process.exit(0);
+    });
+    ccbuild.on('configError', function (err) {
+        console.error(err);
+        process.exit(2);
+    });
+    ccbuild.on('compilationError', function (compilationUnit, err) {
+        console.error(compilationUnit + ': ' + err);
+        process.exit(1);
+    });
+    ccbuild.on('compiled', function (compilationUnit, stdout, stderr) {
+        console.log(compilationUnit + ': ' + stdout + '\n');
+        console.error('warnings: ' + stderr);
+    });
+
+    // ...
+```
+
 # License
 This project is released under [MIT license](./LICENSE). Note: that each referenced npm package that is used has its own license and potentially it has further dependencies. Please check each package individually whether it confirms to your OSS licensing rules.
