@@ -18,6 +18,12 @@ var fs = require('fs');
  */
 var util = require('util');
 
+/**
+ * @ignore
+ * @suppress {duplicate}
+ */
+var CCBuild = /** @type {function(new:CCBuild, Array<string>)} */ (require('../../src/lib.js'));
+
 // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
 /**
  * @ignore
@@ -44,6 +50,15 @@ describe('ccbuild', function () {
                 }
             });
         }
+    });
+
+    it('instantiate CCBuild', function () {
+        expect(new CCBuild([])).toEqual(jasmine.any(CCBuild));
+        expect(function () { new CCBuild({}); }).toThrow(jasmine.any(Error));
+        expect(function () { new CCBuild(null); }).toThrow(jasmine.any(Error));
+        expect(function () { new CCBuild(123); }).toThrow(jasmine.any(Error));
+        expect(function () { new CCBuild('--help'); }).toThrow(jasmine.any(Error));
+        expect(function () { new CCBuild(); }).toThrow(jasmine.any(Error));
     });
 
     it('compile with single config -- success', function (done) {
