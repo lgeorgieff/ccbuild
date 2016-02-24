@@ -31,6 +31,7 @@
     "npm": ">=3.0.0"
   },
   "dependencies": {
+    "async": "^1.5.2",
     "google-closure-compiler": "^20160208.1.0",
     "q": "^1.4.1",
     "read-package-json": "^2.0.3"
