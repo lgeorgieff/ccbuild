@@ -204,21 +204,21 @@ function CCBuild (argv) {
      * States that ccbuild was called with --closure-version and that the version information is ready.
      *
      * @event CCBuild#closureVersion
-     * @param {string} version The requested version information.
+     * @param {string} compilerVersion The requested version information.
      */
 
     /**
      * States the ccbuild was called with --compiler-path and that the compiler path information is ready.
      *
      * @event CCBuild#compilerPath
-     * @param {string} version The requested compiler path information.
+     * @param {string} compilerPath The requested compiler path information.
      */
 
     /**
      * States the ccbuild was called with --contrib-path and that the contrib path information is ready.
      *
      * @event CCBuild#contribPath
-     * @param {string} version The requested contrib path information.
+     * @param {string} contribPath The requested contrib path information.
      */
 
     /**
@@ -239,6 +239,7 @@ function CCBuild (argv) {
      * States an error occurred during the compilation process..
      *
      * @event CCBuild#compilationError
+     * @param {string} unitName The name of the compilation unit that failed.
      * @param {Error} err The compilation error.
      */
 

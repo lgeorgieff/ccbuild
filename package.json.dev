@@ -10,9 +10,9 @@
     "compiler"
   ],
   "bin": {
-    "ccbuild": "src/ccbuild.js"
+    "ccbuild": "src/bin.js"
   },
-  "main": "src/lib.js",
+  "main": "src/CCBuild.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/lgeorgieff/ccbuild.git"

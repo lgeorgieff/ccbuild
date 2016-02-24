@@ -6,7 +6,7 @@
  * @ignore
  * @suppress {duplicate}
  */
-var CCBuild = /** @type {function (new:CCBuild, (Array<string>))} */ (require('./lib'));
+var CCBuild = /** @type {function (new:CCBuild, (Array<string>))} */ (require('./CCBuild.js'));
 
 /**
  * @ignore
