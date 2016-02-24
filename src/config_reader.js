@@ -287,6 +287,7 @@ ConfigurationNormalizer.prototype.normalize = function () {
 
 /**
  * @typedef {{
+ *             workingDirectory: !string,
  *             unitName: !string,
  *             globalSources: !Array<string>,
  *             unitSources: !Array<string>,

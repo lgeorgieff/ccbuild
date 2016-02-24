@@ -572,6 +572,11 @@ describe('ccbuild', function () {
                     sources: ['../source3.js', '../source4.js'],
                     externs: ['../externs2.js', '../externs3.js'],
                     buildOptions: ['--flagfile', '../test_flagfile']
+                },
+                unit4: {
+                    sources: ['../source3.js', '../source4.js'],
+                    externs: ['../externs2.js', '../externs3.js'],
+                    buildOptions: ['--flagfile', '../test_flagfile']
                 }
             }
         };
@@ -592,6 +597,8 @@ describe('ccbuild', function () {
                                    expect(stdout.indexOf('=== unit2 =================================================' +
                                                          '====================\n')).not.toBe(-1);
                                    expect(stdout.indexOf('=== unit3 =================================================' +
+                                                         '====================\n')).not.toBe(-1);
+                                   expect(stdout.indexOf('=== unit4 =================================================' +
                                                          '====================\n')).not.toBe(-1);
                                    expect(stderr.length).toBeGreaterThan(0);
                                    done();
@@ -658,6 +665,10 @@ describe('ccbuild', function () {
             compilationUnits: {
                 unit3: {
                     sources: ['../source3.js', '../source4.js'],
+                    buildOptions: ['--flagfile', '../test_flagfile']
+                },
+                unit4: {
+                    sources: ['../source3.js', '../source4.js'],
                     externs: ['../externs2.js', '../externs3.js'],
                     buildOptions: ['--flagfile', '../test_flagfile']
                 }
@@ -679,7 +690,9 @@ describe('ccbuild', function () {
                                                          '====================\n')).not.toBe(-1);
                                    expect(stderr.indexOf('=== unit2 =================================================' +
                                                          '====================\n')).not.toBe(-1);
-                                   expect(stdout.indexOf('=== unit3 =================================================' +
+                                   expect(stderr.indexOf('=== unit3 =================================================' +
+                                                         '====================\n')).not.toBe(-1);
+                                   expect(stdout.indexOf('=== unit4 =================================================' +
                                                          '====================\n')).not.toBe(-1);
                                    expect(stderr.length).toBeGreaterThan(0);
                                    done();

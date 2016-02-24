@@ -34,6 +34,12 @@ var Q = require('q');
  * @ignore
  * @suppress {duplicate}
  */
+var async = require('async');
+
+/**
+ * @ignore
+ * @suppress {duplicate}
+ */
 var utils = require('./utils');
 
 /**
@@ -354,7 +360,27 @@ CCBuild.prototype._parseCliArgs = function (args) {
 CCBuild.prototype._processConfigs = function (cliArgs) {
     var self = this;
 
+    /**
+     * @private
+     *
+     * @returns {function(function(...*))} A function that expects a done callback that can be called by async
+     *          functions.
+     * @param {CompilerConfiguration} compilationUnit The compiler configuration for a compilation unit.
+     */
+    var compileUnit = function (compilationUnit) {
+        return function (done) {
+            compile(compilationUnit).then(function (args) {
+                self.emit('compiled', args.compilationUnit, args.stdout, args.stderr);
+                done();
+            }).catch(function (args) {
+                self.emit('compilationError', args.compilationUnit, args.error);
+                done();
+            });
+        };
+    };
+
     var processedConfigFiles = [];
+
     /**
      * @private
      *
@@ -362,15 +388,15 @@ CCBuild.prototype._processConfigs = function (cliArgs) {
      * @param {Object=} parentConfig The parsed parent configuration - if present.
      */
     var processConfig = function (configFilePath, parentConfig) {
+        var deferred = Q.defer();
+
         // We ignore duplicate configuration files. This can be for example the case if the same configuration file is
         // specified viw the CLI argument --config|-c and vie the next property in a parent configuration file.
         if (processedConfigFiles.indexOf(configFilePath) === -1) {
             configReader.readAndParseConfiguration(configFilePath, parentConfig).then(function (configObject) {
-                // TODO: Ensure that chdir is called for a compilation process and the process reamins in this dir until
-                //       the compilation process has finished.
-                process.chdir(path.dirname(configFilePath));
-                Object.keys(configObject.compilationUnits).forEach(function (compilationUnit) {
-                    self._compile({
+                var compilationUnits = Object.keys(configObject.compilationUnits).map(function (compilationUnit) {
+                    return {
+                        workingDirectory: path.dirname(configFilePath),
                         unitName: compilationUnit,
                         globalSources: configObject.sources,
                         unitSources: configObject.compilationUnits[compilationUnit].sources,
@@ -378,23 +404,47 @@ CCBuild.prototype._processConfigs = function (cliArgs) {
                         unitExterns: configObject.compilationUnits[compilationUnit].externs,
                         globalBuildOptions: configObject.buildOptions,
                         unitBuildOptions: configObject.compilationUnits[compilationUnit].buildOptions
-                    });
+                    };
                 });
                 processedConfigFiles.push(configFilePath);
-                Object.keys(configObject.next).forEach(function (nextConfigFilePath) {
-                    processConfig(nextConfigFilePath, configObject);
+
+                Q.allSettled(Object.keys(configObject.next).map(function (nextConfigFilePath) {
+                    return processConfig(nextConfigFilePath, configObject);
+                })).then(function (queuedCompilationUnitsPromises) {
+                    var queuedCompilationsUnits = queuedCompilationUnitsPromises.map(function (promise) {
+                        if (promise.state === 'fulfilled') return promise.value;
+                        else return undefined;
+                    }).filter(function (compilationUnits) {
+                        return compilationUnits !== undefined;
+                    }).reduce(function (accumulator, currentValue) {
+                        return accumulator.concat(currentValue);
+                    }, []);
+                    deferred.resolve(queuedCompilationsUnits.concat(compilationUnits));
                 });
             }).catch(function (err) {
                 self.emit('configError', err);
+                deferred.reject(err);
             });
         } else {
-            self.emit('circularDependencyError',
-                      new Error('Discovered circular dependency to "' + configFilePath + '"!'));
+            var error = new Error('Discovered circular dependency to "' + configFilePath + '"!');
+            self.emit('circularDependencyError', error);
+            deferred.reject(error);
         }
+        return deferred.promise;
     };
 
-    cliArgs.configs.forEach(function (configFilePath) {
-        processConfig(configFilePath);
+    Q.allSettled(cliArgs.configs.map(function (configFilePath) {
+        return processConfig(configFilePath);
+    })).then(function (queuedCompilationUnitsPromises) {
+        var queuedCompilationUnits = queuedCompilationUnitsPromises.map(function (promise) {
+            if (promise.state === 'fulfilled') return promise.value;
+            else return undefined;
+        }).filter(function (compilationUnit) {
+            return compilationUnit !== undefined;
+        }).reduce(function (accumulator, currentValue) {
+            return accumulator.concat(currentValue);
+        }, []).map(compileUnit);
+        async.series(queuedCompilationUnits);
     });
 };
 
@@ -404,18 +454,24 @@ CCBuild.prototype._processConfigs = function (cliArgs) {
  *
  * @private
  *
+ * @returns {QPromise<Object>} A promise holding the compilation result.
  * @param {CompilerConfiguration} compilerConfiguration An objet that contains the compiler configuration for a
  *        particular compilation unit.
  */
-CCBuild.prototype._compile = function (compilerConfiguration) {
-    var self = this;
+function compile (compilerConfiguration) {
+    var deferred = Q.defer();
     var compilerArguments = configReader.getCompilerArguments(compilerConfiguration);
     var compiler = new CC.compiler(compilerArguments);
+    process.chdir(compilerConfiguration.workingDirectory);
     compiler.run(function (code, stdout, stderr) {
-        if (code !== 0) self.emit('compilationError', compilerConfiguration.unitName,
-                                  new Error(code + (stderr ? ': ' + stderr : '')));
-        else self.emit('compiled', compilerConfiguration.unitName, stdout, stderr);
+        if (code !== 0) {
+            deferred.reject({compilationUnit: compilerConfiguration.unitName,
+                             error: new Error(code + (stderr ? ': ' + stderr : ''))});
+        } else {
+            deferred.resolve({compilationUnit: compilerConfiguration.unitName, stdout: stdout, stderr: stderr});
+        }
     });
+    return deferred.promise;
 };
 
 module.exports = CCBuild;

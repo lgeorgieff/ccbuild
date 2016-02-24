@@ -88,3 +88,4 @@
 --externs=./tools/node.js_closure_compiler_externs/net.js
 --externs=./tools/closure_compiler_externs/cc.js
 --externs=./tools/closure_compiler_externs/q.js
+--externs=./tools/closure_compiler_externs/async.js
