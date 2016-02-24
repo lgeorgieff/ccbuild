@@ -38,7 +38,7 @@ Checks and compiles JavaScript files via the Closure Compiler.
 
 # Configuration Files
 _ccbuild_ operates on configuration files, i.e. without any configuration file nothing will happen. Usually the configuration files should be named in the form of *.ccbuild.
-If no configuration file is specified via CLI the `$CWD` is searched for all files of the form *.ccbuild. If at least one if found, it will be processed. In case multiple files are found, all of them are processed. To specify any configuration file via CLI, the option -c <FILE PATH> or --config <FILE PATH> must be used. IT is possible to specify multiple configuration files. In case at least one configuration file is specified via CLI, `$CWD` is not searched for any default configuration file. A configuration file may reference another configuration file. In case circular references are found, a second run on a configuration file that was already processed will not be started. All relative paths in the fields _sources_, _externs_ and the _next_ property are resolved against the `__dirname` of the configuration file in which they are defined.
+If no configuration file is specified via CLI, the `$CWD` is searched for all files of the form *.ccbuild. If at least one is found, it will be processed. In case multiple files are found, all of them are processed. To specify any configuration file via CLI, the option -c <FILE PATH> or --config <FILE PATH> must be used. It is possible to specify multiple configuration files. In case at least one configuration file is specified via CLI, `$CWD` is not searched for any default configuration file. A configuration file may reference another configuration file. In case circular references are found, a second run on a configuration file that was already processed will not be started. All relative paths in the fields _sources_, _externs_ and the _next_ property are resolved against the `__dirname` of the configuration file in which they are defined. Any file paths that are defined via the _buildOptions_ property must be defined relative to the location of the configuration file.
 
 A configuration file is of the following form:
 
@@ -77,7 +77,7 @@ Note: buildOptions can be either an array of strings or an object as specified
 at https://www.npmjs.com/package/google-closure-compiler#specifying-options.
 
 # Use ccbuild programmatically
-I n addition to use _ccbuild_ as an executable, you may alos use it directly from your code. Therefore it offers the type CCBuild that implements the _events.EventEmitter_ interface of Node.js. You may specify all supported arguments as an array of strings and pass it to the constructor of CCBuild. Afterwards CCBuild starts processing and emits the following events:
+In addition to use _ccbuild_ as an executable, you may also use it directly from your code. Therefore it offers the type CCBuild that implements the _events.EventEmitter_ interface of Node.js. You may specify all supported arguments as an array of strings and pass it to the constructor of CCBuild. Afterwards CCBuild starts processing and emits the following events:
  * argsError
  * help
  * version
