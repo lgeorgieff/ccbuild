@@ -46,7 +46,7 @@ var utils = require('./utils');
  * @ignore
  * @suppress {duplicate}
  */
-var configReader = require('./config_reader');
+var configReader = require('./configReader');
 
 /**
  * Get the usage text.

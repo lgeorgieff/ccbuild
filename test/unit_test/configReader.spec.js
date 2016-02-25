@@ -18,7 +18,7 @@ var fs = require('fs');
  */
 var util = require('util');
 
-var configReader = require('../../src/config_reader');
+var configReader = require('../../src/configReader');
 
 describe('config_reader', function () {
     beforeEach(function () {
