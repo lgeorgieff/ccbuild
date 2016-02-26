@@ -7,99 +7,6 @@
 var util = require('util');
 
 /**
- * @ignore
- * @suppress {duplicate}
- */
-var rpj = /** @type {function(...*): Promise} */ (require('read-package-json'));
-
-/**
- * @ignore
- * @suppress {duplicate}
- */
-var Q = require('q');
-
-/**
- * @ignore
- * @suppress {duplicate}
- */
-var CC = require('google-closure-compiler');
-
-/**
- * Read a property of this package's package.json file.
- *
- * @private
- *
- * @returns {Promise<*>} A promise that holds the read value.
- * @param {string} propertyName The property name that is read in package.json.
- */
-function getPropertyValueFromPackageJson (propertyName) {
-    var deferred = Q.defer();
-    rpj('./package.json', function (err, data) {
-        if (err) deferred.reject(err);
-        else deferred.resolve(data[propertyName]);
-    });
-    return deferred.promise;
-}
-
-/**
- * Get the version defined in package.json.
- *
- * @returns {Promise<string>} A promise holding the version of this app's package.json file.
- */
-function getSelfVersion () {
-    return /** @type {Promise<string>} */ (getPropertyValueFromPackageJson ('version'));
-}
-
-/**
- * Get the name defined in package.json.
- *
- * @returns {Promise<string>} A promise holding the version of this app's package.json file.
- */
-function getSelfName () {
-    return /** @type {Promise<string>} */ (getPropertyValueFromPackageJson ('name'));
-}
-
-/**
- * Get the version of the closure compiler.
- *
- * @returns {Promise<string>} A promise holding the version of the used Closure Compiler.
- */
-function getCCVersion () {
-    var deferred = Q.defer();
-    var compiler = new CC.compiler(['--version']);
-    compiler.run(function (code, stdout, stderr) {
-        if (code !== 0 || stderr) {
-            var err = new Error(code + (stderr ? ': ' + stderr : ''));
-            deferred.reject(err);
-        } else {
-            deferred.resolve(stdout);
-        }
-    });
-
-    return deferred.promise;
-}
-
-/**
- * Get the help for the closure compiler.
- *
- * @returns {Promise<string>} A promise holding the help message for the Closure Compiler.
- */
-function getCCHelp () {
-    var deferred = Q.defer();
-    var compiler = new CC.compiler(['--help']);
-    compiler.run(function (code, stdout, stderr) {
-        if (code !== 0 || stderr) {
-            var err = new Error(code + (stderr ? ': ' + stderr : ''));
-            deferred.reject(err);
-        } else {
-            deferred.resolve(stdout + '\n');
-        }
-    });
-
-    return deferred.promise;
-}
-
-/**
  * Removes an array representing a set without duplicates.
  *
  * @template T
@@ -300,11 +207,7 @@ function mergeArguments (parentArguments, childArguments) {
     return result;
 }
 
-module.exports.getSelfVersion = getSelfVersion;
-module.exports.getSelfName = getSelfName;
 module.exports.arrayToSet = arrayToSet;
-module.exports.getCCVersion = getCCVersion;
-module.exports.getCCHelp = getCCHelp;
 module.exports.isStringArray = isStringArray;
 module.exports.mergeArrays = mergeArrays;
 module.exports.getValuesFromArgumentsArray = getValuesFromArgumentsArray;

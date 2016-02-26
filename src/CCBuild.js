@@ -46,99 +46,13 @@ var utils = require('./utils');
  * @ignore
  * @suppress {duplicate}
  */
-var configReader = require('./configReader');
+var configReader = require('./configReader.js');
 
 /**
- * Get the usage text.
- *
- * @private
- *
- * @returns {Promise<string>} A promise that holds the usage text as a string value.
+ * @ignore
+ * @suppress {duplicate}
  */
-function getUsage () {
-    var deferred = Q.defer();
-    utils.getSelfName().then(function (selfName) {
-        deferred.resolve(
-            'Usage: ' + selfName + ' [-h|--help] [-v|--version] [--closure-help]\n' +
-                '           [--config-help] [--closure-version] [--compiler-path]\n' +
-                '           [--contrib-path] [--ignore-warnings] [-ignore-errors]\n' +
-                '           [-c|--config PATH]... [--ignore-compiled-code] [--stop-on-error]\n' +
-                '           [--stop-on-warning]\n\n' +
-                'Checks and compiles JavaScript files via the Closure Compiler.\n\n' +
-                '  -h|--help               Display this message and exit.\n' +
-                '  -v|--version            Display version information and exit.\n' +
-                '  --closure-help          Display the usage for the Closure Compiler and exit.\n' +
-                '  --closure-version       Display the version of the Closure Compiler and exit.\n' +
-                '  --compiler-path         Display the path to the Closure Compiler and exit.\n' +
-                '  --contrib-path          Display the path to the contrib directory of the\n' +
-                '                          Closure Compiler and exit.\n' +
-                '  -c|--config PATH        Path to the configuration file ' + selfName + ' should\n' +
-                '                          use. If no configuration is specified ' + selfName + '\n' +
-                '                          checks the current directory for all files with the\n' +
-                '                          file extension ".nbuild". For every matched\n' +
-                '                          configuration file ' + selfName + ' performs a run.\n' +
-                ' --config-help            Display a help message for the configuration file\n' +
-                '                          format and exit.\n' +
-                ' --ignore-warnings        Compilation warnings are not shown on stderr.\n' +
-                ' --ignore-errrors         Compilation errors are not shown on stderr.\n' +
-                ' --ignore-compiled-code   The compiled code is not shown on stdout.\n' +
-                ' --stop-on-error          All compilation processes are stopped in case a\n' +
-                '                          compilation error occurs. ' + selfName + ' will\n' +
-                '                          exit with the exit code 1.\n' +
-                ' --stop-on-warning        All compilation processes are stopped in case a\n' +
-                '                          compilation warning occurs. ' + selfName + ' will\n' +
-                '                          exit with the exit code 1.\n');
-    }).catch(deferred.reject);
-    return deferred.promise;
-}
-
-/**
- * Get a help text for the configuration file.
- *
- * @private
- *
- * @returns {Promise<string>} A promise that holds the help text for the config file format as a string value.
- */
-function getConfigFileHelp () {
-    var deferred = Q.defer();
-    utils.getSelfName().then(function (selfName) {
-        deferred.resolve(
-            'The configuration files for ' + selfName + ' use the JSON format and are of the\n' +
-                'following form:\n\n' +
-                '{\n' +
-                '  "sources": [<source file paths to be included in all compilation units defined in this config>],\n' +
-                '  "externs": [<extern file paths to be included in all compilation units defined in this config>],\n' +
-                '  "buildOptions": [<options to be used for all compilation units defined in this config>],\n' +
-                '  "compilationUnits": {\n' +
-                '    "unit 1": {\n' +
-                '      "externs": [<source file paths to be used only for this compilation unit>],\n' +
-                '      "sources": [<extern file paths to be used only for this compilation unit>],\n' +
-                '      "buildOptions": [<options to be used only for this compilation unit>]\n' +
-                '    },\n' +
-                '    "unit 2": {\n' +
-                '      "externs": [<source file paths to be used only for this compilation unit>],\n' +
-                '      "sources": [<extern file paths to be used only for this compilation unit>],\n' +
-                '      "buildOptions": [<options to be used only for this compilation unit>]\n' +
-                '    },\n' +
-                '  },\n' +
-                '  "next": {\n' +
-                '    "<file path to the next config relative to this config>": {\n' +
-                '      "inheritSources": <boolean>,\n' +
-                '      "inheritExterns": <boolean>,\n' +
-                '      "inheritBuildOptions": <boolean>\n' +
-                '    },\n' +
-                '    "<file path to another config relative to this config>": {\n' +
-                '      "inheritSources": <boolean>,\n' +
-                '      "inheritExterns": <boolean>,\n' +
-                '      "inheritBuildOptions": <boolean>\n' +
-                '    }\n' +
-                '  }\n' +
-                '}\n\n' +
-                'Note: buildOptions can be either an array of strings or an object as specified\n' +
-                'at https://www.npmjs.com/package/google-closure-compiler#specifying-options.');
-    }).catch(deferred.reject);
-    return deferred.promise;
-}
+var CLI = /** @type {function(new:CLI, Array<string>)}*/ (require('./CLI.js'));
 
 /**
  * Instantiates a CCBuild object.
@@ -155,6 +69,7 @@ function getConfigFileHelp () {
  * @emits CCBuild#configHelp
  * @emits CCBuild#closureHelp
  * @emits CCBuild#closureVersion
+ * @emits CCBuild#argsParsed
  * @emits CCBuild#compilerPath
  * @emits CCBuild#contribPath
  * @emits CCBuild#configError
@@ -173,52 +88,59 @@ function CCBuild (argv) {
      */
 
     /**
-     * States that ccbuild was called with --help or -h and that the help message of ccbuild is ready.
+     * States that the option --help or -h was set and that the help message of ccbuild is ready.
      *
      * @event CCBuild#help
-     * @param {string} helpMessage The help message that can be displayed.
+     * @param {string} helpInfo The help message that can be displayed.
      */
 
     /**
-     * States that ccbuild was called with --version or -v and that the version information of ccbuild is ready.
+     * States that the option --version or -v was set and that the version information of ccbuild is ready.
      *
      * @event CCBuild#version
-     * @param {string} version The requested version information.
+     * @param {string} versionInfo The requested version information.
      */
 
     /**
-     * States that ccbuild was called with --config-help and that the help message for configuration files is ready.
+     * States that the option --config-help was set and that the help message for configuration files is ready.
      *
      * @event CCBuild#configHelp
-     * @param {string} helpMessage The help message that can be printed.
+     * @param {string} configHelpInfo The help message that can be printed.
      */
 
     /**
-     * States that ccbuild was called with --closure-help and that the help message is ready.
+     * States that the option --closure-help was set and that the help message is ready.
      *
      * @event CCBuild#closureHelp
-     * @param {string} helpMessage The help message that can be printed.
+     * @param {string} closureHelpInfo The help message that can be printed.
      */
 
     /**
-     * States that ccbuild was called with --closure-version and that the version information is ready.
+     * States that the option --closure-version was set and that the version information is ready.
      *
      * @event CCBuild#closureVersion
-     * @param {string} compilerVersion The requested version information.
+     * @param {string} compilerVersionInfo The requested version information.
      */
 
     /**
-     * States the ccbuild was called with --compiler-path and that the compiler path information is ready.
+     * States that the option --compiler-path was set and that the compiler path information is ready.
      *
      * @event CCBuild#compilerPath
      * @param {string} compilerPath The requested compiler path information.
      */
 
     /**
-     * States the ccbuild was called with --contrib-path and that the contrib path information is ready.
+     * States that the option --contrib-path was set and that the contrib path information is ready.
      *
      * @event CCBuild#contribPath
      * @param {string} contribPath The requested contrib path information.
+     */
+
+    /**
+     * States that the option --contrib-path was set and that the contrib path information is ready.
+     *
+     * @event CCBuild#argsParsed
+     * @param {Object} args The parsed argument object.
      */
 
     /**
@@ -254,7 +176,40 @@ function CCBuild (argv) {
 
     if (!util.isArray(argv)) throw Error('"argv" must be a string array!');
     events.EventEmitter.call(this);
+
+    this._cli = new CLI(argv);
     var self = this;
+    this._cli.on('argsError', function (err) {
+        self.emit('argsError', err);
+    });
+    this._cli.on('help', function (helpInfo) {
+        self.emit('help', helpInfo);
+    });
+    this._cli.on('version', function (versionInfo) {
+        self.emit('version', versionInfo);
+    });
+    this._cli.on('configHelp', function (configHelpInfo) {
+        self.emit('configHelp', configHelpInfo);
+    });
+    this._cli.on('closureHelp', function (closureHelpInfo) {
+        self.emit('closureHelp', closureHelpInfo);
+    });
+    this._cli.on('closureVersion', function (closureVersionInfo) {
+        self.emit('closureVersion', closureVersionInfo);
+    });
+    this._cli.on('compilerPath', function (compilerPath) {
+        self.emit('compilerPath', compilerPath);
+    });
+    this._cli.on('contribPath', function (contribPath) {
+        self.emit('contribPath', contribPath);
+    });
+    this._cli.on('contribPath', function (contribPath) {
+        self.emit('contribPath', contribPath);
+    });
+    this._cli.on('argsParsed', function (contribPath) {
+        self.emit('argsParsed', contribPath);
+    });
+
     self.on('argsParsed', function (cliArgs) {
         if (cliArgs.configs) {
             self._processConfigs(/** @type {{configs: Array<string>}} */ (cliArgs));
@@ -265,90 +220,9 @@ function CCBuild (argv) {
             });
         }
     });
-    process.nextTick(function () {
-        self._parseCliArgs(argv);
-    });
 }
 
 util.inherits(CCBuild, events.EventEmitter);
-
-/**
- * Parse all CLI arguments and emit an 'argsParsed' event with the parsed arguments object as parameter.
- * In case of error, the event 'argsError' is emitted.
- *
- * @private
- *
- * @param {Array<string>} args An array with all CLI arguments.
- */
-CCBuild.prototype._parseCliArgs = function (args) {
-    var self = this;
-    var emitFromPromise = function (eventName, promise) {
-        promise.then(function (promiseResult) {
-            self.emit(eventName, promiseResult);
-        }).catch(function (err) {
-            self.emit('argsError', err);
-        });
-    };
-    var result = {};
-    var i = 2;
-    for (; i < args.length; ++i) {
-        switch (args[i]) {
-        case '--help':
-        case '-h':
-            emitFromPromise('help', utils.getSelfVersion());
-            break;
-        case '--version':
-        case '-v':
-            emitFromPromise('version', utils.getSelfVersion());
-            break;
-        case '--config':
-        case '-c':
-            if (i + 1 === args.length) {
-                this.emit('argsError', new Error('-c|--config requires a PATH parameter'));
-            } else {
-                if (!result.hasOwnProperty('configs')) result.configs = [];
-                result.configs.push(path.resolve(args[++i]));
-            }
-            break;
-        case '--config-help':
-            emitFromPromise('configHelp', getConfigFileHelp());
-            break;
-        case '--closure-help':
-            emitFromPromise('closureHelp', utils.getCCHelp());
-            break;
-        case '--closure-version':
-            emitFromPromise('closureVersion', utils.getCCVersion());
-            break;
-        case '--compiler-path':
-            this.emit('compilerPath', CC.compiler.COMPILER_PATH);
-            break;
-        case '--contrib-path':
-            this.emit('contribPath', CC.compiler.CONTRIB_PATH);
-            break;
-        case '--ignore-warnings':
-            result.ignoreWarnings = true;
-            break;
-        case '--ignore-errors':
-            result.ignoreErrors = true;
-            break;
-        case '--ignore-compiled-code':
-            result.ignoreCompiledCode = true;
-            break;
-        case '--stop-on-error':
-            result.stopOnError = true;
-            break;
-        case '--stop-on-warning':
-            result.stopOnWarning = true;
-            break;
-        default:
-            this.emit('argsError', new Error('The option "' + args[i] + '" is not supported'));
-            i = args.length;
-            break;
-        }
-    }
-    if (result.configs !== undefined) result.configs = utils.arrayToSet(result.configs);
-    this.emit('argsParsed', result);
-};
 
 /**
  * Invokes the compilation process for each configuration file specified via the CLI and via the next property in the

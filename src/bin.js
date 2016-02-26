@@ -12,6 +12,12 @@ var CCBuild = /** @type {function (new:CCBuild, (Array<string>))} */ (require('.
  * @ignore
  * @suppress {duplicate}
  */
+var CLI = /** @type {function (new:CLI, (Array<string>))} */ (require('./CLI.js'));
+
+/**
+ * @ignore
+ * @suppress {duplicate}
+ */
 var util = require('util');
 
 /**
@@ -50,7 +56,7 @@ function main () {
     var parsedCliArgs = {};
     var ccbuild = new CCBuild(process.argv);
     ccbuild.on('argsError', function (err) {
-        utils.getSelfName().then(function (selfName) {
+        CLI.getSelfName().then(function (selfName) {
             console.error(err + '\n');
             console.error('For more information call ' + selfName + ' --help');
             process.exit(2);
