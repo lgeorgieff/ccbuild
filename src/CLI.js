@@ -62,69 +62,6 @@ var utils = require('./utils');
  * @param {Array<string>} argv An array representing the CLI arguments that will be parsed by this class.
  */
 function CLI (argv) {
-    /**
-     * States that the parsing process of the CLI arguments failed.
-     *
-     * @event CCBuild#argsError
-     * @param {Error} err The error that occurred during argumentation parsing.
-     */
-
-    /**
-     * States that the option --help or -h was set and that the help message of ccbuild is ready.
-     *
-     * @event CCBuild#help
-     * @param {string} helpInfo The help message that can be displayed.
-     */
-
-    /**
-     * States that the option --version or -v was set and that the version information of ccbuild is ready.
-     *
-     * @event CCBuild#version
-     * @param {string} versionInfo The requested version information.
-     */
-
-    /**
-     * States that the option --config-help was set and that the help message for configuration files is ready.
-     *
-     * @event CCBuild#configHelp
-     * @param {string} configHelpInfo The help message that can be printed.
-     */
-
-    /**
-     * States that the option --closure-help was set and that the help message is ready.
-     *
-     * @event CCBuild#closureHelp
-     * @param {string} closureHelpInfo The help message that can be printed.
-     */
-
-    /**
-     * States that the option --closure-version was set and that the version information is ready.
-     *
-     * @event CCBuild#closureVersion
-     * @param {string} compilerVersionInfo The requested version information.
-     */
-
-    /**
-     * States that the option --compiler-path was set and that the compiler path information is ready.
-     *
-     * @event CCBuild#compilerPath
-     * @param {string} compilerPath The requested compiler path information.
-     */
-
-    /**
-     * States that the option --contrib-path was set and that the contrib path information is ready.
-     *
-     * @event CCBuild#contribPath
-     * @param {string} contribPath The requested contrib path information.
-     */
-
-    /**
-     * States that the option --contrib-path was set and that the contrib path information is ready.
-     *
-     * @event CCBuild#argsParsed
-     * @param {Object} args The parsed argument object.
-     */
-
     events.EventEmitter.call(this);
     process.nextTick(this._parseCliArgs.bind(this, argv));
 }
@@ -293,6 +230,8 @@ function getPropertyValueFromPackageJson (propertyName) {
  * @private
  *
  * @param {Array<string>} args An array with all CLI arguments.
+ *
+ * @suppress {misplacedTypeAnnotation}
  */
 CLI.prototype._parseCliArgs = function (args) {
     if (!util.isArray(args)) args = [];
@@ -302,6 +241,12 @@ CLI.prototype._parseCliArgs = function (args) {
         promise.then(function (promiseResult) {
             self.emit(eventName, promiseResult);
         }).catch(function (err) {
+            /**
+             * States that the parsing process of the CLI arguments failed.
+             *
+             * @event CLI#argsError
+             * @param {Error} err The error that occurred during argumentation parsing.
+             */
             self.emit('argsError', err);
         });
     };
@@ -311,15 +256,33 @@ CLI.prototype._parseCliArgs = function (args) {
         switch (args[i]) {
         case '--help':
         case '-h':
+            /**
+             * States that the option --help or -h was set and that the help message of ccbuild is ready.
+             *
+             * @event CLI#help
+             * @param {string} helpInfo The help message that can be displayed.
+             */
             emitFromPromise('help', CLI.getUsage());
             break;
         case '--version':
         case '-v':
+            /**
+             * States that the option --version or -v was set and that the version information of ccbuild is ready.
+             *
+             * @event CLI#version
+             * @param {string} versionInfo The requested version information.
+             */
             emitFromPromise('version', CLI.getSelfVersion());
             break;
         case '--config':
         case '-c':
             if (i + 1 === args.length) {
+                /**
+                 * States that the parsing process of the CLI arguments failed.
+                 *
+                 * @event CLI#argsError
+                 * @param {Error} err The error that occurred during argumentation parsing.
+                 */
                 this.emit('argsError', new Error('-c|--config requires a PATH parameter'));
             } else {
                 if (!result.hasOwnProperty('configs')) result.configs = [];
@@ -327,18 +290,48 @@ CLI.prototype._parseCliArgs = function (args) {
             }
             break;
         case '--config-help':
+            /**
+             * States that the option --config-help was set and that the help message for configuration files is ready.
+             *
+             * @event CLI#configHelp
+             * @param {string} configHelpInfo The help message that can be printed.
+             */
             emitFromPromise('configHelp', CLI.getConfigFileHelp());
             break;
         case '--closure-help':
+            /**
+             * States that the option --closure-help was set and that the help message is ready.
+             *
+             * @event CLI#closureHelp
+             * @param {string} closureHelpInfo The help message that can be printed.
+             */
             emitFromPromise('closureHelp', CLI.getCCHelp());
             break;
         case '--closure-version':
+            /**
+             * States that the option --closure-version was set and that the version information is ready.
+             *
+             * @event CLI#closureVersion
+             * @param {string} compilerVersionInfo The requested version information.
+             */
             emitFromPromise('closureVersion', CLI.getCCVersion());
             break;
         case '--compiler-path':
+            /**
+             * States that the option --compiler-path was set and that the compiler path information is ready.
+             *
+             * @event CLI#compilerPath
+             * @param {string} compilerPath The requested compiler path information.
+             */
             this.emit('compilerPath', CC.compiler.COMPILER_PATH);
             break;
         case '--contrib-path':
+            /**
+             * States that the option --contrib-path was set and that the contrib path information is ready.
+             *
+             * @event CLI#contribPath
+             * @param {string} contribPath The requested contrib path information.
+             */
             this.emit('contribPath', CC.compiler.CONTRIB_PATH);
             break;
         case '--ignore-warnings':
@@ -357,12 +350,24 @@ CLI.prototype._parseCliArgs = function (args) {
             result.stopOnWarning = true;
             break;
         default:
+            /**
+             * States that the parsing process of the CLI arguments failed.
+             *
+             * @event CLI#argsError
+             * @param {Error} err The error that occurred during argumentation parsing.
+             */
             this.emit('argsError', new Error('The option "' + args[i] + '" is not supported'));
             i = args.length;
             break;
         }
     }
     if (result.configs !== undefined) result.configs = utils.arrayToSet(result.configs);
+    /**
+     * States that the parsing of CLI arguments was finished was set and that the contrib path information is ready.
+     *
+     * @event CLI#argsParsed
+     * @param {Object} args The parsed argument object.
+     */
     this.emit('argsParsed', result);
 };
 
