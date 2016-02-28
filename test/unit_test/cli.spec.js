@@ -93,11 +93,17 @@ var expectedConfigHelp = 'The configuration files for ' + scriptName + ' use the
         'at https://www.npmjs.com/package/google-closure-compiler#specifying-options.';
 
 describe('CLI class', function () {
-    it('accepts uses default parameter when instantiating', function () {
+    it('accepts default parameter when instantiating', function () {
         var cli = new CLI();
         expect(cli).not.toBeNull();
         expect(cli).toBeDefined();
         expect(cli).toEqual(jasmine.any(CLI));
+    });
+
+    it('throws in case of bad argument', function () {
+        expect(function () { new CLI({}); }).toThrow(jasmine.any(Error));
+        expect(function () { new CLI(123); }).toThrow(jasmine.any(Error));
+        expect(function () { new CLI('--help'); }).toThrow(jasmine.any(Error));
     });
 
     it('processes --help', function (done) {

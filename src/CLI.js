@@ -60,8 +60,12 @@ var utils = require('./utils');
  * @emits CLI#argsParsed
  *
  * @param {Array<string>} argv An array representing the CLI arguments that will be parsed by this class.
+ * @throws {Error} Thrown if argv is not null, undefined or an Array.
  */
 function CLI (argv) {
+    if (!argv) argv = [];
+    if (!util.isArray(argv)) throw Error('"argv" must be a string array!');
+
     events.EventEmitter.call(this);
     process.nextTick(this._parseCliArgs.bind(this, argv));
 }
@@ -229,13 +233,11 @@ function getPropertyValueFromPackageJson (propertyName) {
  *
  * @private
  *
- * @param {Array<string>} args An array with all CLI arguments.
+ * @param {Array<string>} argv An array with all CLI arguments.
  *
  * @suppress {misplacedTypeAnnotation}
  */
-CLI.prototype._parseCliArgs = function (args) {
-    if (!util.isArray(args)) args = [];
-
+CLI.prototype._parseCliArgs = function (argv) {
     var self = this;
     var emitFromPromise = function (eventName, promise) {
         promise.then(function (promiseResult) {
@@ -252,8 +254,8 @@ CLI.prototype._parseCliArgs = function (args) {
     };
     var result = {};
     var i = 2;
-    for (; i < args.length; ++i) {
-        switch (args[i]) {
+    for (; i < argv.length; ++i) {
+        switch (argv[i]) {
         case '--help':
         case '-h':
             /**
@@ -276,7 +278,7 @@ CLI.prototype._parseCliArgs = function (args) {
             break;
         case '--config':
         case '-c':
-            if (i + 1 === args.length) {
+            if (i + 1 === argv.length) {
                 /**
                  * States that the parsing process of the CLI arguments failed.
                  *
@@ -286,7 +288,7 @@ CLI.prototype._parseCliArgs = function (args) {
                 this.emit('argsError', new Error('-c|--config requires a PATH parameter'));
             } else {
                 if (!result.hasOwnProperty('configs')) result.configs = [];
-                result.configs.push(path.resolve(args[++i]));
+                result.configs.push(path.resolve(argv[++i]));
             }
             break;
         case '--config-help':
@@ -356,8 +358,8 @@ CLI.prototype._parseCliArgs = function (args) {
              * @event CLI#argsError
              * @param {Error} err The error that occurred during argumentation parsing.
              */
-            this.emit('argsError', new Error('The option "' + args[i] + '" is not supported'));
-            i = args.length;
+            this.emit('argsError', new Error('The option "' + argv[i] + '" is not supported'));
+            i = argv.length;
             break;
         }
     }

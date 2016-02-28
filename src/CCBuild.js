@@ -78,6 +78,7 @@ var CLI = /** @type {function(new:CLI, Array<string>)}*/ (require('./CLI.js'));
  * @emits CCBuild#compiled
  *
  * @param {Array<string>} argv An array representing the CLI arguments that will be parsed by this class.
+ * @throws {Error} Thrown if argv is not null, undefined or an Array.
  *
  * @suppress {misplacedTypeAnnotation}
  */
