@@ -82,6 +82,7 @@ var CLI = /** @type {function(new:CLI, Array<string>)}*/ (require('./CLI.js'));
  * @suppress {misplacedTypeAnnotation}
  */
 function CCBuild (argv) {
+    if (!argv) argv = [];
     if (!util.isArray(argv)) throw Error('"argv" must be a string array!');
     events.EventEmitter.call(this);
 
