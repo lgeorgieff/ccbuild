@@ -76,6 +76,7 @@ var CLI = /** @type {function(new:CLI, Array<string>)}*/ (require('./CLI.js'));
  * @emits CCBuild#circularDependencyError
  * @emits CCBuild#compilationError
  * @emits CCBuild#compiled
+ * @emits CCBuild#done
  *
  * @param {Array<string>} argv An array representing the CLI arguments that will be parsed by this class.
  * @throws {Error} Thrown if argv is not null, undefined or an Array.
@@ -169,6 +170,10 @@ function CCBuild (argv) {
          * @param {Object} args The parsed argument object.
          */
         self.emit('argsParsed', contribPath);
+    });
+    var originalWorkingDirectory = process.cwd();
+    this.on('done', function () {
+        process.chdir(originalWorkingDirectory);
     });
 
     self.on('argsParsed', function (cliArgs) {
@@ -309,7 +314,16 @@ CCBuild.prototype._processConfigs = function (cliArgs) {
         }).reduce(function (accumulator, currentValue) {
             return accumulator.concat(currentValue);
         }, []).map(compileUnit);
-        async.series(queuedCompilationUnits);
+        async.series(queuedCompilationUnits, function () {
+            /**
+             * States that the processing of all config files and the compilation of all defined compilation units is
+             * done. This event is emitted after all {@link CCBuild#compiled} and {@link CCBuild#compilationError}
+             * events are emitted.
+             *
+             * @event CCBuild#done
+             */
+            self.emit('done');
+        });
     });
 };
 

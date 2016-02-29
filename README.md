@@ -90,6 +90,7 @@ In addition to use _ccbuild_ as an executable, you may also use it directly from
  * circularDependencyError
  * compilationError
  * compiled
+ * done
 
 The following example illustratest how you can use CCBuild in your code:
 ```javascript
