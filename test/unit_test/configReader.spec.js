@@ -1072,4 +1072,8 @@ describe('config_reader', function () {
         expect(compilerArguments.length).toBe(expectedCompilerArguments.length);
         expect(compilerArguments).toEqual(jasmine.arrayContaining(expectedCompilerArguments));
     });
+
+    it('processes empty config for unit properly', function () {
+        expect(configReader.getCompilerArguments ({})).toEqual([]);
+    });
 });

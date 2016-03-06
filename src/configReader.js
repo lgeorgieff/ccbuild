@@ -144,7 +144,7 @@ ConfigurationNormalizer._mapBooleanProperty = function (booleanValue, nextPath, 
 };
 
 /**
- * Resolves all relative paths agains `this._basePath`.
+ * Resolves all relative paths against `this._basePath`.
  *
  * @private
  *
@@ -315,8 +315,9 @@ function getCompilerArguments (unitConfiguration) {
     var sources = utils.mergeArrays(unitConfiguration.globalSources, unitConfiguration.unitSources,
                                     utils.getValuesFromArgumentsArray(buildOptions, '--js'));
 
-    return buildOptions.concat(utils.valuesToArgumentsArray(externs, '--externs'))
-        .concat(utils.valuesToArgumentsArray(sources, '--js'));
+    if (externs.length !== 0) externs = utils.valuesToArgumentsArray(externs, '--externs');
+    if (sources.length !== 0) sources = utils.valuesToArgumentsArray(sources, '--js');
+    return buildOptions.concat(externs).concat(sources);
 }
 
 /**

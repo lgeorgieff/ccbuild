@@ -65,7 +65,7 @@ function mergeArrays (arrays, comp) {
     }
 
     for (var i = 0; i < arraysLength; ++i) {
-        result = arrayToSet(result.concat(arguments[i]), compFunction);
+        if (arguments[i]) result = arrayToSet(result.concat(arguments[i]), compFunction);
     }
 
     return result;
@@ -146,7 +146,7 @@ function removeArgumentsFromArgumentsArray (allArguments, argumentsToBeRemoved) 
  * @param {!string} argumentName The name of the CLI option.
  */
 function valuesToArgumentsArray (values, argumentName) {
-    if (!values || values.length === 0) return [argumentName];
+    if (!values || values.length === 0) return [];
     return values.reduce(function (accumulator, currentValue) {
         accumulator.push(argumentName, currentValue);
         return accumulator;
