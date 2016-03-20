@@ -54,7 +54,6 @@ function isStringArray (arr) {
  */
 function mergeArrays (arrays, comp) {
     var result = [];
-
     var arraysLength = arguments.length;
     var compFunction = function (lft, rgt) {
         return lft === rgt;
@@ -137,6 +136,53 @@ function removeArgumentsFromArgumentsArray (allArguments, argumentsToBeRemoved) 
 }
 
 /**
+ * Transforms an array of elements into a list of tuples.
+ *
+ * @returns {Array<{fst:*, snd:*}>} An array of tuples.
+ * @param {Array<*>} lst An array.
+ */
+function listToTuples (lst) {
+    if (!lst) lst = [];
+
+    var result = [];
+    var currentElem = {};
+    for (var i = 0; i !== lst.length; ++i) {
+        if (i % 2 === 0) {
+            currentElem.fst = lst[i];
+        } else {
+            currentElem.snd = lst[i];
+            result.push(currentElem);
+            currentElem = {};
+        }
+    }
+    return result;
+}
+
+/**
+ * Removes all tuples from the given list.
+ *
+ * @returns {Array<*>} A filtered version of ht elist given to this function.
+ * @param {Array<*>} allElements The given array that is checkd for sequences of tuples.
+ * @param {Array<{fst:*, snd:*}>} tuples A list of tuples to be removed from the given array.
+ */
+function removeTuplesFromArray (allElements, tuples) {
+    var elementsToBeRemoved = [];
+
+    (tuples || []).forEach(function (tuple) {
+        for (var i = 0; i !== allElements.length; ++i) {
+            if (i !== allElements.length - 1 && allElements[i] === tuple.fst && allElements[i + 1] === tuple.snd) {
+                elementsToBeRemoved.push(allElements[i], allElements[i + 1]);
+                ++i;
+            }
+        }
+    });
+
+    return allElements.filter(function (elem) {
+        return elementsToBeRemoved.indexOf(elem) === -1;
+    });
+}
+
+/**
  * Transforms the passed values and the passed argument name to an array of argument values, e.g. the value array
  * `['1', '2', '3']` and the argument name '--number' will be transformed to
  * `['--number', '1', '--number', '2', '--number', '3']`.
@@ -146,7 +192,7 @@ function removeArgumentsFromArgumentsArray (allArguments, argumentsToBeRemoved) 
  * @param {!string} argumentName The name of the CLI option.
  */
 function valuesToArgumentsArray (values, argumentName) {
-    if (!values || values.length === 0) return [];
+    if (!values || values.length === 0) return [argumentName];
     return values.reduce(function (accumulator, currentValue) {
         accumulator.push(argumentName, currentValue);
         return accumulator;
@@ -215,3 +261,5 @@ module.exports.removeArgumentsFromArgumentsArray = removeArgumentsFromArgumentsA
 module.exports.valuesToArgumentsArray = valuesToArgumentsArray;
 module.exports.mergeArguments = mergeArguments;
 module.exports.findTuple = findTuple;
+module.exports.removeTuplesFromArray = removeTuplesFromArray;
+module.exports.listToTuples = listToTuples;

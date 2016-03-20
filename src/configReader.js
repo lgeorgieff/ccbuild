@@ -159,6 +159,20 @@ ConfigurationNormalizer.prototype._resolvePaths = function (paths) {
 };
 
 /**
+ * Resolves a relative path against `this._basePath`.
+ *
+ * @private
+ *
+ * @returns {string|undefined} A string representing a resolved path.
+ * @param {string} filePath A string representing a file/folder path.
+ */
+ConfigurationNormalizer.prototype._resolvePath = function (filePath) {
+    var self = this;
+    if (!filePath) return undefined;
+    return path.resolve(self._basePath, filePath);
+};
+
+/**
  * A helper function that checks and normalizes the buildOptions property.
  *
  * @private
@@ -258,6 +272,7 @@ ConfigurationNormalizer.prototype.normalize = function () {
                     ConfigurationNormalizer._mapStringArray(self._config.compilationUnits[key].externs, 'externs'));
             accumulator[key].buildOptions =
                 ConfigurationNormalizer._normalizeBuildOptions(self._config.compilationUnits[key].buildOptions, key);
+            accumulator[key].outputFile = ConfigurationNormalizer.prototype._resolvePath(accumulator[key].outputFile);
             return accumulator;
         }, {}) || {};
     } else {
@@ -286,16 +301,15 @@ ConfigurationNormalizer.prototype.normalize = function () {
 };
 
 /**
- * @typedef {{
- *             workingDirectory: !string,
- *             unitName: !string,
- *             globalSources: !Array<string>,
- *             unitSources: !Array<string>,
- *             globalExterns: !Array<string>,
- *             unitExterns: !Array<string>,
- *             globalBuildOptions: !Array<string>,
- *             unitBuildOptions: !Array<string>
- *          }}
+ * @typedef {{workingDirectory: !string,
+ *            unitName: !string,
+ *            globalSources: !Array<string>,
+ *            unitSources: !Array<string>,
+ *            globalExterns: !Array<string>,
+ *            unitExterns: !Array<string>,
+ *            globalBuildOptions: !Array<string>,
+ *            unitBuildOptions: !Array<string>,
+ *            outputFile: (?string|undefined)}}
  */
 var CompilerConfiguration;
 
@@ -306,18 +320,28 @@ var CompilerConfiguration;
  *          configuration for the compilation unit.
  * @param {CompilerConfiguration} unitConfiguration An object containing the entire configuration settings for one
  *        compilation unit.
+ * @throws {Error} In case the configuration is not valid.
  */
 function getCompilerArguments (unitConfiguration) {
     var buildOptions = utils.mergeArguments(unitConfiguration.globalBuildOptions, unitConfiguration.unitBuildOptions);
-    buildOptions = utils.removeArgumentsFromArgumentsArray(buildOptions, ['--js', '--externs']);
     var externs = utils.mergeArrays(unitConfiguration.globalExterns, unitConfiguration.unitExterns,
                                     utils.getValuesFromArgumentsArray(buildOptions, '--externs'));
     var sources = utils.mergeArrays(unitConfiguration.globalSources, unitConfiguration.unitSources,
                                     utils.getValuesFromArgumentsArray(buildOptions, '--js'));
 
+    var outputFile = utils.getValuesFromArgumentsArray(buildOptions, '--js_output_file');
+    if (outputFile.length !== 0) outputFile.unshift('--js_output_file');
+    if (outputFile.length !== 0 && unitConfiguration.outputFile) {
+        throw new Error('"--js_output_file" must not be set in "buildOptions" when "outputFile" property is used!');
+    }
+
+    if (unitConfiguration.outputFile) outputFile.push('--js_output_file', unitConfiguration.outputFile);
     if (externs.length !== 0) externs = utils.valuesToArgumentsArray(externs, '--externs');
     if (sources.length !== 0) sources = utils.valuesToArgumentsArray(sources, '--js');
-    return buildOptions.concat(externs).concat(sources);
+
+    var cleanedBuildOptions =
+            utils.removeTuplesFromArray(buildOptions, utils.listToTuples(externs.concat(sources).concat(outputFile)));
+    return cleanedBuildOptions.concat(externs).concat(sources).concat(outputFile);
 }
 
 /**
@@ -355,9 +379,11 @@ function mergeConfigurations (configuration, configurationPath, parentConfigurat
     } else {
         resultBuildOptions = configuration.buildOptions;
     }
+
     return {
         sources: resultSources,
         externs: resultExterns,
+        outputFile: configuration.outputFile,
         buildOptions: resultBuildOptions,
         compilationUnits: configuration.compilationUnits,
         next: configuration.next

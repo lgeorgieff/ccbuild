@@ -47,7 +47,7 @@
     "install_git_hooks": "npm run install_git_pre_commit_hook",
     "install_git_pre_commit_hook": "if [ ! -e .git/hook/pre-commit ]; then cp tools/pre-commit.hook.git .git/hooks/pre-commit; fi",
     "compile_closure_compiler": "if [ ! -e tools/closure_compiler/build/compiler.jar ]; then cd tools/closure_compiler/ && ant; fi",
-    "test": "#JASMINE_CONFIG_PATH=test/jasmine.spec.json jasmine",
+    "test": "JASMINE_CONFIG_PATH=test/jasmine.spec.json jasmine",
     "lint_js": "if [ $(find src/ -name '*.js' | wc -l) -gt 0 ] || [ $(find test/ -name '*.js' | wc -l) -gt 0 ]; then jscs --config src/.jscsrc src/ test/; fi",
     "lint_json": "for jsonFile in $(find src/ -name '*.json' && echo package.json && echo doc/.jsdocrc && echo src/.jscsrc && echo test/jasmine.spec.json); do echo \">> ${jsonFile} <<\"; if ! jsonlint \"${jsonFile}\" --indent \"  \" --diff --diff-context 3 --ignore-trailing-newlines 1 --ignore-empty-lines 1; then exit 1; fi; done",
     "lint": "npm run lint_js && npm run lint_json",

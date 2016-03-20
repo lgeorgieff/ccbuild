@@ -144,6 +144,7 @@ CLI.getConfigFileHelp = function () {
                 '    "unit 2": {\n' +
                 '      "externs": [<source file paths to be used only for this compilation unit>],\n' +
                 '      "sources": [<extern file paths to be used only for this compilation unit>],\n' +
+                '      "outputFile": "file path to resulting code",\n' +
                 '      "buildOptions": [<options to be used only for this compilation unit>]\n' +
                 '    },\n' +
                 '  },\n' +

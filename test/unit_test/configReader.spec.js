@@ -963,7 +963,8 @@ describe('config_reader', function () {
             globalBuildOptions: buildOptions1,
             unitBuildOptions: []
         };
-        var compilerArguments = configReader.getCompilerArguments (unitConfiguration1);
+
+        var compilerArguments = configReader.getCompilerArguments(unitConfiguration1);
         var expectedCompilerArguments = [
             '--js', path.resolve('file1.js'),
             '--js', path.resolve('/tmp/file2.js'),
@@ -1075,5 +1076,105 @@ describe('config_reader', function () {
 
     it('processes empty config for unit properly', function () {
         expect(configReader.getCompilerArguments ({})).toEqual([]);
+    });
+
+    it('processes outputFile config properly', function () {
+        var unitConfiguration1 = {
+            unitExterns: ['externs1.js'],
+            unitSources: ['sources1.js'],
+            outputFile: 'out.js'
+        };
+        var compilerArguments = configReader.getCompilerArguments (unitConfiguration1);
+        expect(compilerArguments.length).toBe(6);
+        expect(compilerArguments).toEqual(jasmine.arrayContaining(['--js', 'sources1.js', '--externs', 'externs1.js',
+                                                                   '--js_output_file', 'out.js']));
+    });
+
+    it('takes into account --js option in buildOptions', () => {
+        var unitConfiguration1 = {
+            unitBuildOptions: ['--js', 'source2.js'],
+            unitSources: ['source1.js']
+        };
+        var compilerArguments = configReader.getCompilerArguments (unitConfiguration1);
+        expect(compilerArguments.length).toBe(4);
+        expect(compilerArguments).toEqual(jasmine.arrayContaining(['--js', 'source1.js',
+                                                                   '--js', 'source2.js']));
+    });
+
+    it('takes into account --js option in global buildOptions', () => {
+        var unitConfiguration1 = {
+            globalBuildOptions: ['--js', 'source2.js'],
+            unitSources: ['source1.js']
+        };
+        var compilerArguments = configReader.getCompilerArguments (unitConfiguration1);
+        expect(compilerArguments.length).toBe(4);
+        expect(compilerArguments).toEqual(jasmine.arrayContaining(['--js', 'source1.js',
+                                                                   '--js', 'source2.js']));
+    });
+
+    it('takes into account --externs option in buildOptions', () => {
+        var unitConfiguration1 = {
+            unitBuildOptions: ['--externs', 'externs2.js'],
+            unitExterns: ['externs1.js']
+        };
+        var compilerArguments = configReader.getCompilerArguments (unitConfiguration1);
+        expect(compilerArguments.length).toBe(4);
+        expect(compilerArguments).toEqual(jasmine.arrayContaining(['--externs', 'externs1.js',
+                                                                   '--externs', 'externs2.js']));
+    });
+
+    it('takes into account --externs option in global buildOptions', () => {
+        var unitConfiguration1 = {
+            globalBuildOptions: ['--externs', 'externs2.js'],
+            unitExterns: ['externs1.js']
+        };
+        var compilerArguments = configReader.getCompilerArguments (unitConfiguration1);
+        expect(compilerArguments.length).toBe(4);
+        expect(compilerArguments).toEqual(jasmine.arrayContaining(['--externs', 'externs1.js',
+                                                                   '--externs', 'externs2.js']));
+    });
+
+    it('takes into account --js_output_file option in buildOptions', () => {
+        var unitConfiguration1 = {
+            unitBuildOptions: ['--js_output_file', 'out.js'],
+            unitExterns: ['externs1.js']
+        };
+        var compilerArguments = configReader.getCompilerArguments (unitConfiguration1);
+        expect(compilerArguments.length).toBe(4);
+        expect(compilerArguments).toEqual(jasmine.arrayContaining(['--externs', 'externs1.js',
+                                                                   '--js_output_file', 'out.js']));
+    });
+
+    it('takes into account --js_output_file option in global buildOptions', () => {
+        var unitConfiguration1 = {
+            globalBuildOptions: ['--js_output_file', 'out.js'],
+            unitExterns: ['externs1.js']
+        };
+        var compilerArguments = configReader.getCompilerArguments (unitConfiguration1);
+        expect(compilerArguments.length).toBe(4);
+        expect(compilerArguments).toEqual(jasmine.arrayContaining(['--externs', 'externs1.js',
+                                                                   '--js_output_file', 'out.js']));
+    });
+
+    it('throws in case of outputFile config and --js_output_file build option', function () {
+        var unitConfiguration1 = {
+            unitBuildOptions: ['--js_output_file', 'out.js'],
+            outputFile: 'anotherOutputFile.js',
+            unitExterns: ['externs1.js']
+        };
+        expect(function () {
+            configReader.getCompilerArguments (unitConfiguration1);
+        }).toThrowError();
+    });
+
+    it('throws in case of outputFile config and --js_output_file global build option', function () {
+        var unitConfiguration1 = {
+            globalBuildOptions: ['--js_output_file', 'out.js'],
+            outputFile: 'anotherOutputFile.js',
+            unitExterns: ['externs1.js']
+        };
+        expect(function () {
+            configReader.getCompilerArguments (unitConfiguration1);
+        }).toThrowError();
     });
 });
