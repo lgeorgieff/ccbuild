@@ -96,7 +96,7 @@ function ConfigurationNormalizer (config, basePath) {
         throw new Error('config must be of the type object|null|undefined but is ' + config + '!');
     }
 
-    if (basePath === undefined || basePath === null) this._basePath = process.cwd();
+    if (basePath == null) this._basePath = process.cwd();
     else this._basePath = basePath;
 }
 
@@ -272,7 +272,10 @@ ConfigurationNormalizer.prototype.normalize = function () {
                     ConfigurationNormalizer._mapStringArray(self._config.compilationUnits[key].externs, 'externs'));
             accumulator[key].buildOptions =
                 ConfigurationNormalizer._normalizeBuildOptions(self._config.compilationUnits[key].buildOptions, key);
-            accumulator[key].outputFile = ConfigurationNormalizer.prototype._resolvePath(accumulator[key].outputFile);
+            if (self._config.compilationUnits[key].outputFile) {
+                accumulator[key].outputFile =
+                        self._resolvePath(self._config.compilationUnits[key].outputFile);
+            }
             return accumulator;
         }, {}) || {};
     } else {
@@ -297,6 +300,7 @@ ConfigurationNormalizer.prototype.normalize = function () {
     } else {
         result.next = {};
     }
+
     return result;
 };
 
@@ -334,11 +338,9 @@ function getCompilerArguments (unitConfiguration) {
     if (outputFile.length !== 0 && unitConfiguration.outputFile) {
         throw new Error('"--js_output_file" must not be set in "buildOptions" when "outputFile" property is used!');
     }
-
     if (unitConfiguration.outputFile) outputFile.push('--js_output_file', unitConfiguration.outputFile);
     if (externs.length !== 0) externs = utils.valuesToArgumentsArray(externs, '--externs');
     if (sources.length !== 0) sources = utils.valuesToArgumentsArray(sources, '--js');
-
     var cleanedBuildOptions =
             utils.removeTuplesFromArray(buildOptions, utils.listToTuples(externs.concat(sources).concat(outputFile)));
     return cleanedBuildOptions.concat(externs).concat(sources).concat(outputFile);
