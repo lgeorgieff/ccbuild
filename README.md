@@ -56,7 +56,7 @@ A configuration file is of the following form:
     "unit 2": {
       "externs": ["<source file paths to be used only for this compilation unit>"],
       "sources": ["<extern file paths to be used only for this compilation unit>"],
-      "outputFile: "file path to resulting code",
+      "outputFile: "<file path to resulting code>",
       "buildOptions": ["<options to be used only for this compilation unit>"]
     },
   },
