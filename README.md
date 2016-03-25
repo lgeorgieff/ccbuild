@@ -7,6 +7,7 @@ Usage: ccbuild [-h|--help] [-v|--version] [--closure-help]
            [--closure-version] [--compiler-path] [--contrib-path]
            [--ignore-warnings] [-ignore-errors] [-c|--config PATH]...
            [--ignore-compiled-code] [--stop-on-error] [--config-help]
+           [-u|--unit UNIT_NAME]...
 
 Checks and compiles JavaScript files via the Closure Compiler.
 
@@ -23,6 +24,7 @@ Checks and compiles JavaScript files via the Closure Compiler.
                           all files with the file extension ".ccbuild". For
                           every matched configuration file ccbuild
                           performs a run.
+                          You may specify multiple configurations
  --config-help            Display a help message for the configuration file
                           format and exit.
  --ignore-warnings        Compilation warnings are not shown on stderr.
@@ -34,6 +36,9 @@ Checks and compiles JavaScript files via the Closure Compiler.
  --stop-on-warning        All compilation processes are stopped in case a
                           compilation warning occurs. ccbuild will exit with
                           the exit code 1.
+ -u|--unit UNIT_NAME      Filters the units that are taken into account for the
+                          compilation process. All other units are ignored.
+                          You may specify multiple units.
 ```
 
 # Configuration Files
