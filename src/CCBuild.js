@@ -262,17 +262,20 @@ CCBuild.prototype._processConfigs = function (cliArgs) {
                         break;
                     }
 
-                    compilationUnits.push({
-                        workingDirectory: path.dirname(configFilePath),
-                        unitName: objectKeys[i],
-                        globalSources: configObject.sources,
-                        unitSources: configObject.compilationUnits[objectKeys[i]].sources,
-                        globalExterns: configObject.externs,
-                        unitExterns: configObject.compilationUnits[objectKeys[i]].externs,
-                        globalBuildOptions: configObject.buildOptions,
-                        unitBuildOptions: configObject.compilationUnits[objectKeys[i]].buildOptions,
-                        outputFile: outputFile
-                    });
+                    if (!cliArgs.filteredUnits || cliArgs.filteredUnits.length === 0 ||
+                        cliArgs.filteredUnits.indexOf(objectKeys[i]) !== -1) {
+                        compilationUnits.push({
+                            workingDirectory: path.dirname(configFilePath),
+                            unitName: objectKeys[i],
+                            globalSources: configObject.sources,
+                            unitSources: configObject.compilationUnits[objectKeys[i]].sources,
+                            globalExterns: configObject.externs,
+                            unitExterns: configObject.compilationUnits[objectKeys[i]].externs,
+                            globalBuildOptions: configObject.buildOptions,
+                            unitBuildOptions: configObject.compilationUnits[objectKeys[i]].buildOptions,
+                            outputFile: outputFile
+                        });
+                    }
                 }
                 var err;
                 if (localContainsJsOutputFile || globalContainsJsOutputFile) {

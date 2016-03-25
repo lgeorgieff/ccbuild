@@ -1118,8 +1118,12 @@ describe('bin', function () {
                                } else {
                                    expect(stdout.length).toBe(0);
                                    expect(stderr.length).toBe(0);
-                                   expect(fs.statSync(out1).size).toBeGreaterThan(0);
-                                   expect(fs.statSync(out2).size).toBeGreaterThan(0);
+                                   try {
+                                       expect(fs.statSync(out1).size).toBeGreaterThan(0);
+                                       expect(fs.statSync(out2).size).toBeGreaterThan(0);
+                                   } catch (fsErr) {
+                                       fail(fsErr);
+                                   }
                                    self.resourcesToDelete.push(configPath, out1, out2);
                                    done();
                                }
@@ -1245,7 +1249,6 @@ describe('bin', function () {
 
     it('compile with outputFile option -- error', function (done) {
         var out1 = path.join('test', 'unit_test', 'out1.js');
-        var out2 = path.join('test', 'unit_test', 'out2.js');
         var config = {
             sources: ['./data/source1.js'],
             externs: ['data/externs1.js'],
@@ -1257,7 +1260,7 @@ describe('bin', function () {
             ],
             compilationUnits: {
                 unit1: {
-                    outputFile: path.basename(out2),
+                    outputFile: path.basename(out1),
                     sources: ['./data/source3.js', './data/source4.js']
                 }
             }
@@ -1277,10 +1280,145 @@ describe('bin', function () {
                                    try {
                                        expect(fs.statSync(out1).size).toBeGreaterThan(0);
                                        done.fail('Expected ' + out1 + ' not to be existing!');
-                                   } catch (err) {
-                                       if (err.code === 'ENOENT') done();
-                                       else done.fail(err);
+                                   } catch (fsErr) {
+                                       if (fsErr.code === 'ENOENT') done();
+                                       else done.fail(fsErr);
                                    }
+                               } else {
+                                   done.fail('Expeted compilation process to fail!');
+                               }
+                           });
+        // jscs:enable requireCamelCaseOrUpperCaseIdentifiers
+        this.resourcesToDelete.push(configPath);
+    });
+
+    it('compiles only units that are filtered by the -u and the --unit option', function (done) {
+        var self = this;
+        var configPath1 = path.join(__dirname, 'config1.ccbuild');
+        var configPath2 = path.join(__dirname, 'data', 'config2.ccbuild');
+        var configPath3 = path.join(__dirname, 'data', 'configs', 'config3.ccbuild');
+        var temporaryConfigDirectory = path.join(__dirname, 'data', 'configs');
+        try {
+            fs.mkdirSync(temporaryConfigDirectory);
+        } catch (err) {
+            console.error(err);
+        }
+
+        var config1 = {
+            sources: ['./data/source1.js'],
+            externs: ['data/externs1.js'],
+            buildOptions: [
+                '--compilation_level', 'ADVANCED_OPTIMIZATIONS',
+                '--warning_level', 'VERBOSE',
+                '--env', 'CUSTOM'
+            ],
+            compilationUnits: {
+                unit1: {
+                    buildOptions: ['--flagfile', './data/test_flagfile']
+                }
+            },
+            next: {}
+        };
+        config1.next[path.relative(path.dirname(configPath1), configPath2)] = {
+            inheritSources: true,
+            inheritExterns: true,
+            inheritBuildOptions: true
+        };
+        var config2 = {
+            buildOptions: config1.buildOptions,
+            compilationUnits: {
+                unit2: {
+                    sources: ['source2.js'],
+                    externs: ['./externs2.js'],
+                    buildOptions: ['--flagfile', './test_flagfile']
+                }
+            },
+            next: {}
+        };
+        config2.next[path.relative(path.dirname(configPath2), configPath3)] = {
+            inheritSources: true,
+            inheritExterns: true,
+            inheritBuildOptions: true
+        };
+        var config3 = {
+            sources: ['../source1.js'],
+            externs: ['../externs1.js'],
+            buildOptions: config1.buildOptions,
+            compilationUnits: {
+                unit3: {
+                    sources: ['../source3.js', '../source4.js'],
+                    externs: ['../externs2.js', '../externs3.js'],
+                    buildOptions: ['--flagfile', '../test_flagfile']
+                },
+                unit4: {
+                    sources: ['../source3.js', '../source4.js'],
+                    externs: ['../externs2.js', '../externs3.js'],
+                    buildOptions: ['--flagfile', '../test_flagfile']
+                }
+            }
+        };
+
+        fs.writeFileSync(configPath1, JSON.stringify(config1, null, 2));
+        fs.writeFileSync(configPath2, JSON.stringify(config2, null, 2));
+        fs.writeFileSync(configPath3, JSON.stringify(config3, null, 2));
+
+        // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
+        child_process.exec('node ./src/bin.js -c ' + configPath1 + ' -u unit1 --unit unit4 --unit unit3',
+                           function (err, stdout, stderr) {
+                               if (err) {
+                                   done.fail(err);
+                               } else {
+                                   var hd1 = '=== unit1 =============================================================' +
+                                           '========';
+                                   var hd2 = '=== unit2 =============================================================' +
+                                           '========';
+                                   var hd3 = '=== unit3 =============================================================' +
+                                           '========';
+                                   var hd4 = '=== unit4 =============================================================' +
+                                           '========';
+                                   expect(stdout.indexOf(hd1)).not.toBe(-1);
+                                   expect(stdout.indexOf(hd2)).toBe(-1);
+                                   expect(stdout.indexOf(hd3)).not.toBe(-1);
+                                   expect(stdout.indexOf(hd4)).not.toBe(-1);
+                                   expect(stdout.length).toBeGreaterThan(0);
+                                   expect(stderr.length).toBe(0);
+                                   self.resourcesToDelete.push(configPath1, configPath2, configPath3,
+                                                               temporaryConfigDirectory);
+                                   done();
+                               }
+                           });
+        // jscs:enable requireCamelCaseOrUpperCaseIdentifiers
+    });
+
+    it('wrong unit name in in the -u and the --unit option has no effect', function (done) {
+        var config = {
+            sources: ['./data/source1.js'],
+            externs: ['data/externs1.js'],
+            buildOptions: [
+                '--compilation_level', 'ADVANCED_OPTIMIZATIONS',
+                '--warning_level', 'VERBOSE',
+                '--env', 'CUSTOM',
+                '--flagfile', './data/test_flagfile'
+            ],
+            compilationUnits: {
+                unit1: {
+                    sources: ['./data/source3.js', './data/source4.js']
+                }
+            }
+        };
+
+        var configPath = path.join(__dirname, 'config1.ccbuild');
+        fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
+        // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
+        child_process.exec('node ./src/bin.js --config ./test/unit_test/config1.ccbuild',
+                           function (err, stdout, stderr) {
+                               if (err) {
+                                   let hd1 = '=== unit1 =============================================================' +
+                                           '========';
+                                   expect(stderr.indexOf(hd1)).not.toBe(-1);
+                                   expect(stdout.length).toBe(0);
+                                   expect(stderr.length).toBeGreaterThan(0);
+                                   done();
                                } else {
                                    done.fail('Expeted compilation process to fail!');
                                }
