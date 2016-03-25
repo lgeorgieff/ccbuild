@@ -116,7 +116,9 @@ CLI.getUsage = function () {
                 '                          exit with the exit code 1.\n' +
                 ' -u|--unit UNIT_NAME      Filters the units that are taken into account for the\n' +
                 '                          compilation process. All other units are ignored.\n' +
-                '                          You may specify multiple units.\n');
+                '                          You may specify multiple units.\n' +
+                '                          If no unit is specified, all units defined in the\n' +
+                '                          configuration files will be processed.\n');
     }).catch(deferred.reject);
     return deferred.promise;
 };

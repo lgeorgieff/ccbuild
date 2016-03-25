@@ -39,6 +39,8 @@ Checks and compiles JavaScript files via the Closure Compiler.
  -u|--unit UNIT_NAME      Filters the units that are taken into account for the
                           compilation process. All other units are ignored.
                           You may specify multiple units.
+                          If no unit is specified, all units defined in the
+                          configuration files will be processed.
 ```
 
 # Configuration Files
