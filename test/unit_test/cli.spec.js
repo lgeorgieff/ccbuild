@@ -44,6 +44,7 @@ var expectedUsage = 'Usage: ' + scriptName + ' [-h|--help] [-v|--version] [--clo
         '                          checks the current directory for all files with the\n' +
         '                          file extension ".nbuild". For every matched\n' +
         '                          configuration file ' + scriptName + ' performs a run.\n' +
+        '                          You may specify multiple configurations.\n' +
         ' --config-help            Display a help message for the configuration file\n' +
         '                          format and exit.\n' +
         ' --ignore-warnings        Compilation warnings are not shown on stderr.\n' +
@@ -54,7 +55,10 @@ var expectedUsage = 'Usage: ' + scriptName + ' [-h|--help] [-v|--version] [--clo
         '                          exit with the exit code 1.\n' +
         ' --stop-on-warning        All compilation processes are stopped in case a\n' +
         '                          compilation warning occurs. ' + scriptName + ' will\n' +
-        '                          exit with the exit code 1.\n';
+        '                          exit with the exit code 1.\n' +
+        ' -u|--unit UNIT_NAME      Filters the units that are taken into account for the\n' +
+        '                          compilation process. All other units are ignored.\n' +
+        '                          You may specify multiple units.\n';
 
 var expectedVersion = JSON.parse(fs.readFileSync('./package.json')).version;
 
@@ -303,5 +307,65 @@ describe('CLI class', function () {
             });
             done();
         });
+    });
+
+    it('parses -u option', function (done) {
+        var cli = new CLI([process.argv[0], process.argv[1], '-u', 'unit1']);
+        cli.on('argsError', fail);
+        cli.on('argsParsed', function (options) {
+            expect(options).toEqual({filteredUnits: ['unit1']});
+            done();
+        });
+    });
+
+    it('parses --unit option', function (done) {
+        var cli = new CLI([process.argv[0], process.argv[1], '--unit', 'unit1']);
+        cli.on('argsError', fail);
+        cli.on('argsParsed', function (options) {
+            expect(options).toEqual({filteredUnits: ['unit1']});
+            done();
+        });
+    });
+
+    it('parses multiple --unit and -u options', function (done) {
+        var cli = new CLI([process.argv[0], process.argv[1], '--unit', 'unit1', '-u', 'unit3', '-u', 'unit2',
+                           '--unit', 'unit4']);
+        cli.on('argsError', fail);
+        cli.on('argsParsed', function (options) {
+            expect(options).toEqual(jasmine.objectContaining({filteredUnits: jasmine.arrayContaining(
+                ['unit1', 'unit2', 'unit3', 'unit4'])}));
+            expect(options.filteredUnits.length).toBe(4);
+            done();
+        });
+    });
+
+    it('parses multiple --unit and -u options nad removes duplicates', function (done) {
+        var cli = new CLI([process.argv[0], process.argv[1], '--unit', 'unit1', '-u', 'unit3', '-u', 'unit2',
+                           '--unit', 'unit4', '-u', 'unit1', '--unit', 'unit3']);
+        cli.on('argsError', fail);
+        cli.on('argsParsed', function (options) {
+            expect(options).toEqual(jasmine.objectContaining({filteredUnits: jasmine.arrayContaining(
+                ['unit1', 'unit2', 'unit3', 'unit4'])}));
+            expect(options.filteredUnits.length).toBe(4);
+            done();
+        });
+    });
+
+    it('signals argsError in case no value is provided for --unit', function (done) {
+        var cli = new CLI([process.argv[0], process.argv[1], '--unit']);
+        cli.on('argsError', function (err) {
+            expect(err).toEqual(jasmine.any(Error));
+            done();
+        });
+        cli.on('argsParsed', fail);
+    });
+
+    it('signals argsError in case no value is provided for -u', function (done) {
+        var cli = new CLI([process.argv[0], process.argv[1], '-u']);
+        cli.on('argsError', function (err) {
+            expect(err).toEqual(jasmine.any(Error));
+            done();
+        });
+        cli.on('argsParsed', fail);
     });
 });

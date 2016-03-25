@@ -52,6 +52,7 @@ var expectedUsage = 'Usage: ' + scriptName + ' [-h|--help] [-v|--version] [--clo
         '                          checks the current directory for all files with the\n' +
         '                          file extension ".nbuild". For every matched\n' +
         '                          configuration file ' + scriptName + ' performs a run.\n' +
+        '                          You may specify multiple configurations.\n' +
         ' --config-help            Display a help message for the configuration file\n' +
         '                          format and exit.\n' +
         ' --ignore-warnings        Compilation warnings are not shown on stderr.\n' +
@@ -62,7 +63,10 @@ var expectedUsage = 'Usage: ' + scriptName + ' [-h|--help] [-v|--version] [--clo
         '                          exit with the exit code 1.\n' +
         ' --stop-on-warning        All compilation processes are stopped in case a\n' +
         '                          compilation warning occurs. ' + scriptName + ' will\n' +
-        '                          exit with the exit code 1.\n';
+        '                          exit with the exit code 1.\n' +
+        ' -u|--unit UNIT_NAME      Filters the units that are taken into account for the\n' +
+        '                          compilation process. All other units are ignored.\n' +
+        '                          You may specify multiple units.\n';
 
 var expectedVersion = JSON.parse(fs.readFileSync('./package.json')).version;
 

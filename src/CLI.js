@@ -102,6 +102,7 @@ CLI.getUsage = function () {
                 '                          checks the current directory for all files with the\n' +
                 '                          file extension ".nbuild". For every matched\n' +
                 '                          configuration file ' + selfName + ' performs a run.\n' +
+                '                          You may specify multiple configurations.\n' +
                 ' --config-help            Display a help message for the configuration file\n' +
                 '                          format and exit.\n' +
                 ' --ignore-warnings        Compilation warnings are not shown on stderr.\n' +
@@ -112,7 +113,10 @@ CLI.getUsage = function () {
                 '                          exit with the exit code 1.\n' +
                 ' --stop-on-warning        All compilation processes are stopped in case a\n' +
                 '                          compilation warning occurs. ' + selfName + ' will\n' +
-                '                          exit with the exit code 1.\n');
+                '                          exit with the exit code 1.\n' +
+                ' -u|--unit UNIT_NAME      Filters the units that are taken into account for the\n' +
+                '                          compilation process. All other units are ignored.\n' +
+                '                          You may specify multiple units.\n');
     }).catch(deferred.reject);
     return deferred.promise;
 };
@@ -251,6 +255,7 @@ CLI.prototype._parseCliArgs = function (argv) {
              * @param {Error} err The error that occurred during argumentation parsing.
              */
             self.emit('argsError', err);
+            return;
         });
     };
     var result = {};
@@ -287,9 +292,26 @@ CLI.prototype._parseCliArgs = function (argv) {
                  * @param {Error} err The error that occurred during argumentation parsing.
                  */
                 this.emit('argsError', new Error('-c|--config requires a PATH parameter'));
+                return;
             } else {
-                if (!result.hasOwnProperty('configs')) result.configs = [];
+                if (!result.configs) result.configs = [];
                 result.configs.push(path.resolve(argv[++i]));
+            }
+            break;
+        case '-u':
+        case '--unit':
+            if (i + 1 === argv.length) {
+                /**
+                 * States that the parsing process of the CLI arguments failed.
+                 *
+                 * @event CLI#argsError
+                 * @param {Error} err The error that occurred during argumentation parsing.
+                 */
+                this.emit('argsError', new Error('-u|--unit requires a UNIT_NAME parameter'));
+                return;
+            } else {
+                if (!result.filteredUnits) result.filteredUnits = [];
+                result.filteredUnits.push(argv[++i]);
             }
             break;
         case '--config-help':
@@ -360,11 +382,11 @@ CLI.prototype._parseCliArgs = function (argv) {
              * @param {Error} err The error that occurred during argumentation parsing.
              */
             this.emit('argsError', new Error('The option "' + argv[i] + '" is not supported'));
-            i = argv.length;
-            break;
+            return;
         }
     }
     if (result.configs !== undefined) result.configs = utils.arrayToSet(result.configs);
+    if (result.filteredUnits !== undefined) result.filteredUnits = utils.arrayToSet(result.filteredUnits);
     /**
      * States that the parsing of CLI arguments was finished was set and that the contrib path information is ready.
      *

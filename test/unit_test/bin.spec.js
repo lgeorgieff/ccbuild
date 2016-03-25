@@ -381,9 +381,7 @@ describe('bin', function () {
                                }
                            });
         // jscs:enable requireCamelCaseOrUpperCaseIdentifiers
-        this.resourcesToDelete.push(configPath1);
-        this.resourcesToDelete.push(configPath2);
-        this.resourcesToDelete.push(configPath3);
+        //this.resourcesToDelete.push(configPath1, configPath2, configPath3);
     });
 
     it('compile with mulit-level inheritance -- success ', function (done) {
