@@ -64,11 +64,14 @@ var expectedUsage = 'Usage: ' + scriptName + ' [-h|--help] [-v|--version] [--clo
         ' --stop-on-warning        All compilation processes are stopped in case a\n' +
         '                          compilation warning occurs. ' + scriptName + ' will\n' +
         '                          exit with the exit code 1.\n' +
-        ' -u|--unit UNIT_NAME      Filters the units that are taken into account for the\n' +
-        '                          compilation process. All other units are ignored.\n' +
-        '                          You may specify multiple units.\n' +
-        '                          If no unit is specified, all units defined in the\n' +
-        '                          configuration files will be processed.\n';
+        ' -u|--unit UNIT_NAME      Filter the compilation units that are taken into\n' +
+        '                          account for the compilation process. All other units\n' +
+        '                          are ignored.\n' +
+        '                          You may specify multiple compilation units.\n' +
+        '                          If no compilation unit is specified, all units\n' +
+        '                          defined in the configuration files will be processed.\n\n' +
+        'ccbuild exits with the return code 0 in case of successful compilation(s) this\n' +
+        'includes warnings as well. In case of compilation errors the return code is 1.\n';
 
 var expectedVersion = JSON.parse(fs.readFileSync('./package.json')).version;
 

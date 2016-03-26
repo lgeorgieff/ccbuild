@@ -36,11 +36,15 @@ Checks and compiles JavaScript files via the Closure Compiler.
  --stop-on-warning        All compilation processes are stopped in case a
                           compilation warning occurs. ccbuild will exit with
                           the exit code 1.
- -u|--unit UNIT_NAME      Filters the units that are taken into account for the
-                          compilation process. All other units are ignored.
-                          You may specify multiple units.
-                          If no unit is specified, all units defined in the
-                          configuration files will be processed.
+ -u|--unit UNIT_NAME      Filter the compilation units that are taken into
+                          account for the compilation process. All other units
+                          are ignored.
+                          You may specify multiple compilation units.
+                          If no compilation unit is specified, all units
+                          defined in the configuration files will be processed.
+
+ccbuild exits with the return code 0 in case of successful compilation(s) this
+includes warnings as well. In case of compilation errors the return code is 1.
 ```
 
 # Configuration Files
