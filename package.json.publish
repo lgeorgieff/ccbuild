@@ -1,6 +1,6 @@
 {
   "name": "ccbuild",
-  "version": "1.6.1",
+  "version": "1.6.2",
   "description": "This package provides a thin layer for the Google Closure Compiler package that allows additional configuration such as compilation units and inheritance of configuration files. The offered functionality is a VERY LIGHTWEIGHT make system for Node.js.",
   "keywords": [
     "Google Closure Compiler",
