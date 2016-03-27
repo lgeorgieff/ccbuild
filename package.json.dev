@@ -34,12 +34,14 @@
     "async": "^1.5.2",
     "google-closure-compiler": "^20160208.1.0",
     "q": "^1.4.1",
+    "glob": "^7.0.3",
     "read-package-json": "^2.0.3"
   },
   "devDependencies": {
     "jasmine": "^2.4.1",
     "jscs": "^2.4.0",
-    "jsdoc": "^3.4.0"
+    "jsdoc": "^3.4.0",
+    "mock-fs": "^3.8.0"
   },
   "scripts": {
     "postinstall": "npm run install_fixes && npm run compile_closure_compiler && npm run install_git_hooks",

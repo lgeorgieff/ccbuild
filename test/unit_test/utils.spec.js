@@ -4,6 +4,18 @@
  * @ignore
  * @suppress {dupicate}
  */
+var path = require('path');
+
+/**
+ * @ignore
+ * @suppress {dupicate}
+ */
+var mockFs = require('mock-fs');
+
+/**
+ * @ignore
+ * @suppress {dupicate}
+ */
 var utils = require('../../src/utils');
 
 describe('array functions', function () {
@@ -217,5 +229,363 @@ describe('array functions', function () {
                  '--transform_amd_modules', '--externs', 'extern2.js', '--use_types_for_optimization', '--externs',
                  'extern1.js', '--js', 'file3.js'];
         expect(utils.mergeArguments(args1, args2)).toEqual(args3);
+    });
+});
+
+describe('utils\' isX', function () {
+    var relativePathToDir = path.join('relative', 'path', 'to', 'dir');
+    var relativePathToDirMock = 'relative/path/to/dir';
+    var relativePathToFile = path.join('relative', 'path', 'to', 'file.txt');
+    var relativePathToFileMock = 'relative/path/to/file.txt';
+    var absolutePathToDir;
+    var absolutePathToDirMock;
+    var absolutePathToFile;
+    var absolutePathToFileMock;
+    if (process.platform === 'win32') {
+        absolutePathToDir = path.join('c:' + 'absolute', 'path', 'to', 'dir');
+        absolutePathToDirMock = 'c:/absolute/path/to/dir';
+        absolutePathToFile = path.join('c:' + 'absolute', 'path', 'to', 'file.txt');
+        absolutePathToFileMock = 'c:/absolute/path/to/file.txt';
+    } else {
+        absolutePathToDir = path.join(path.sep + 'absolute', 'path', 'to', 'dir');
+        absolutePathToDirMock = '/absolute/path/to/dir';
+        absolutePathToFile = path.join(path.sep + 'absolute', 'path', 'to', 'file.txt');
+        absolutePathToFileMock = '/absolute/path/to/file.txt';
+    }
+    var pathToSymlinkToFile = path.join('relative', 'path', 'to', 'symlink', 'file');
+    var pathToSymlinkToFileMock = 'relative/path/to/symlink/file';
+    var pathToSymlinkToDir = path.join('relative', 'path', 'to', 'symlink', 'folder');
+    var pathToSymlinkToDirMock = 'relative/path/to/symlink/folder';
+    var pathToBrokenSymlink = path.join('relative', 'path', 'to', 'symlink', 'broken');
+    var pathToBrokenSymlinkMock = 'relative/path/to/symlink/broken';
+
+    beforeAll(function () {
+        var fakeFs = {};
+        fakeFs[relativePathToDirMock] = {};
+        fakeFs[relativePathToFileMock] = 'some text';
+        fakeFs[absolutePathToDirMock] = {};
+        fakeFs[absolutePathToFileMock] = 'some text';
+        fakeFs[pathToSymlinkToFileMock] = mockFs.symlink({path: '../../../../' + relativePathToFileMock});
+        fakeFs[pathToSymlinkToDirMock] = mockFs.symlink({path: '../../../../' + relativePathToDirMock});
+        fakeFs[pathToBrokenSymlinkMock] = mockFs.symlink({path: 'does/not/exist'});
+        mockFs(fakeFs);
+    });
+
+    afterAll(mockFs.restore);
+
+    describe('utils.isFile', function () {
+        it('returns false for relative directory path', function (done) {
+            utils.isFile(relativePathToDir).then(function (value) {
+                expect(value).toBe(false);
+                done();
+            }).catch(fail);
+        });
+
+        it('returns true for relative file path', function (done) {
+            utils.isFile(relativePathToFile).then(function (value) {
+                expect(value).toBe(true);
+                done();
+            }).catch(fail);
+        });
+
+        it('returns false for absolute directory path', function (done) {
+            utils.isFile(absolutePathToDir).then(function (value) {
+                expect(value).toBe(false);
+                done();
+            }).catch(fail);
+        });
+
+        it('returns true for relative absolute path', function (done) {
+            utils.isFile(absolutePathToFile).then(function (value) {
+                expect(value).toBe(true);
+                done();
+            }).catch(fail);
+        });
+
+        it('signals an error if path does not exist', function (done) {
+            utils.isFile(path.join('path', 'does', 'not', 'exist'))
+                .then(function (value) {
+                    fail('Expected the isFile will signal an error!');
+                })
+                .catch(function (err) {
+                    expect(err).toEqual(jasmine.any(Error));
+                    done();
+                });
+        });
+
+        it('returns false for symlink to folder', function (done) {
+            utils.isFile(pathToSymlinkToDir).then(function (value) {
+                expect(value).toBe(false);
+                done();
+            }).catch(fail);
+        });
+
+        it('returns true for symlink to file', function (done) {
+            utils.isFile(pathToSymlinkToFile).then(function (value) {
+                expect(value).toBe(true);
+                done();
+            }).catch(fail);
+        });
+
+        it('broken symlink signals an error', function (done) {
+            utils.isFile(pathToBrokenSymlink)
+                .then(function (value) {
+                    fail('Expected the isFile will signal an error!');
+                })
+                .catch(function (err) {
+                    expect(err).toEqual(jasmine.any(Error));
+                    done();
+                });
+        });
+    });
+
+    describe('utils.isDirectory', function () {
+        it('returns true for relative directory path', function (done) {
+            utils.isDirectory(relativePathToDir).then(function (value) {
+                expect(value).toBe(true);
+                done();
+            }).catch(fail);
+        });
+
+        it('returns false for relative file path', function (done) {
+            utils.isDirectory(relativePathToFile).then(function (value) {
+                expect(value).toBe(false);
+                done();
+            }).catch(fail);
+        });
+
+        it('returns true for absolute directory path', function (done) {
+            utils.isDirectory(absolutePathToDir).then(function (value) {
+                expect(value).toBe(true);
+                done();
+            }).catch(fail);
+        });
+
+        it('returns false for absolute file path', function (done) {
+            utils.isDirectory(absolutePathToFile).then(function (value) {
+                expect(value).toBe(false);
+                done();
+            }).catch(fail);
+        });
+
+        it('signals an error if path does not exist', function (done) {
+            utils.isDirectory(path.join('path', 'does', 'not', 'exist'))
+                .then(function (value) {
+                    fail('Expected the isDirectory will signal an error!');
+                })
+                .catch(function (err) {
+                    expect(err).toEqual(jasmine.any(Error));
+                    done();
+                });
+        });
+
+        it('returns true for symlink to folder', function (done) {
+            utils.isDirectory(pathToSymlinkToDir).then(function (value) {
+                expect(value).toBe(true);
+                done();
+            }).catch(fail);
+        });
+
+        it('returns false for symlink to file', function (done) {
+            utils.isDirectory(pathToSymlinkToFile).then(function (value) {
+                expect(value).toBe(false);
+                done();
+            }).catch(fail);
+        });
+
+        it('broken symlink signals an error', function (done) {
+            utils.isFile(pathToBrokenSymlink)
+                .then(function (value) {
+                    fail('Expected the isFile will signal an error!');
+                })
+                .catch(function (err) {
+                    expect(err).toEqual(jasmine.any(Error));
+                    done();
+                });
+        });
+    });
+});
+
+describe('utils\' glob expressions', function () {
+    beforeAll(function () {
+        var fakeFs = {
+            'source1.js': '',
+            'source2.js': '',
+            'source3.cpp': '',
+            'source4.fs': '',
+            'data1.json': '',
+            'data2.json': '',
+            'sub-directory-1': {
+                'source5.js': '',
+                'source6.cpp': '',
+                'data3.json': '',
+                'sub-sub-directory-1-1': {
+                    'source7.js': '',
+                    'data4.txt': '',
+                    'symlink.js': mockFs.symlink({path: '../source5.js'})
+                }
+            },
+            'sub-directory-2': {
+                'source8.js': '',
+                'source9.cpp': '',
+                'data5.json': '',
+                'sub-sub-directory-2-1': {
+                    'source10.js': '',
+                    'data6.txt': '',
+                    'symlink.js': mockFs.symlink({path: '../'})
+                },
+                'sub-sub-directory-2-2': {
+                    'symlink.js': mockFs.symlink({path: '../does/not/exist'})
+                },
+                'sub-sub-directory-2-3': mockFs.directory({mode: parseInt('666', 8),
+                                                           items: {
+                                                               'source11.js': ''
+                                                           }})
+            }
+        };
+        mockFs(fakeFs);
+    });
+
+    afterAll(mockFs.restore);
+
+    describe('utils.globFiles', function () {
+        it('returns an empty array if no match is found', function (done) {
+            utils.globFiles(path.join('path', 'does', 'not', 'exist'))
+                .then(function (files) {
+                    expect(files).toEqual([]);
+                    done();
+                })
+                .catch(function (err) {
+                    fail(err);
+                });
+        });
+
+        it('lists all files in current directory with * and ignores folders', function (done) {
+            utils.globFiles('*')
+                .then(function (files) {
+                    expect(files.length).toBe(6);
+                    expect(files).toEqual(jasmine.arrayContaining(['source1.js', 'source2.js', 'source3.cpp',
+                                                                   'source4.fs', 'data1.json', 'data2.json']));
+                    done();
+                })
+                .catch(fail);
+        });
+
+        it('list all *.js files in all first level sub-directories', function (done) {
+            utils.globFiles('*/*.js')
+                .then(function (files) {
+                    expect(files.length).toBe(2);
+                    expect(files).toEqual(jasmine.arrayContaining(['sub-directory-1/source5.js',
+                                                                   'sub-directory-2/source8.js']));
+                    done();
+                })
+                .catch(fail);
+        });
+
+        it('*.js includes symlink to files', function (done) {
+            utils.globFiles(path.join('sub-directory-1', 'sub-sub-directory-1-1', '*.js'))
+                .then(function (files) {
+                    expect(files.length).toBe(2);
+                    expect(files).toEqual(jasmine.arrayContaining([
+                        path.join('sub-directory-1', 'sub-sub-directory-1-1', 'symlink.js'),
+                        path.join('sub-directory-1', 'sub-sub-directory-1-1', 'source7.js')]));
+                    done();
+                })
+                .catch(fail);
+        });
+
+        it('*.js does not include symlinks to directories', function (done) {
+            utils.globFiles(path.join('sub-directory-2', 'sub-sub-directory-2-1', 'symlink.js'))
+                .then(function (files) {
+                    expect(files.length).toBe(0);
+                    done();
+                })
+                .catch(fail);
+        });
+
+        it('broken symlink signals an error', function (done) {
+            utils.globFiles(path.join('sub-directory-2', 'sub-sub-directory-2-2', '*'))
+                .then(function (files) {
+                    fail('Expected utils.globFiles to fail!');
+                })
+                .catch(done);
+        });
+
+        it('signals error in case folder is not executable', function (done) {
+            utils.globFiles(path.join('sub-directory-2', 'sub-sub-directory-2-3', '*'))
+                .then(function (files) {
+                    fail('Expected utils.globFiles to fail!');
+                })
+                .catch(done);
+        });
+    });
+
+    describe('utils.globDirectories', function () {
+        it('returns an empty array if no match is found', function (done) {
+            utils.globDirectories(path.join('path', 'does', 'not', 'exist'))
+                .then(function (files) {
+                    expect(files).toEqual([]);
+                    done();
+                })
+                .catch(function (err) {
+                    fail(err);
+                });
+        });
+
+        it('lists all directories in current directory with * and ignores folders', function (done) {
+            utils.globDirectories('*')
+                .then(function (files) {
+                    expect(files.length).toBe(2);
+                    expect(files).toEqual(jasmine.arrayContaining(['sub-directory-1', 'sub-directory-2']));
+                    done();
+                })
+                .catch(fail);
+        });
+
+        it('list all sub-sub-directories of the form *-1', function (done) {
+            utils.globDirectories('*/*-1')
+                .then(function (files) {
+                    expect(files.length).toBe(2);
+                    expect(files).toEqual(jasmine.arrayContaining(['sub-directory-1/sub-sub-directory-1-1',
+                                                                   'sub-directory-2/sub-sub-directory-2-1']));
+                    done();
+                })
+                .catch(fail);
+        });
+
+        it('does not include symlink to files', function (done) {
+            utils.globDirectories(path.join('sub-directory-1', 'sub-sub-directory-1-1', '*'))
+                .then(function (files) {
+                    expect(files.length).toBe(0);
+                    done();
+                })
+                .catch(fail);
+        });
+
+        it('includes symlinks to directories', function (done) {
+            utils.globDirectories(path.join('sub-directory-2', 'sub-sub-directory-2-1', 'symlink.js'))
+                .then(function (files) {
+                    expect(files.length).toBe(1);
+                    expect(files).toEqual([path.join('sub-directory-2', 'sub-sub-directory-2-1', 'symlink.js')]);
+                    done();
+                })
+                .catch(fail);
+        });
+
+        it('broken symlink signals an error', function (done) {
+            utils.globDirectories(path.join('sub-directory-2', 'sub-sub-directory-2-2', '*'))
+                .then(function (files) {
+                    fail('Expected utils.globFiles to fail!');
+                })
+                .catch(done);
+        });
+
+        it('signals error in case folder is not executable', function (done) {
+            utils.globDirectories(path.join('sub-directory-2', 'sub-sub-directory-2-3', '*'))
+                .then(function (files) {
+                    fail('Expected utils.globFiles to fail!');
+                })
+                .catch(done);
+        });
     });
 });

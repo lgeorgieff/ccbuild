@@ -7,6 +7,24 @@
 var util = require('util');
 
 /**
+ * @ignore
+ * @suppress {duplicate}
+ */
+var fs = require('fs');
+
+/**
+ * @ignore
+ * @suppress {duplicate}
+ */
+var glob = /** function(string, Object=, function(Error, Array<string>): void */ (require('glob'));
+
+/**
+ * @ignore
+ * @suppress {duplicate}
+ */
+var Q = require('q');
+
+/**
  * Removes an array representing a set without duplicates.
  *
  * @template T
@@ -253,6 +271,105 @@ function mergeArguments (parentArguments, childArguments) {
     return result;
 }
 
+/**
+ * Check whether the passed file path refers to a file or not.
+ *
+ * @returns {Promise} A pronmise holding a boolean value that indicates whether the passed file path refers to a file
+ *          or not.
+ * @param {string} filePath The path that is checked.
+ */
+function isFile (filePath) {
+    var deferred = Q.defer();
+
+    fs.stat(filePath, function (err, stats) {
+        if (err) deferred.reject(err);
+        else deferred.resolve(stats.isFile());
+    });
+
+    return deferred.promise;
+}
+
+/**
+ * Check whether the passed file path refers to a file or not.
+ *
+ * @returns {Promise} A promise holding a boolean value that indicates whether the passed directory path refers to a
+ *          directory or not.
+ * @param {string} directoryPath The path that is checked.
+ */
+function isDirectory (directoryPath) {
+    var deferred = Q.defer();
+
+    fs.stat(directoryPath, function (err, stats) {
+        if (err) deferred.reject(err);
+        else deferred.resolve(stats.isDirectory());
+    });
+
+    return deferred.promise;
+}
+
+/**
+ * Expands the passed glob and returns the resulting file and folder paths.
+ *
+ * @private
+ *
+ * @returns {Promise} A promise holding an array of file and folder paths.
+ * @param {string} globExpression A glob expression.
+ */
+function expandGlob (globExpression) {
+    var deferred = Q.defer();
+    glob(globExpression, function (err, filesAndFolders) {
+        if (err) {
+            deferred.reject(err);
+        } else {
+            deferred.resolve(filesAndFolders);
+        }
+    });
+
+    return deferred.promise;
+}
+
+/**
+ * Expands the passed glob and returns the resulting file paths that are filtered for files only.
+ *
+ * @returns {Promise} A promise holding an array of file paths.
+ * @param {string} globExpression A glob expression.
+ */
+function globFiles (globExpression) {
+    return expandGlob(globExpression).then(function (filesAndFolders) {
+        return Q.all(filesAndFolders.map(function (filePath) {
+            return isFile(filePath).then(function (result) {
+                if (result) return filePath;
+                return undefined;
+            });
+        })).then(function (results) {
+            return results.filter(function (result) {
+                return result !== undefined;
+            });
+        });
+    });
+}
+
+/**
+ * Expands the passed glob and returns the resulting directory paths that are filtered for directories only.
+ *
+ * @returns {Promise} A promise holding an array of file paths.
+ * @param {string} globExpression A glob expression.
+ */
+function globDirectories (globExpression) {
+    return expandGlob(globExpression).then(function (filesAndFolders) {
+        return Q.all(filesAndFolders.map(function (filePath) {
+            return isDirectory(filePath).then(function (result) {
+                if (result) return filePath;
+                return undefined;
+            });
+        })).then(function (results) {
+            return results.filter(function (result) {
+                return result !== undefined;
+            });
+        });
+    });
+}
+
 module.exports.arrayToSet = arrayToSet;
 module.exports.isStringArray = isStringArray;
 module.exports.mergeArrays = mergeArrays;
@@ -263,3 +380,7 @@ module.exports.mergeArguments = mergeArguments;
 module.exports.findTuple = findTuple;
 module.exports.removeTuplesFromArray = removeTuplesFromArray;
 module.exports.listToTuples = listToTuples;
+module.exports.globFiles = globFiles;
+module.exports.globDirectories = globDirectories;
+module.exports.isFile = isFile;
+module.exports.isDirectory = isDirectory;
