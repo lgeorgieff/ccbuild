@@ -219,6 +219,20 @@ index 596f66b..fc3f3ac 100644
  var path = {};
  
  /**
+diff --git a/process.js b/process.js
+index b1592f4..cd8826c 100644
+--- a/process.js
++++ b/process.js
+@@ -167,3 +167,9 @@ process.uptime = function() {};
+  * @nosideeffects
+  */
+ process.hrtime = function() {};
++
++/**
++ * @param {string} event
++ * @param {function(...*)} fn
++ */
++process.on = function(event, fn) {};
 diff --git a/punycode.js b/punycode.js
 index cf96ea1..5dc797c 100644
 --- a/punycode.js
