@@ -16,7 +16,13 @@ var fs = require('fs');
  * @ignore
  * @suppress {duplicate}
  */
-var glob = /** function(string, Object=, function(Error, Array<string>): void */ (require('glob'));
+var path = require('path');
+
+/**
+ * @ignore
+ * @suppress {duplicate}
+ */
+var glob = /** @type {function(string, Object=, function(Error, Array<string>)): void} */ (require('glob'));
 
 /**
  * @ignore
@@ -370,6 +376,86 @@ function globDirectories (globExpression) {
     });
 }
 
+/**
+ * Get a list of all files of the given directory and filter the resulting file list for their file extensions.
+ *
+ * @returns {Promise} A promise holding an array of file paths.
+ * @param {string} directory Paths to the root directories that all files are searched in.
+ * @param {Array<string>=} fileExtensions Optional file extensions that are used for filtering the found files. If no value
+ *        is given the found files are not filtered for their extension.
+ */
+function getAllFilesFromDirectory (directory, fileExtensions) {
+    var readdirp = function (dir) {
+        return Q.nfcall(fs.readdir, dir).then(function (entries) {
+            return entries.map(function (entry) {
+                return path.join(dir, entry);
+            });
+        });
+    };
+
+    return readdirp(directory).then(function (entries) {
+        return Q.all(entries.map(function (entry) {
+            return isDirectory(entry).then(function (_isDir) {
+                if (_isDir) {
+                    return getAllFilesFromDirectory(entry, fileExtensions);
+                } else {
+                    return isFile(entry).then(function (_isFile) {
+                        if (_isFile) return entry;
+                        else return undefined;
+                    });
+                }
+            });
+        }));
+    })
+        .then(flatten)
+        .then(function (files) {
+            return files.filter(function (file) {
+                return file !== undefined;
+            }).filter(function (file) {
+                return !fileExtensions || fileExtensions.length === 0 ||
+                    fileExtensions.indexOf(path.extname(file)) !== -1;
+            });
+        });
+}
+
+/**
+ * Flattens an multi-dimensional array into a single-dimensional array.
+ *
+ * @private
+ *
+ * @returns {Array<*>} The flattened array.
+ * @param {Array<*>} arr A multi-dimensional array.
+ */
+function flatten (arr) {
+    return (arr || []).reduce(function (accumulator, currentElement) {
+        var toAppend;
+        if (Array.isArray(currentElement)) toAppend = flatten(currentElement);
+        else toAppend = currentElement;
+        if (!Array.isArray(toAppend)) toAppend = [toAppend];
+        Array.prototype.push.apply(accumulator, toAppend);
+        return accumulator;
+    }, []);
+}
+
+/**
+ * Get a list of all files of the given directories and filter the resulting file list for their file extensions.
+ *
+ * @returns {Promise} A promise holding an array of file paths.
+ * @param {Array<string>} directories Paths to the root directories that all files are searched in.
+ * @param {Array<string>=} fileExtensions Optional file extensions that are used for filtering the found files. If no value
+ *        is given the found files are not filtered for their extension.
+ */
+function getAllFilesFromDirectories (directories, fileExtensions) {
+    return Q.all(directories.map(function (directory) {
+        return getAllFilesFromDirectory(directory, fileExtensions);
+    })).then(function (results) {
+        return results.reduce(function (accumulator, currentResult) {
+            Array.prototype.push.apply(accumulator, currentResult);
+            return accumulator;
+        }, []);
+    });
+}
+
 module.exports.arrayToSet = arrayToSet;
 module.exports.isStringArray = isStringArray;
 module.exports.mergeArrays = mergeArrays;
@@ -384,3 +470,5 @@ module.exports.globFiles = globFiles;
 module.exports.globDirectories = globDirectories;
 module.exports.isFile = isFile;
 module.exports.isDirectory = isDirectory;
+module.exports.getAllFilesFromDirectory = getAllFilesFromDirectory;
+module.exports.getAllFilesFromDirectories = getAllFilesFromDirectories;

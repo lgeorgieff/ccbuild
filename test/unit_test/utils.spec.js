@@ -589,3 +589,327 @@ describe('utils\' glob expressions', function () {
         });
     });
 });
+
+describe('utils\' list all files utility', function () {
+    var allFiles = [
+        path.join('dir-1', 'file1.js'),
+        path.join('dir-1', 'file2.js'),
+        path.join('dir-1', 'file3.txt'),
+        path.join('dir-1', 'dir-1-1', 'file4.json'),
+        path.join('dir-1', 'dir-1-1', 'file5.json'),
+        path.join('dir-1', 'dir-1-1', 'dir-1-1-1', 'file6.cpp'),
+        path.join('dir-1', 'dir-1-1', 'dir-1-1-1', 'file7.py'),
+        path.join('dir-1', 'dir-1-1', 'dir-1-1-1', 'dir-1-1-1-1', 'file8.txt'),
+        path.join('dir-1', 'dir-1-1', 'dir-1-1-1', 'dir-1-1-1-1', 'file33.cs'),
+        path.join('dir-1', 'dir-1-1', 'dir-1-1-1', 'dir-1-1-1-2', 'file8.txt'),
+        path.join('dir-1', 'dir-1-1', 'dir-1-1-2', 'file6.cpp'),
+        path.join('dir-1', 'dir-1-1', 'dir-1-1-2', 'file7.py'),
+        path.join('dir-1', 'dir-1-1', 'dir-1-1-2', 'dir-1-1-2-1', 'file8.txt'),
+        path.join('dir-1', 'dir-1-1', 'dir-1-1-2', 'dir-1-1-2-1', 'file55'),
+        path.join('dir-1', 'dir-1-1', 'dir-1-1-2', 'dir-1-1-2-2', 'file8.txt'),
+        path.join('dir-1', 'dir-1-1', 'dir-1-1-2', 'dir-1-1-2-3', 'file18.cs'),
+        path.join('dir-1', 'dir-1-2', 'file4.json'),
+        path.join('dir-1', 'dir-1-2', 'file5.json'),
+        path.join('dir-1', 'dir-1-2', 'dir-1-2-1', 'file6.cpp'),
+        path.join('dir-1', 'dir-1-2', 'dir-1-2-1', 'file7.py'),
+        path.join('dir-1', 'dir-1-2', 'dir-1-2-1', 'dir-1-2-1-1', 'file8.txt'),
+        path.join('dir-1', 'dir-1-2', 'dir-1-2-1', 'dir-1-2-1-2', 'file8.txt'),
+        path.join('dir-1', 'dir-1-2', 'dir-1-2-2', 'file6.cpp'),
+        path.join('dir-1', 'dir-1-2', 'dir-1-2-2', 'file7.py'),
+        path.join('dir-1', 'dir-1-2', 'dir-1-2-2', 'dir-1-2-2-1', 'file8.txt'),
+        path.join('dir-1', 'dir-1-2', 'dir-1-2-2', 'dir-1-2-2-2', 'file8.txt'),
+        path.join('dir-2', 'file1.js'),
+        path.join('dir-2', 'file2.js'),
+        path.join('dir-2', 'file3.txt'),
+        path.join('dir-2', 'dir-2-1', 'file4.json'),
+        path.join('dir-2', 'dir-2-1', 'file5.json'),
+        path.join('dir-2', 'dir-2-1', 'dir-2-1-1', 'file6.cpp'),
+        path.join('dir-2', 'dir-2-1', 'dir-2-1-1', 'file7.py'),
+        path.join('dir-2', 'dir-2-1', 'dir-2-1-1', 'dir-2-1-1-1', 'file8.txt'),
+        path.join('dir-2', 'dir-2-1', 'dir-2-1-1', 'dir-2-1-1-2', 'file8.txt'),
+        path.join('dir-2', 'dir-2-1', 'dir-2-1-2', 'file6.cpp'),
+        path.join('dir-2', 'dir-2-1', 'dir-2-1-2', 'file7.py'),
+        path.join('dir-2', 'dir-2-1', 'dir-2-1-2', 'dir-2-1-2-1', 'file8.txt'),
+        path.join('dir-2', 'dir-2-1', 'dir-2-1-2', 'dir-2-1-2-2', 'file8.txt'),
+        path.join('dir-2', 'dir-2-2', 'file4.json'),
+        path.join('dir-2', 'dir-2-2', 'file5.json'),
+        path.join('dir-2', 'dir-2-2', 'dir-2-2-1', 'file6.cpp'),
+        path.join('dir-2', 'dir-2-2', 'dir-2-2-1', 'file7.py'),
+        path.join('dir-2', 'dir-2-2', 'dir-2-2-1', 'dir-2-2-1-1', 'file8.txt'),
+        path.join('dir-2', 'dir-2-2', 'dir-2-2-1', 'dir-2-2-1-2', 'file8.txt'),
+        path.join('dir-2', 'dir-2-2', 'dir-2-2-2', 'file6.cpp'),
+        path.join('dir-2', 'dir-2-2', 'dir-2-2-2', 'file7.py'),
+        path.join('dir-2', 'dir-2-2', 'dir-2-2-2', 'dir-2-2-2-1', 'file8.txt'),
+        path.join('dir-2', 'dir-2-2', 'dir-2-2-2', 'dir-2-2-2-2', 'file8.txt')
+    ];
+
+    beforeAll(function () {
+        var fakeFs = {
+            'dir-1': {
+                'file1.js': '',
+                'file2.js': '',
+                'dir-1-1': {
+                    'file4.json': '',
+                    'dir-1-1-1': {
+                        'file6.cpp': '',
+                        'dir-1-1-1-1': {
+                            'file8.txt': '',
+                            'file33.cs': ''
+                        },
+                        'file7.py': '',
+                        'dir-1-1-1-2': {
+                            'file8.txt': ''
+                        }
+                    },
+                    'dir-1-1-2': {
+                        'file6.cpp': '',
+                        'dir-1-1-2-1': {
+                            'file8.txt': '',
+                            'file55': ''
+                        },
+                        'file7.py': '',
+                        'dir-1-1-2-2': {
+                            'file8.txt': ''
+                        },
+                        'dir-1-1-2-3': {
+                            'file18.cs': ''
+                        }
+                    },
+                    'file5.json': ''
+                },
+                'file3.txt': '',
+                'dir-1-2': {
+                    'file4.json': '',
+                    'dir-1-2-1': {
+                        'file6.cpp': '',
+                        'dir-1-2-1-1': {
+                            'file8.txt': ''
+                        },
+                        'file7.py': '',
+                        'dir-1-2-1-2': {
+                            'file8.txt': ''
+                        }
+                    },
+                    'dir-1-2-2': {
+                        'file6.cpp': '',
+                        'dir-1-2-2-1': {
+                            'file8.txt': ''
+                        },
+                        'file7.py': '',
+                        'dir-1-2-2-2': {
+                            'file8.txt': ''
+                        }
+                    },
+                    'file5.json': ''
+                }
+            },
+            'dir-2': {
+                'file1.js': '',
+                'file2.js': '',
+                'dir-2-1': {
+                    'file4.json': '',
+                    'dir-2-1-1': {
+                        'file6.cpp': '',
+                        'dir-2-1-1-1': {
+                            'file8.txt': ''
+                        },
+                        'file7.py': '',
+                        'dir-2-1-1-2': {
+                            'file8.txt': ''
+                        }
+                    },
+                    'dir-2-1-2': {
+                        'file6.cpp': '',
+                        'dir-2-1-2-1': {
+                            'file8.txt': ''
+                        },
+                        'file7.py': '',
+                        'dir-2-1-2-2': {
+                            'file8.txt': ''
+                        }
+                    },
+                    'file5.json': ''
+                },
+                'file3.txt': '',
+                'dir-2-2': {
+                    'file4.json': '',
+                    'dir-2-2-1': {
+                        'file6.cpp': '',
+                        'dir-2-2-1-1': {
+                            'file8.txt': ''
+                        },
+                        'file7.py': '',
+                        'dir-2-2-1-2': {
+                            'file8.txt': ''
+                        }
+                    },
+                    'dir-2-2-2': {
+                        'file6.cpp': '',
+                        'dir-2-2-2-1': {
+                            'file8.txt': ''
+                        },
+                        'file7.py': '',
+                        'dir-2-2-2-2': {
+                            'file8.txt': ''
+                        },
+                        'dir-2-2-3': {}
+                    },
+                    'file5.json': ''
+                }
+            }
+        };
+
+        mockFs(fakeFs);
+    });
+
+    afterAll(mockFs.restore);
+
+    describe('utils.getAllFilesFromDirectory', function () {
+        it('signals error if directory does not exist', function (done) {
+            utils.getAllFilesFromDirectory(path.join('does', 'not', 'exist'))
+                .then(function (files) {
+                    fail('Exptected utils.getAllFilesFromDirectory to fail!');
+                })
+                .catch(function (err) {
+                    expect(err).toEqual(jasmine.any(Error));
+                    expect(err.code).toBe('ENOENT');
+                    done();
+                });
+        });
+
+        it('lists all files in directory leaf', function (done) {
+            var dirPath = path.join('dir-1', 'dir-1-1', 'dir-1-1-1', 'dir-1-1-1-1');
+            utils.getAllFilesFromDirectory(dirPath)
+                .then(function (files) {
+                    expect(files.length).toBe(2);
+                    expect(files).toEqual(jasmine.arrayContaining([path.join(dirPath, 'file8.txt'),
+                                                                   path.join(dirPath, 'file33.cs')]));
+                    done();
+                })
+                .catch(fail);
+        });
+
+        it('lists all files in directory and its direct sub-driectories', function (done) {
+            var dirPath = path.join('dir-1', 'dir-1-1', 'dir-1-1-1');
+            utils.getAllFilesFromDirectory(dirPath)
+                .then(function (files) {
+                    expect(files.length).toBe(5);
+                    expect(files).toEqual(jasmine.arrayContaining([
+                        path.join(dirPath, 'file6.cpp'),
+                        path.join(dirPath, 'dir-1-1-1-1', 'file8.txt'),
+                        path.join(dirPath, 'dir-1-1-1-1', 'file33.cs'),
+                        path.join(dirPath, 'file7.py'),
+                        path.join(dirPath, 'dir-1-1-1-2', 'file8.txt')
+                    ]));
+                    done();
+                })
+                .catch(fail);
+        });
+
+        it('lists all files from mutliple sub-directories', function (done) {
+            var dirPath = path.join('dir-1', 'dir-1-1', 'dir-1-1-2');
+            utils.getAllFilesFromDirectory(dirPath)
+                .then(function (files) {
+                    expect(files.length).toBe(6);
+                    expect(files).toEqual(jasmine.arrayContaining([
+                        path.join(dirPath, 'file6.cpp'),
+                        path.join(dirPath, 'file7.py'),
+                        path.join(dirPath, 'dir-1-1-2-1', 'file8.txt'),
+                        path.join(dirPath, 'dir-1-1-2-1', 'file55'),
+                        path.join(dirPath, 'dir-1-1-2-2', 'file8.txt'),
+                        path.join(dirPath, 'dir-1-1-2-3', 'file18.cs')
+                    ]));
+                    done();
+                })
+                .catch(fail);
+        });
+
+        it('lists all files in directory and all its sub-driectories', function (done) {
+            utils.getAllFilesFromDirectory('.')
+                .then(function (files) {
+                    expect(files.length).toBe(allFiles.length);
+                    expect(files).toEqual(jasmine.arrayContaining(allFiles));
+                    done();
+                })
+                .catch(fail);
+        });
+
+        it('lists only files with correct file extensions', function (done) {
+            utils.getAllFilesFromDirectory('.', ['.txt', '.cs'])
+                .then(function (files) {
+                    var expectedFiles = allFiles.filter(function (f) {
+                        return f.endsWith('.txt') || f.endsWith('.cs');
+                    });
+
+                    expect(files.length).toBe(expectedFiles.length);
+                    expect(files).toEqual(jasmine.arrayContaining(expectedFiles));
+                    done();
+                })
+                .catch(fail);
+        });
+
+        it('lists only files without a file extension in case of ""', function (done) {
+            utils.getAllFilesFromDirectory('.', [''])
+                .then(function (files) {
+                    var expectedFiles = allFiles.filter(function (f) {
+                        var noExtension = false;
+                        var parts = f.split(path.sep);
+                        if (parts.length > 0) {
+                            var fileName = parts[parts.length - 1];
+                            noExtension = fileName.indexOf('.') === -1;
+                        }
+                        return noExtension;
+                    });
+                    expect(files.length).toBe(expectedFiles.length);
+                    expect(files).toEqual(jasmine.arrayContaining(expectedFiles));
+                    done();
+                })
+                .catch(fail);
+        });
+    });
+
+    describe('utils.getAllFilesFromDirectories', function () {
+        it('lists all files in directories and all their sub-driectories', function (done) {
+            utils.getAllFilesFromDirectories(['./dir-1', 'dir-2'])
+                .then(function (files) {
+                    expect(files.length).toBe(allFiles.length);
+                    expect(files).toEqual(jasmine.arrayContaining(allFiles));
+                    done();
+                })
+                .catch(fail);
+        });
+
+        it('lists only files with correct file extensions', function (done) {
+            utils.getAllFilesFromDirectories(['dir-1', './dir-2'], ['.txt', '.cs'])
+                .then(function (files) {
+                    var expectedFiles = allFiles.filter(function (f) {
+                        return f.endsWith('.txt') || f.endsWith('.cs');
+                    });
+
+                    expect(files.length).toBe(expectedFiles.length);
+                    expect(files).toEqual(jasmine.arrayContaining(expectedFiles));
+                    done();
+                })
+                .catch(fail);
+        });
+
+        it('lists only files without a file extension in case of ""', function (done) {
+            utils.getAllFilesFromDirectories(['./dir-1', './dir-2'], [''])
+                .then(function (files) {
+                    var expectedFiles = allFiles.filter(function (f) {
+                        var noExtension = false;
+                        var parts = f.split(path.sep);
+                        if (parts.length > 0) {
+                            var fileName = parts[parts.length - 1];
+                            noExtension = fileName.indexOf('.') === -1;
+                        }
+                        return noExtension;
+                    });
+                    expect(files.length).toBe(expectedFiles.length);
+                    expect(files).toEqual(jasmine.arrayContaining(expectedFiles));
+                    done();
+                })
+                .catch(fail);
+        });
+    });
+});
