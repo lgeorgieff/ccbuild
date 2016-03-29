@@ -393,29 +393,35 @@ function getAllFilesFromDirectory (directory, fileExtensions) {
         });
     };
 
-    return readdirp(directory).then(function (entries) {
-        return Q.all(entries.map(function (entry) {
-            return isDirectory(entry).then(function (_isDir) {
-                if (_isDir) {
-                    return getAllFilesFromDirectory(entry, fileExtensions);
-                } else {
-                    return isFile(entry).then(function (_isFile) {
-                        if (_isFile) return entry;
-                        else return undefined;
+    return isFile(directory).then(function (directoryIsFile) {
+        if (directoryIsFile) {
+            return [directory];
+        } else {
+            return readdirp(directory).then(function (entries) {
+                return Q.all(entries.map(function (entry) {
+                    return isDirectory(entry).then(function (_isDir) {
+                        if (_isDir) {
+                            return getAllFilesFromDirectory(entry, fileExtensions);
+                        } else {
+                            return isFile(entry).then(function (_isFile) {
+                                if (_isFile) return entry;
+                                else return undefined;
+                            });
+                        }
                     });
-                }
-            });
-        }));
-    })
-        .then(flatten)
-        .then(function (files) {
-            return files.filter(function (file) {
-                return file !== undefined;
-            }).filter(function (file) {
-                return !fileExtensions || fileExtensions.length === 0 ||
-                    fileExtensions.indexOf(path.extname(file)) !== -1;
-            });
-        });
+                }));
+            })
+                .then(flatten)
+                .then(function (files) {
+                    return files.filter(function (file) {
+                        return file !== undefined;
+                    }).filter(function (file) {
+                        return !fileExtensions || fileExtensions.length === 0 ||
+                            fileExtensions.indexOf(path.extname(file)) !== -1;
+                    });
+                });
+        }
+    });
 }
 
 /**
@@ -446,7 +452,7 @@ function flatten (arr) {
  *        is given the found files are not filtered for their extension.
  */
 function getAllFilesFromDirectories (directories, fileExtensions) {
-    return Q.all(directories.map(function (directory) {
+    return Q.all((directories || []).map(function (directory) {
         return getAllFilesFromDirectory(directory, fileExtensions);
     })).then(function (results) {
         return results.reduce(function (accumulator, currentResult) {

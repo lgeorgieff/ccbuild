@@ -18,7 +18,7 @@ var mockFs = require('mock-fs');
  */
 var utils = require('../../src/utils');
 
-describe('array functions', function () {
+fdescribe('array functions', function () {
     it('arrayToSet', function () {
         var comp1 = function (lft, rgt) {
             return lft === rgt;
@@ -232,7 +232,7 @@ describe('array functions', function () {
     });
 });
 
-describe('utils\' isX', function () {
+fdescribe('utils\' isX', function () {
     var relativePathToDir = path.join('relative', 'path', 'to', 'dir');
     var relativePathToDirMock = 'relative/path/to/dir';
     var relativePathToFile = path.join('relative', 'path', 'to', 'file.txt');
@@ -273,7 +273,7 @@ describe('utils\' isX', function () {
 
     afterAll(mockFs.restore);
 
-    describe('utils.isFile', function () {
+    fdescribe('utils.isFile', function () {
         it('returns false for relative directory path', function (done) {
             utils.isFile(relativePathToDir).then(function (value) {
                 expect(value).toBe(false);
@@ -339,7 +339,7 @@ describe('utils\' isX', function () {
         });
     });
 
-    describe('utils.isDirectory', function () {
+    fdescribe('utils.isDirectory', function () {
         it('returns true for relative directory path', function (done) {
             utils.isDirectory(relativePathToDir).then(function (value) {
                 expect(value).toBe(true);
@@ -406,7 +406,7 @@ describe('utils\' isX', function () {
     });
 });
 
-describe('utils\' glob expressions', function () {
+fdescribe('utils\' glob expressions', function () {
     beforeAll(function () {
         var fakeFs = {
             'source1.js': '',
@@ -448,7 +448,7 @@ describe('utils\' glob expressions', function () {
 
     afterAll(mockFs.restore);
 
-    describe('utils.globFiles', function () {
+    fdescribe('utils.globFiles', function () {
         it('returns an empty array if no match is found', function (done) {
             utils.globFiles(path.join('path', 'does', 'not', 'exist'))
                 .then(function (files) {
@@ -520,7 +520,7 @@ describe('utils\' glob expressions', function () {
         });
     });
 
-    describe('utils.globDirectories', function () {
+    fdescribe('utils.globDirectories', function () {
         it('returns an empty array if no match is found', function (done) {
             utils.globDirectories(path.join('path', 'does', 'not', 'exist'))
                 .then(function (files) {
@@ -590,7 +590,7 @@ describe('utils\' glob expressions', function () {
     });
 });
 
-describe('utils\' list all files utility', function () {
+fdescribe('utils\' list all files utility', function () {
     var allFiles = [
         path.join('dir-1', 'file1.js'),
         path.join('dir-1', 'file2.js'),
@@ -764,7 +764,7 @@ describe('utils\' list all files utility', function () {
 
     afterAll(mockFs.restore);
 
-    describe('utils.getAllFilesFromDirectory', function () {
+    fdescribe('utils.getAllFilesFromDirectory', function () {
         it('signals error if directory does not exist', function (done) {
             utils.getAllFilesFromDirectory(path.join('does', 'not', 'exist'))
                 .then(function (files) {
@@ -823,6 +823,17 @@ describe('utils\' list all files utility', function () {
                 })
                 .catch(fail);
         });
+        
+        it('list file if path is not a directory but a file', function (done) {
+            var dirPath = path.join('dir-1', 'dir-1-1', 'dir-1-1-2', 'file6.cpp');
+            utils.getAllFilesFromDirectory(dirPath)
+                .then(function (files) {
+                    expect(files.length).toBe(1);
+                    expect(files).toEqual(jasmine.arrayContaining([dirPath]));
+                    done();
+                })
+                .catch(fail);
+        });
 
         it('lists all files in directory and all its sub-driectories', function (done) {
             utils.getAllFilesFromDirectory('.')
@@ -868,7 +879,7 @@ describe('utils\' list all files utility', function () {
         });
     });
 
-    describe('utils.getAllFilesFromDirectories', function () {
+    fdescribe('utils.getAllFilesFromDirectories', function () {
         it('lists all files in directories and all their sub-driectories', function (done) {
             utils.getAllFilesFromDirectories(['./dir-1', 'dir-2'])
                 .then(function (files) {
