@@ -39,7 +39,20 @@ QPromise.prototype.catch = function (args) {};
 Q.promise = function() {};
 
 /**
- * @returns {*}
- * @param {Array<QDeferred>} promises
+ * @returns {QPromise}
+ * @param {Array<QPromise>} promises
  */
-Q.allSettled = function(promises) {};
+Q.allSettled = function (promises) {};
+
+/**
+ * @returns {QPromise}
+ * @param {Array<QPromise>} promises
+ */
+Q.all = function (promises) {};
+
+/**
+ * @returns {QPromise}
+ * @param {function(...?):?} fn
+ * @param {...*} args
+ */
+Q.nfcall = function (fn, args) {};
