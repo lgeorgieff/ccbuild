@@ -18,7 +18,7 @@ var mockFs = require('mock-fs');
  */
 var utils = require('../../src/utils');
 
-fdescribe('array functions', function () {
+describe('array functions', function () {
     it('arrayToSet', function () {
         var comp1 = function (lft, rgt) {
             return lft === rgt;
@@ -232,7 +232,7 @@ fdescribe('array functions', function () {
     });
 });
 
-fdescribe('utils\' isX', function () {
+describe('utils\' isX', function () {
     var relativePathToDir = path.join('relative', 'path', 'to', 'dir');
     var relativePathToDirMock = 'relative/path/to/dir';
     var relativePathToFile = path.join('relative', 'path', 'to', 'file.txt');
@@ -273,7 +273,7 @@ fdescribe('utils\' isX', function () {
 
     afterAll(mockFs.restore);
 
-    fdescribe('utils.isFile', function () {
+    describe('utils.isFile', function () {
         it('returns false for relative directory path', function (done) {
             utils.isFile(relativePathToDir).then(function (value) {
                 expect(value).toBe(false);
@@ -339,7 +339,7 @@ fdescribe('utils\' isX', function () {
         });
     });
 
-    fdescribe('utils.isDirectory', function () {
+    describe('utils.isDirectory', function () {
         it('returns true for relative directory path', function (done) {
             utils.isDirectory(relativePathToDir).then(function (value) {
                 expect(value).toBe(true);
@@ -406,7 +406,7 @@ fdescribe('utils\' isX', function () {
     });
 });
 
-fdescribe('utils\' glob expressions', function () {
+describe('utils\' glob expressions', function () {
     beforeAll(function () {
         var fakeFs = {
             'source1.js': '',
@@ -448,7 +448,7 @@ fdescribe('utils\' glob expressions', function () {
 
     afterAll(mockFs.restore);
 
-    fdescribe('utils.globFiles', function () {
+    describe('utils.globFiles', function () {
         it('returns an empty array if no match is found', function (done) {
             utils.globFiles(path.join('path', 'does', 'not', 'exist'))
                 .then(function (files) {
@@ -520,7 +520,7 @@ fdescribe('utils\' glob expressions', function () {
         });
     });
 
-    fdescribe('utils.globDirectories', function () {
+    describe('utils.globDirectories', function () {
         it('returns an empty array if no match is found', function (done) {
             utils.globDirectories(path.join('path', 'does', 'not', 'exist'))
                 .then(function (files) {
@@ -590,7 +590,7 @@ fdescribe('utils\' glob expressions', function () {
     });
 });
 
-fdescribe('utils\' list all files utility', function () {
+describe('utils\' list all files utility', function () {
     var allFiles = [
         path.join('dir-1', 'file1.js'),
         path.join('dir-1', 'file2.js'),
@@ -764,7 +764,7 @@ fdescribe('utils\' list all files utility', function () {
 
     afterAll(mockFs.restore);
 
-    fdescribe('utils.getAllFilesFromDirectory', function () {
+    describe('utils.getAllFilesFromDirectory', function () {
         it('signals error if directory does not exist', function (done) {
             utils.getAllFilesFromDirectory(path.join('does', 'not', 'exist'))
                 .then(function (files) {
@@ -823,7 +823,7 @@ fdescribe('utils\' list all files utility', function () {
                 })
                 .catch(fail);
         });
-        
+
         it('list file if path is not a directory but a file', function (done) {
             var dirPath = path.join('dir-1', 'dir-1-1', 'dir-1-1-2', 'file6.cpp');
             utils.getAllFilesFromDirectory(dirPath)
@@ -879,7 +879,7 @@ fdescribe('utils\' list all files utility', function () {
         });
     });
 
-    fdescribe('utils.getAllFilesFromDirectories', function () {
+    describe('utils.getAllFilesFromDirectories', function () {
         it('lists all files in directories and all their sub-driectories', function (done) {
             utils.getAllFilesFromDirectories(['./dir-1', 'dir-2'])
                 .then(function (files) {

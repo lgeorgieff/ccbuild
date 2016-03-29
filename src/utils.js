@@ -280,7 +280,7 @@ function mergeArguments (parentArguments, childArguments) {
 /**
  * Check whether the passed file path refers to a file or not.
  *
- * @returns {Promise} A pronmise holding a boolean value that indicates whether the passed file path refers to a file
+ * @returns {QPromise} A pronmise holding a boolean value that indicates whether the passed file path refers to a file
  *          or not.
  * @param {string} filePath The path that is checked.
  */
@@ -298,7 +298,7 @@ function isFile (filePath) {
 /**
  * Check whether the passed file path refers to a file or not.
  *
- * @returns {Promise} A promise holding a boolean value that indicates whether the passed directory path refers to a
+ * @returns {QPromise} A promise holding a boolean value that indicates whether the passed directory path refers to a
  *          directory or not.
  * @param {string} directoryPath The path that is checked.
  */
@@ -316,9 +316,7 @@ function isDirectory (directoryPath) {
 /**
  * Expands the passed glob and returns the resulting file and folder paths.
  *
- * @private
- *
- * @returns {Promise} A promise holding an array of file and folder paths.
+ * @returns {QPromise} A promise holding an array of file and folder paths.
  * @param {string} globExpression A glob expression.
  */
 function expandGlob (globExpression) {
@@ -335,9 +333,20 @@ function expandGlob (globExpression) {
 }
 
 /**
+ * Expands the passed glob expressions and returns the resulting file and folder paths.
+ *
+ * @returns {QPromise} A promise holding an array of file and folder paths.
+ * @param {Array<string>} globExpressions A list with glob expressions.
+ */
+function expandGlobs (globExpressions) {
+    return Q.all((globExpressions || []).map(expandGlob))
+        .then(flatten);
+}
+
+/**
  * Expands the passed glob and returns the resulting file paths that are filtered for files only.
  *
- * @returns {Promise} A promise holding an array of file paths.
+ * @returns {QPromise} A promise holding an array of file paths.
  * @param {string} globExpression A glob expression.
  */
 function globFiles (globExpression) {
@@ -358,7 +367,7 @@ function globFiles (globExpression) {
 /**
  * Expands the passed glob and returns the resulting directory paths that are filtered for directories only.
  *
- * @returns {Promise} A promise holding an array of file paths.
+ * @returns {QPromise} A promise holding an array of file paths.
  * @param {string} globExpression A glob expression.
  */
 function globDirectories (globExpression) {
@@ -379,7 +388,7 @@ function globDirectories (globExpression) {
 /**
  * Get a list of all files of the given directory and filter the resulting file list for their file extensions.
  *
- * @returns {Promise} A promise holding an array of file paths.
+ * @returns {QPromise} A promise holding an array of file paths.
  * @param {string} directory Paths to the root directories that all files are searched in.
  * @param {Array<string>=} fileExtensions Optional file extensions that are used for filtering the found files. If no value
  *        is given the found files are not filtered for their extension.
@@ -446,7 +455,7 @@ function flatten (arr) {
 /**
  * Get a list of all files of the given directories and filter the resulting file list for their file extensions.
  *
- * @returns {Promise} A promise holding an array of file paths.
+ * @returns {QPromise} A promise holding an array of file paths.
  * @param {Array<string>} directories Paths to the root directories that all files are searched in.
  * @param {Array<string>=} fileExtensions Optional file extensions that are used for filtering the found files. If no value
  *        is given the found files are not filtered for their extension.
@@ -472,6 +481,8 @@ module.exports.mergeArguments = mergeArguments;
 module.exports.findTuple = findTuple;
 module.exports.removeTuplesFromArray = removeTuplesFromArray;
 module.exports.listToTuples = listToTuples;
+module.exports.expandGlob = expandGlob;
+module.exports.expandGlobs = expandGlobs;
 module.exports.globFiles = globFiles;
 module.exports.globDirectories = globDirectories;
 module.exports.isFile = isFile;
