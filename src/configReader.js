@@ -261,6 +261,23 @@ ConfigurationNormalizer.prototype.normalize = function () {
     result.externs = this._resolvePaths(ConfigurationNormalizer._mapStringArray(this._config.externs, 'externs'));
     result.buildOptions = ConfigurationNormalizer._normalizeBuildOptions(this._config.buildOptions);
 
+    result.checkIfFilesAreInUnit = {};
+    if (util.isObject(this._config.checkIfFilesAreInUnit)) {
+        result.checkIfFilesAreInUnit.check = self._resolvePaths(
+            ConfigurationNormalizer._mapStringArray(this._config.checkIfFilesAreInUnit.check,
+                                                    'checkIfFilesAreInUnit.check'));
+        result.checkIfFilesAreInUnit.ignore = self._resolvePaths(
+            ConfigurationNormalizer._mapStringArray(this._config.checkIfFilesAreInUnit.ignore,
+                                                    'checkIfFilesAreInUnit.ignore'));
+        if (this._config.checkIfFilesAreInUnit.fileExtensions == null) {
+            result.checkIfFilesAreInUnit.fileExtensions = ['.js', '.json'];
+        } else {
+            result.checkIfFilesAreInUnit.fileExtensions =
+                ConfigurationNormalizer._mapStringArray(this._config.checkIfFilesAreInUnit.fileExtensions,
+                                                        'checkIfFilesAreInUnit.fileExtensions');
+        }
+    }
+
     if (util.isObject(this._config.compilationUnits)) {
         result.compilationUnits = Object.keys(this._config.compilationUnits).reduce(function (accumulator, key) {
             accumulator[key] = {};

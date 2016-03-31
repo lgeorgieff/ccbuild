@@ -26,7 +26,8 @@ describe('config_reader', function () {
          * @private
          * @const
          */
-        this.EMPTY_CONFIG = {sources: [], externs: [], buildOptions: [], compilationUnits: {}, next: {}};
+        this.EMPTY_CONFIG = {checkIfFilesAreInUnit: {}, sources: [], externs: [], buildOptions: [],
+                             compilationUnits: {}, next: {}};
         this.resourcesToDelete = [];
     });
 
@@ -1106,7 +1107,7 @@ describe('config_reader', function () {
             globalBuildOptions: ['--js', 'source2.js'],
             unitSources: ['source1.js']
         };
-        var compilerArguments = configReader.getCompilerArguments (unitConfiguration1);
+        var compilerArguments = configReader.getCompilerArguments(unitConfiguration1);
         expect(compilerArguments.length).toBe(4);
         expect(compilerArguments).toEqual(jasmine.arrayContaining(['--js', 'source1.js',
                                                                    '--js', 'source2.js']));
@@ -1117,7 +1118,7 @@ describe('config_reader', function () {
             unitBuildOptions: ['--externs', 'externs2.js'],
             unitExterns: ['externs1.js']
         };
-        var compilerArguments = configReader.getCompilerArguments (unitConfiguration1);
+        var compilerArguments = configReader.getCompilerArguments(unitConfiguration1);
         expect(compilerArguments.length).toBe(4);
         expect(compilerArguments).toEqual(jasmine.arrayContaining(['--externs', 'externs1.js',
                                                                    '--externs', 'externs2.js']));
@@ -1128,7 +1129,7 @@ describe('config_reader', function () {
             globalBuildOptions: ['--externs', 'externs2.js'],
             unitExterns: ['externs1.js']
         };
-        var compilerArguments = configReader.getCompilerArguments (unitConfiguration1);
+        var compilerArguments = configReader.getCompilerArguments(unitConfiguration1);
         expect(compilerArguments.length).toBe(4);
         expect(compilerArguments).toEqual(jasmine.arrayContaining(['--externs', 'externs1.js',
                                                                    '--externs', 'externs2.js']));
@@ -1139,7 +1140,7 @@ describe('config_reader', function () {
             unitBuildOptions: ['--js_output_file', 'out.js'],
             unitExterns: ['externs1.js']
         };
-        var compilerArguments = configReader.getCompilerArguments (unitConfiguration1);
+        var compilerArguments = configReader.getCompilerArguments(unitConfiguration1);
         expect(compilerArguments.length).toBe(4);
         expect(compilerArguments).toEqual(jasmine.arrayContaining(['--externs', 'externs1.js',
                                                                    '--js_output_file', 'out.js']));
@@ -1150,7 +1151,7 @@ describe('config_reader', function () {
             globalBuildOptions: ['--js_output_file', 'out.js'],
             unitExterns: ['externs1.js']
         };
-        var compilerArguments = configReader.getCompilerArguments (unitConfiguration1);
+        var compilerArguments = configReader.getCompilerArguments(unitConfiguration1);
         expect(compilerArguments.length).toBe(4);
         expect(compilerArguments).toEqual(jasmine.arrayContaining(['--externs', 'externs1.js',
                                                                    '--js_output_file', 'out.js']));
@@ -1163,7 +1164,7 @@ describe('config_reader', function () {
             unitExterns: ['externs1.js']
         };
         expect(function () {
-            configReader.getCompilerArguments (unitConfiguration1);
+            configReader.getCompilerArguments(unitConfiguration1);
         }).toThrowError();
     });
 
@@ -1174,7 +1175,57 @@ describe('config_reader', function () {
             unitExterns: ['externs1.js']
         };
         expect(function () {
-            configReader.getCompilerArguments (unitConfiguration1);
+            configReader.getCompilerArguments(unitConfiguration1);
         }).toThrowError();
+    });
+
+    it('normalizes default checkIfFilesAreInUnit', function () {
+        var config = {
+            checkIfFilesAreInUnit: {}
+        };
+        var normalizer = new configReader.ConfigurationNormalizer(config);
+        var normalizedConfig = normalizer.normalize();
+        var expectedConfig = Object.assign({}, this.EMPTY_CONFIG);
+        expectedConfig.checkIfFilesAreInUnit = {check: [], ignore: [], fileExtensions: ['.js', '.json']};
+        expect(normalizedConfig).toEqual(expectedConfig);
+    });
+
+    it('normalizes set checkIfFilesAreInUnit.fileExtensions', function () {
+        var config = {
+            checkIfFilesAreInUnit: {fileExtensions: ['.js', '', '.txt']}
+        };
+        var normalizer = new configReader.ConfigurationNormalizer(config);
+        var normalizedConfig = normalizer.normalize();
+        var expectedConfig = Object.assign({}, this.EMPTY_CONFIG);
+        expectedConfig.checkIfFilesAreInUnit = {check: [], ignore: [], fileExtensions: ['.js', '', '.txt']};
+        expect(normalizedConfig).toEqual(expectedConfig);
+    });
+
+    it('normalizes set checkIfFilesAreInUnit.check', function () {
+        var config = {
+            checkIfFilesAreInUnit: {check: ['file1.js', '/tmp/files/file2.json', 'src/file3.js']}
+        };
+        var normalizer = new configReader.ConfigurationNormalizer(config, __dirname);
+        var normalizedConfig = normalizer.normalize();
+        var expectedConfig = Object.assign({}, this.EMPTY_CONFIG);
+        expectedConfig.checkIfFilesAreInUnit = {check: [path.join(__dirname, 'file1.js'), '/tmp/files/file2.json',
+                                                        path.join(__dirname, 'src/file3.js')],
+                                                ignore: [],
+                                                fileExtensions: ['.js', '.json']};
+        expect(normalizedConfig).toEqual(expectedConfig);
+    });
+
+    it('normalizes set checkIfFilesAreInUnit.ignore', function () {
+        var config = {
+            checkIfFilesAreInUnit: {ignore: ['file1.js', '/tmp/files/file2.json', 'src/file3.js']}
+        };
+        var normalizer = new configReader.ConfigurationNormalizer(config, __dirname);
+        var normalizedConfig = normalizer.normalize();
+        var expectedConfig = Object.assign({}, this.EMPTY_CONFIG);
+        expectedConfig.checkIfFilesAreInUnit = {ignore: [path.join(__dirname, 'file1.js'), '/tmp/files/file2.json',
+                                                         path.join(__dirname, 'src/file3.js')],
+                                                check: [],
+                                                fileExtensions: ['.js', '.json']};
+        expect(normalizedConfig).toEqual(expectedConfig);
     });
 });
