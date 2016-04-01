@@ -52,17 +52,6 @@ var configReader = require('./configReader.js');
  * @ignore
  * @suppress {duplicate}
  */
-var FileChecker = /** @type {function (new:FileChecker, {
-                               fileExtensions: Array<string>,
-                               filesInUnits: Array<string>,
-                               filesToCheck: Array<string>,
-                               filesToIgnore: Array<string>
-                               })} */ (require('./FileChecker.js'));
-
-/**
- * @ignore
- * @suppress {duplicate}
- */
 var CLI = /** @type {function(new:CLI, Array<string>)}*/ (require('./CLI.js'));
 
 /**
@@ -250,7 +239,7 @@ CCBuild.prototype._processConfigs = function (cliArgs) {
         var localContainsExterns;
 
         // We ignore duplicate configuration files. This can be for example the case if the same configuration file is
-        // specified viw the CLI argument --config|-c and vie the next property in a parent configuration file.
+        // specified viw the CLI argument --config|-c and via the next property in a parent configuration file.
         if (processedConfigFiles.indexOf(configFilePath) === -1) {
             configReader.readAndParseConfiguration(configFilePath, parentConfig).then(function (configObject) {
                 globalContainsJsOutputFile = configObject.buildOptions.indexOf('--js_output_file') !== -1;
