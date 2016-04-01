@@ -400,6 +400,7 @@ function mergeConfigurations (configuration, configurationPath, parentConfigurat
     }
 
     return {
+        checkIfFilesAreInUnit: configuration.checkIfFilesAreInUnit,
         sources: resultSources,
         externs: resultExterns,
         outputFile: configuration.outputFile,

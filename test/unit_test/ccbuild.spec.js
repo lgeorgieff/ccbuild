@@ -78,6 +78,12 @@ var expectedVersion = JSON.parse(fs.readFileSync('./package.json')).version;
 var expectedConfigHelp = 'The configuration files for ' + scriptName + ' use the JSON format and are of the\n' +
         'following form:\n\n' +
         '{\n' +
+        '  "checkIfFilesAreInUnit": {\n' +
+        '    "check": ["<GLOB paths to files to be checked whether they are included in any compilation unit>"],\n' +
+        '    "fileExtensions": ["<file extensions of files to be checked. This filter is applied on files ' +
+        'resulting from \"check\". If nothing is specified, the default is set to \".js\" and \".json\">"]\n' +
+        '    "ignore": ["<GLOB paths to files that are ignored from checking>"]\n' +
+        '  }\n' +
         '  "sources": [<source file paths to be included in all compilation units defined in this config>],\n' +
         '  "externs": [<extern file paths to be included in all compilation units defined in this config>],\n' +
         '  "buildOptions": [<options to be used for all compilation units defined in this config>],\n' +
@@ -322,10 +328,19 @@ describe('CCBuild class', function () {
         });
     });
 
+    it('processes -u and --unit options', function (done) {
+        var ccbuild = new CCBuild([process.argv[0], process.argv[1], '-u', 'unit1', '--unit', 'unit2',
+                                   '--unit', 'unit3', '-u', 'unit4']);
+        ccbuild.on('argsParsed', function (args) {
+            expect(args).toEqual({filteredUnits: ['unit1', 'unit2', 'unit3', 'unit4']});
+            done();
+        });
+    });
+
     it ('emits the event argsParsed with a proper args object', function (done) {
         var ccbuild = new CCBuild([process.argv[0], process.argv[1], '-c', 'PATH1', '--config', 'PATH2',
                                    '--ignore-warnings', '--ignore-errors', '--ignore-compiled-code', '--stop-on-error',
-                                   '--stop-on-warning']);
+                                   '--stop-on-warning', '--unit', 'unit1', '-u', 'unit2']);
         ccbuild.on('argsParsed', function (args) {
             expect(args).toEqual({
                 configs: [path.resolve('PATH1'), path.resolve('PATH2')],
@@ -333,7 +348,8 @@ describe('CCBuild class', function () {
                 ignoreErrors: true,
                 ignoreCompiledCode: true,
                 stopOnError: true,
-                stopOnWarning: true
+                stopOnWarning: true,
+                filteredUnits: ['unit1', 'unit2']
             });
             done();
         });

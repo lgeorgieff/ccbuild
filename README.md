@@ -55,6 +55,11 @@ A configuration file is of the following form:
 
 ```json
 {
+  "checkIfFilesAreInUnit": {
+    "check": ["<GLOB paths to files to be checked whether they are included in any compilation unit>"],
+    "fileExtensions": ["<file extensions of files to be checked. This filter is applied on files resulting from \"check\". If nothing is specified, the default is set to \".js\" and \".json\">"]
+    "ignore": ["<GLOB paths to files that are ignored from checking>"]
+  }
   "sources": ["<source file paths to be included in all compilation units defined in this config>"],
   "externs": ["<extern file paths to be included in all compilation units defined in this config>"],
   "buildOptions": ["<options to be used for all compilation units defined in this config>"],

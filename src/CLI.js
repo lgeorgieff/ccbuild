@@ -141,6 +141,13 @@ CLI.getConfigFileHelp = function () {
             'The configuration files for ' + selfName + ' use the JSON format and are of the\n' +
                 'following form:\n\n' +
                 '{\n' +
+                '  "checkIfFilesAreInUnit": {\n' +
+                '    "check": ["<GLOB paths to files to be checked whether they are included in any compilation unit>' +
+                '"],\n' +
+                '    "fileExtensions": ["<file extensions of files to be checked. This filter is applied on files ' +
+                'resulting from \"check\". If nothing is specified, the default is set to \".js\" and \".json\">"]\n' +
+                '    "ignore": ["<GLOB paths to files that are ignored from checking>"]\n' +
+                '  }\n' +
                 '  "sources": [<source file paths to be included in all compilation units defined in this config>],\n' +
                 '  "externs": [<extern file paths to be included in all compilation units defined in this config>],\n' +
                 '  "buildOptions": [<options to be used for all compilation units defined in this config>],\n' +

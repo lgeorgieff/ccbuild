@@ -52,6 +52,17 @@ var configReader = require('./configReader.js');
  * @ignore
  * @suppress {duplicate}
  */
+var FileChecker = /** @type {function (new:FileChecker, {
+                               fileExtensions: Array<string>,
+                               filesInUnits: Array<string>,
+                               filesToCheck: Array<string>,
+                               filesToIgnore: Array<string>
+                               })} */ (require('./FileChecker.js'));
+
+/**
+ * @ignore
+ * @suppress {duplicate}
+ */
 var CLI = /** @type {function(new:CLI, Array<string>)}*/ (require('./CLI.js'));
 
 /**
@@ -245,7 +256,6 @@ CCBuild.prototype._processConfigs = function (cliArgs) {
                 globalContainsJsOutputFile = configObject.buildOptions.indexOf('--js_output_file') !== -1;
                 globalContainsJs = configObject.buildOptions.indexOf('--js') !== -1;
                 globalContainsExterns = configObject.buildOptions.indexOf('--externs') !== -1;
-
                 var compilationUnits = [];
                 var objectKeys = Object.keys(configObject.compilationUnits);
                 var i = 0;
@@ -298,17 +308,18 @@ CCBuild.prototype._processConfigs = function (cliArgs) {
 
                     Q.allSettled(Object.keys(configObject.next).map(function (nextConfigFilePath) {
                         return processConfig(nextConfigFilePath, configObject);
-                    })).then(function (queuedCompilationUnitsPromises) {
-                        var queuedCompilationsUnits = queuedCompilationUnitsPromises.map(function (promise) {
-                            if (promise.state === 'fulfilled') return promise.value;
-                            else return undefined;
-                        }).filter(function (compilationUnits) {
-                            return compilationUnits !== undefined;
-                        }).reduce(function (accumulator, currentValue) {
-                            return accumulator.concat(currentValue);
-                        }, []);
-                        deferred.resolve(queuedCompilationsUnits.concat(compilationUnits));
-                    });
+                    }))
+                        .then(function (queuedCompilationUnitsPromises) {
+                            var queuedCompilationsUnits = queuedCompilationUnitsPromises.map(function (promise) {
+                                if (promise.state === 'fulfilled') return promise.value;
+                                else return undefined;
+                            }).filter(function (compilationUnits) {
+                                return compilationUnits !== undefined;
+                            }).reduce(function (accumulator, currentValue) {
+                                return accumulator.concat(currentValue);
+                            }, []);
+                            deferred.resolve(queuedCompilationsUnits.concat(compilationUnits));
+                        });
                 }
             }).catch(function (err) {
                 /**
