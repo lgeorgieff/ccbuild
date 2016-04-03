@@ -72,7 +72,7 @@ A configuration file is of the following form:
     "unit 2": {
       "externs": ["<source file paths to be used only for this compilation unit>"],
       "sources": ["<extern file paths to be used only for this compilation unit>"],
-      "outputFile: "<file path to resulting code>",
+      "outputFile": "<file path to resulting code>",
       "buildOptions": ["<options to be used only for this compilation unit>"]
     },
   },
@@ -127,6 +127,28 @@ The following example illustratest how you can use CCBuild in your code:
     ccbuild.on('compiled', function (compilationUnit, stdout, stderr) {
         console.log(compilationUnit + ': ' + stdout + '\n');
         console.error('warnings: ' + stderr);
+    });
+
+    // ...
+```
+
+To check whether certain files are used in any of the compilation unit you may use the following code:
+```javascript
+    var ccfc = new CCFileCheck(process.argv);
+    ccbuild.on('configError', function (err) {
+        console.error(err);
+        process.exit(2);
+    });
+    ccfc.on('verificationError', function (filePath, configFilePath) {
+        console.error('The file "' + filePath + '" is not used in any compilation unit of "' + configFilePath + '"');
+        process.exit(1);
+    });
+    ccfc.on('verificationSuccess', function (filePath, configFilePath) {
+        console.log('The file "' + filePath + '" is used in a compilation unit of "' + configFilePath + '"');
+        process.exit(1);
+    });
+    ccfc.on('done', function () {
+        process.exit();
     });
 
     // ...
