@@ -302,13 +302,10 @@ describe('utils\' isX', function () {
             }).catch(fail);
         });
 
-        it('signals an error if path does not exist', function (done) {
+        it('returns false if path does not exist', function (done) {
             utils.isFile(path.join('path', 'does', 'not', 'exist'))
                 .then(function (value) {
-                    fail('Expected the isFile will signal an error!');
-                })
-                .catch(function (err) {
-                    expect(err).toEqual(jasmine.any(Error));
+                    expect(value).toBe(false);
                     done();
                 });
         });
@@ -327,13 +324,10 @@ describe('utils\' isX', function () {
             }).catch(fail);
         });
 
-        it('broken symlink signals an error', function (done) {
+        it('broken symlink returns false', function (done) {
             utils.isFile(pathToBrokenSymlink)
                 .then(function (value) {
-                    fail('Expected the isFile will signal an error!');
-                })
-                .catch(function (err) {
-                    expect(err).toEqual(jasmine.any(Error));
+                    expect(value).toBe(false);
                     done();
                 });
         });
@@ -368,13 +362,10 @@ describe('utils\' isX', function () {
             }).catch(fail);
         });
 
-        it('signals an error if path does not exist', function (done) {
+        it('returns false if path does not exist', function (done) {
             utils.isDirectory(path.join('path', 'does', 'not', 'exist'))
                 .then(function (value) {
-                    fail('Expected the isDirectory will signal an error!');
-                })
-                .catch(function (err) {
-                    expect(err).toEqual(jasmine.any(Error));
+                    expect(value).toBe(false);
                     done();
                 });
         });
@@ -393,13 +384,10 @@ describe('utils\' isX', function () {
             }).catch(fail);
         });
 
-        it('broken symlink signals an error', function (done) {
+        it('broken symlink returns false', function (done) {
             utils.isFile(pathToBrokenSymlink)
                 .then(function (value) {
-                    fail('Expected the isFile will signal an error!');
-                })
-                .catch(function (err) {
-                    expect(err).toEqual(jasmine.any(Error));
+                    expect(value).toBe(false);
                     done();
                 });
         });
@@ -503,12 +491,12 @@ describe('utils\' glob expressions', function () {
                 .catch(fail);
         });
 
-        it('broken symlink signals an error', function (done) {
+        it('broken symlink returns empty list', function (done) {
             utils.globFiles(path.join('sub-directory-2', 'sub-sub-directory-2-2', '*'))
                 .then(function (files) {
-                    fail('Expected utils.globFiles to fail!');
-                })
-                .catch(done);
+                    expect([]).toEqual([]);
+                    done();
+                });
         });
 
         it('signals error in case folder is not executable', function (done) {
@@ -572,12 +560,12 @@ describe('utils\' glob expressions', function () {
                 .catch(fail);
         });
 
-        it('broken symlink signals an error', function (done) {
+        it('broken symlink returns an empty list', function (done) {
             utils.globDirectories(path.join('sub-directory-2', 'sub-sub-directory-2-2', '*'))
                 .then(function (files) {
-                    fail('Expected utils.globFiles to fail!');
-                })
-                .catch(done);
+                    expect(files).toEqual([]);
+                    done();
+                });
         });
 
         it('signals error in case folder is not executable', function (done) {
@@ -768,11 +756,7 @@ describe('utils\' list all files utility', function () {
         it('signals error if directory does not exist', function (done) {
             utils.getAllFilesFromDirectory(path.join('does', 'not', 'exist'))
                 .then(function (files) {
-                    fail('Exptected utils.getAllFilesFromDirectory to fail!');
-                })
-                .catch(function (err) {
-                    expect(err).toEqual(jasmine.any(Error));
-                    expect(err.code).toBe('ENOENT');
+                    expect(files).toEqual([]);
                     done();
                 });
         });

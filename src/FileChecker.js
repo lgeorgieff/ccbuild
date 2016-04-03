@@ -127,6 +127,9 @@ function FileChecker (options) {
                          */
                         self.emit('error', err);
                     });
+            })
+            .catch(function (err) {
+                self.emit('error', err);
             });
     });
 }

@@ -288,7 +288,8 @@ function isFile (filePath) {
     var deferred = Q.defer();
 
     fs.stat(filePath, function (err, stats) {
-        if (err) deferred.reject(err);
+        if (err && /** @type {{code: string}} */ (err).code !== 'ENOENT') deferred.reject(err);
+        else if (err) deferred.resolve(false);
         else deferred.resolve(stats.isFile());
     });
 
@@ -306,7 +307,8 @@ function isDirectory (directoryPath) {
     var deferred = Q.defer();
 
     fs.stat(directoryPath, function (err, stats) {
-        if (err) deferred.reject(err);
+        if (err && /** @type {{code: string}} */ (err).code !== 'ENOENT') deferred.reject(err);
+        else if (err) deferred.resolve(false);
         else deferred.resolve(stats.isDirectory());
     });
 
@@ -395,42 +397,49 @@ function globDirectories (globExpression) {
  */
 function getAllFilesFromDirectory (directory, fileExtensions) {
     var readdirp = function (dir) {
-        return Q.nfcall(fs.readdir, dir).then(function (entries) {
-            return entries.map(function (entry) {
-                return path.join(dir, entry);
-            });
-        });
+        return isDirectory(dir)
+            .then(function (isDir) {
+                if (isDir) {
+                    return Q.nfcall(fs.readdir, dir).then(function (entries) {
+                        return entries.map(function (entry) {
+                            return path.join(dir, entry);
+                        });
+                    });
+                } else {
+                    return Q.resolve([]);
+                }});
     };
 
-    return isFile(directory).then(function (directoryIsFile) {
-        if (directoryIsFile) {
-            return [directory];
-        } else {
-            return readdirp(directory).then(function (entries) {
-                return Q.all(entries.map(function (entry) {
-                    return isDirectory(entry).then(function (_isDir) {
-                        if (_isDir) {
-                            return getAllFilesFromDirectory(entry, fileExtensions);
-                        } else {
-                            return isFile(entry).then(function (_isFile) {
-                                if (_isFile) return entry;
-                                else return undefined;
-                            });
-                        }
+    return isFile(directory)
+        .then(function (directoryIsFile) {
+            if (directoryIsFile) {
+                return [directory];
+            } else {
+                return readdirp(directory).then(function (entries) {
+                    return Q.all(entries.map(function (entry) {
+                        return isDirectory(entry).then(function (_isDir) {
+                            if (_isDir) {
+                                return getAllFilesFromDirectory(entry, fileExtensions);
+                            } else {
+                                return isFile(entry).then(function (_isFile) {
+                                    if (_isFile) return entry;
+                                    else return undefined;
+                                });
+                            }
+                        });
+                    }));
+                })
+                    .then(flatten)
+                    .then(function (files) {
+                        return files.filter(function (file) {
+                            return file !== undefined;
+                        }).filter(function (file) {
+                            return !fileExtensions || fileExtensions.length === 0 ||
+                                fileExtensions.indexOf(path.extname(file)) !== -1;
+                        });
                     });
-                }));
-            })
-                .then(flatten)
-                .then(function (files) {
-                    return files.filter(function (file) {
-                        return file !== undefined;
-                    }).filter(function (file) {
-                        return !fileExtensions || fileExtensions.length === 0 ||
-                            fileExtensions.indexOf(path.extname(file)) !== -1;
-                    });
-                });
-        }
-    });
+            }
+        });
 }
 
 /**
