@@ -241,7 +241,7 @@ describe('CCBuild class', function () {
         });
     });
 
-    it('processes duplciate --config and -c options', function (done) {
+    it('processes duplicate --config and -c options', function (done) {
         var ccbuild = new CCBuild([process.argv[0], process.argv[1], '--config', 'configPath1', '-c', 'configPath2',
                                    '-c', 'configPath1', '--config', 'configPath2']);
         ccbuild.on('argsParsed', function (args) {
