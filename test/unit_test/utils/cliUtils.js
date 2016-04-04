@@ -55,7 +55,7 @@ var expectedConfigHelp = 'The configuration files for ' + scriptName + ' use the
         '    "fileExtensions": ["<file extensions of files to be checked. This filter is applied on files ' +
         'resulting from \"check\". If nothing is specified, the default is set to \".js\" and \".json\">"],\n' +
         '    "ignore": ["<GLOB paths to files that are ignored from checking>"]\n' +
-        '  }\n' +
+        '  },\n' +
         '  "sources": [<source file paths to be included in all compilation units defined in this config>],\n' +
         '  "externs": [<extern file paths to be included in all compilation units defined in this config>],\n' +
         '  "buildOptions": [<options to be used for all compilation units defined in this config>],\n' +
