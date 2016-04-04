@@ -686,27 +686,5 @@ describe('CCFileCheck class', function () {
                 done();
             });
         }, 2000);
-
-        it('signals error in case a folder cannot be accessed -- --stop-on-warning', function (done) {
-            var ccfc = new CCFileCheck([process.argv[0], process.argv[1], '--stop-on-warning',
-                                        '-c', path.join('dir-3', 'config99.ccbuild'),
-                                        '-c', path.join('dir-2', 'config98.ccbuild')]);
-            ccfc.on('verificationSuccess', function (f) {
-                fail('Did not expect "verificationSuccess" to be fired!');
-            });
-            ccfc.on('verificationError', function (f) {
-                fail('Did not expect "verificationError" to be fired!');
-            });
-
-            var errorHandler = jasmine.createSpy('errorHandler');
-            ccfc.on('error', errorHandler);
-
-            ccfc.on('done', function () {
-                expect(errorHandler.calls.count()).toBe(1);
-                expect(errorHandler).toHaveBeenCalledWith(jasmine.any(Error));
-                expect(errorHandler.calls.mostRecent().args[0].code).toBe('EACCES');
-                done();
-            });
-        }, 2000);
     });
 });

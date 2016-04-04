@@ -170,13 +170,13 @@ function CCFileCheck (argv) {
     self.on('argsParsed', function (cliArgs) {
         var processConfigsOperation;
         if (cliArgs.configs) {
-            processConfigsOperation = self._processConfigs(/** @type {{stopOnError: boolean, stopOnWarning: boolean}} */
+            processConfigsOperation = self._processConfigs(/** @type {{stopOnError: boolean}} */
                 (cliArgs));
         } else {
             processConfigsOperation = configReader.getLocalConfigFiles()
                 .then(function (configFiles) {
                     cliArgs.configs = configFiles;
-                    return self._processConfigs(/** @type {{stopOnError: boolean, stopOnWarning: boolean}} */
+                    return self._processConfigs(/** @type {{stopOnError: boolean}} */
                         (cliArgs));
                 });
         }
@@ -210,7 +210,7 @@ util.inherits(CCFileCheck, events.EventEmitter);
  * @private
  *
  * @returns {Promise} A Promise holding no further value.
- * @param {{stopOnError: boolean, stopOnWarning: boolean}} cliArgs An object containing all CLI arguments.
+ * @param {{stopOnError: boolean}} cliArgs An object containing all CLI arguments.
  *
  * @emits CCFileCheck#verificationSuccess
  * @emits CCFileCheck#verificationError
@@ -272,7 +272,7 @@ CCFileCheck.prototype._processConfigs = function (cliArgs) {
     });
 
     var result;
-    if (util.isObject(cliArgs) && (cliArgs.stopOnError || cliArgs.stopOnWarning)) {
+    if (util.isObject(cliArgs) && cliArgs.stopOnError) {
         result = Q.all(allPromises);
     } else {
         result = Q.allSettled(allPromises);
@@ -283,7 +283,7 @@ CCFileCheck.prototype._processConfigs = function (cliArgs) {
             return Q.resolve();
         })
         .catch(function (err) {
-            // All promis rejections are handled in this function, i.e. there is no need to handle it outside of this
+            // All promise rejections are handled in this function, i.e. there is no need to handle it outside of this
             // function.
             return Q.resolve();
         });
@@ -295,7 +295,7 @@ CCFileCheck.prototype._processConfigs = function (cliArgs) {
  * @private
  *
  * @returns {Promise} A Promise holding no further value.
- * @param {{stopOnError: boolean, stopOnWarning: boolean}} cliArgs An object containing all CLI arguments.
+ * @param {{stopOnError: boolean}} cliArgs An object containing all CLI arguments.
  * @param {{check: !Array<string>, ignore: !Array<string>, fileExtensions: !Array<string>}} settingsFromConfig All
  *        settings defined in `checkIfFilesAreInUnit` of the currently processed configuration file.
  * @param {Array<string>} sourcesFound All sources found in all the compilation units defined in the currently processed
@@ -332,7 +332,7 @@ CCFileCheck.prototype._checkFiles = function (cliArgs, settingsFromConfig, sourc
     fileChecker.on('verificationError', function (filePath) {
         self.emit('verificationError', filePath, configFilePath);
 
-        if (util.isObject(cliArgs) && (cliArgs.stopOnError || cliArgs.stopOnWarning)) {
+        if (util.isObject(cliArgs) && cliArgs.stopOnError) {
             fileChecker.removeAllListeners();
             deferred.reject(new Error('Caught "verificationError" for the configuration file "' + configFilePath +
                                       '"!'));
