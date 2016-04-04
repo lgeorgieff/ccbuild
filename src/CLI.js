@@ -125,7 +125,8 @@ CLI.getUsage = function () {
                 '                          specified files are included in the defined\n' +
                 '                          compilation units.\n\n' +
                 selfName + ' exits with the return code 0 in case of successful compilation(s) this\n' +
-                'includes warnings as well. In case of compilation errors the return code is 1.\n');
+                'includes warnings as well. In case of compilation errors and file verification\n' +
+                'errors the return code is 1.\n');
     }).catch(deferred.reject);
     return deferred.promise;
 };

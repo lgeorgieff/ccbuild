@@ -47,7 +47,8 @@ var expectedUsage = 'Usage: ' + scriptName + ' [-h|--help] [-v|--version] [--clo
         '                          specified files are included in the defined\n' +
         '                          compilation units.\n\n' +
         'ccbuild exits with the return code 0 in case of successful compilation(s) this\n' +
-        'includes warnings as well. In case of compilation errors the return code is 1.\n';
+        'includes warnings as well. In case of compilation errors and file verification\n' +
+        'errors the return code is 1.\n';
 
 var expectedVersion = JSON.parse(fs.readFileSync('./package.json')).version;
 

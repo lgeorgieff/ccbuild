@@ -48,7 +48,8 @@ Checks and compiles JavaScript files via the Closure Compiler.
                           compilation units.
 
 ccbuild exits with the return code 0 in case of successful compilation(s) this
-includes warnings as well. In case of compilation errors the return code is 1.
+includes warnings as well. In case of compilation errors and file verification
+errors the return code is 1.
 ```
 
 # Configuration Files
