@@ -12,6 +12,12 @@ var CCBuild = /** @type {function (new:CCBuild, (Array<string>))} */ (require('.
  * @ignore
  * @suppress {duplicate}
  */
+var CCFileCheck = /** @type {function (new:CCFileCheck, (Array<string>))} */ (require('./CCFileCheck.js'));
+
+/**
+ * @ignore
+ * @suppress {duplicate}
+ */
 var CLI = /** @type {function (new:CLI, (Array<string>))} */ (require('./CLI.js'));
 
 /**
@@ -21,14 +27,14 @@ var CLI = /** @type {function (new:CLI, (Array<string>))} */ (require('./CLI.js'
 var util = require('util');
 
 /**
- * This module wide variable is used to indicate whether an compilation error occurred for one of the compilation units
- * or not. In case a compilation error occurred, this variable is used to use the exit code 1 when quitting this script.
+ * This module wide variable is used to indicate whether an error occurred for one of the compilation units or the
+ * configuraton files. In case an error occurred, this variable is used to use the exit code 1 when quitting this script.
  *
  * @private
  *
  * @type {boolean}
  */
-var compilationErrorDetected = false;
+var errorDetected = false;
 
 /**
  * Generate a heading line for a compilation unit.
@@ -48,13 +54,16 @@ function getHeading (unitName, maxLength) {
 }
 
 /**
- * The entry point of this script.
+ * Compile all compilation units from the given configuration files.
  *
  * @private
+ *
+ * @param {Array<string>} cliArguments All CLI arguments that are used during the command line invocation for this
+ *        script.
  */
-function main () {
+function compile (cliArguments) {
     var parsedCliArgs = {};
-    var ccbuild = new CCBuild(process.argv);
+    var ccbuild = new CCBuild(cliArguments);
     ccbuild.on('argsError', function (err) {
         CLI.getSelfName().then(function (selfName) {
             console.error(err + '\n');
@@ -84,7 +93,7 @@ function main () {
         console.error(err);
     });
     ccbuild.on('compilationError', function (compilationUnit, err) {
-        compilationErrorDetected = true;
+        errorDetected = true;
         if (!parsedCliArgs.args.ignoreErrors) {
             console.error(getHeading(compilationUnit));
             console.error(err);
@@ -113,9 +122,53 @@ function main () {
     ccbuild.on('configHelp', printAndExit);
     ccbuild.on('closureHelp', printAndExit);
     ccbuild.on('closureVersion', printAndExit);
+}
+
+/**
+ * Checks whether the specifed files in the configuration files are included in any compilation unit or not.
+ *
+ * @private
+ *
+ * @param {Array<string>} cliArguments All CLI arguments that are used during the command line invocation for this
+ *        script.
+ */
+function checkFiles (cliArguments) {
+    var parsedCliArgs = {};
+    var ccfc = new CCFileCheck(cliArguments);
+
+    ccfc.on('argsParsed', function (parsedArgs) {
+        parsedCliArgs.args = parsedArgs;
+    });
+
+    ccfc.on('verificationError', function (filePath, configFilePath) {
+        errorDetected = true;
+        if (!parsedCliArgs.args.ignoreErrors) {
+            console.error('The file "' + filePath + '" is not included in any of the compilation units defined in "' +
+                          configFilePath + '"!');
+        }
+        if (parsedCliArgs.args.stopOnError) process.exit(1);
+    });
+
+    ccfc.on('error', function (err) {
+        errorDetected = true;
+        if (!parsedCliArgs.args.ignoreErrors) {
+            console.error(err);
+        }
+        if (parsedCliArgs.args.stopOnError) process.exit(1);
+    });
+}
+
+/**
+ * The entry point of this script.
+ *
+ * @private
+ */
+function main () {
+    compile(process.argv);
+    checkFiles(process.argv);
 
     process.on('exit', function () {
-        process.exitCode = Number(compilationErrorDetected);
+        process.exitCode = Number(errorDetected);
     });
 }
 

@@ -1424,4 +1424,352 @@ describe('bin', function () {
         // jscs:enable requireCamelCaseOrUpperCaseIdentifiers
         this.resourcesToDelete.push(configPath);
     });
+
+    it('checkFs inside config hierarchy -- success', function (done) {
+        var configPath1 = path.join(__dirname, 'config1.ccbuild');
+        var configPath2 = path.join(__dirname, 'data', 'config2.ccbuild');
+        var configPath3 = path.join(__dirname, 'data', 'configs', 'config3.ccbuild');
+        var temporaryConfigDirectory = path.join(__dirname, 'data', 'configs');
+        try {
+            fs.mkdirSync(temporaryConfigDirectory);
+        } catch (err) {
+            console.error(err);
+        }
+
+        var config1 = {
+            sources: ['./data/source1.js'],
+            externs: ['data/externs1.js'],
+            checkFs: {
+                check: ['data/source1.js'],
+                ignore: ['externs*.js']
+            },
+            buildOptions: [
+                '--compilation_level', 'ADVANCED_OPTIMIZATIONS',
+                '--warning_level', 'VERBOSE',
+                '--env', 'CUSTOM'
+            ],
+            compilationUnits: {
+                unit1: {
+                    buildOptions: ['--flagfile', './data/test_flagfile']
+                }
+            },
+            next: {}
+        };
+        config1.next[path.relative(path.dirname(configPath1), configPath2)] = {
+            inheritSources: true,
+            inheritExterns: true,
+            inheritBuildOptions: true
+        };
+        var config2 = {
+            buildOptions: config1.buildOptions,
+            checkFs: {
+                check: ['.'],
+                ignore: ['externs*.js', 'source3.js', 'source4.js']
+            },
+            compilationUnits: {
+                unit2: {
+                    sources: ['source2.js'],
+                    externs: ['./externs2.js'],
+                    buildOptions: ['--flagfile', './test_flagfile']
+                }
+            },
+            next: {}
+        };
+        config2.next[path.relative(path.dirname(configPath2), configPath3)] = {
+            inheritSources: true,
+            inheritExterns: true,
+            inheritBuildOptions: true
+        };
+        var config3 = {
+            sources: ['../source1.js'],
+            externs: ['../externs1.js'],
+            buildOptions: config1.buildOptions,
+            checkFs: {
+                check: ['./configs/*'],
+                ignore: ['externs*.js']
+            },
+            compilationUnits: {
+                unit3: {
+                    sources: ['../source3.js', '../source4.js'],
+                    externs: ['../externs2.js', '../externs3.js'],
+                    buildOptions: ['--flagfile', '../test_flagfile']
+                },
+                unit4: {
+                    sources: ['../source3.js', '../source4.js'],
+                    externs: ['../externs2.js', '../externs3.js'],
+                    buildOptions: ['--flagfile', '../test_flagfile']
+                }
+            }
+        };
+
+        fs.writeFileSync(configPath1, JSON.stringify(config1, null, 2));
+        fs.writeFileSync(configPath2, JSON.stringify(config2, null, 2));
+        fs.writeFileSync(configPath3, JSON.stringify(config3, null, 2));
+
+        // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
+        child_process.exec('node ./src/bin.js --ignore-compiled-code -c ' + configPath1,
+                           function (err, stdout, stderr) {
+                               if (err) {
+                                   done.fail(err);
+                               } else {
+                                   done();
+                               }
+                           });
+        // jscs:enable requireCamelCaseOrUpperCaseIdentifiers
+        this.resourcesToDelete.push(configPath1);
+        this.resourcesToDelete.push(configPath2);
+        this.resourcesToDelete.push(configPath3);
+        this.resourcesToDelete.push(temporaryConfigDirectory);
+    });
+
+    it('checkFs inside config hierarchy -- verificationError', function (done) {
+        var configPath1 = path.join(__dirname, 'config1.ccbuild');
+        var configPath2 = path.join(__dirname, 'data', 'config2.ccbuild');
+        var configPath3 = path.join(__dirname, 'data', 'configs', 'config3.ccbuild');
+        var temporaryConfigDirectory = path.join(__dirname, 'data', 'configs');
+        try {
+            fs.mkdirSync(temporaryConfigDirectory);
+        } catch (err) {
+            console.error(err);
+        }
+
+        var config1 = {
+            sources: ['./data/source1.js'],
+            externs: ['data/externs1.js'],
+            checkFs: {
+                check: ['data/source1.js'],
+                ignore: ['externs*.js']
+            },
+            buildOptions: [
+                '--compilation_level', 'ADVANCED_OPTIMIZATIONS',
+                '--warning_level', 'VERBOSE',
+                '--env', 'CUSTOM'
+            ],
+            compilationUnits: {
+                unit1: {
+                    buildOptions: ['--flagfile', './data/test_flagfile']
+                }
+            },
+            next: {}
+        };
+        config1.next[path.relative(path.dirname(configPath1), configPath2)] = {
+            inheritSources: true,
+            inheritExterns: true,
+            inheritBuildOptions: true
+        };
+        var config2 = {
+            buildOptions: config1.buildOptions,
+            checkFs: {
+                check: ['.'],
+                ignore: ['externs*.js']
+            },
+            compilationUnits: {
+                unit2: {
+                    sources: ['source2.js'],
+                    externs: ['./externs2.js'],
+                    buildOptions: ['--flagfile', './test_flagfile']
+                }
+            },
+            next: {}
+        };
+        config2.next[path.relative(path.dirname(configPath2), configPath3)] = {
+            inheritSources: true,
+            inheritExterns: true,
+            inheritBuildOptions: true
+        };
+        var config3 = {
+            sources: ['../source1.js'],
+            externs: ['../externs1.js'],
+            buildOptions: config1.buildOptions,
+            checkFs: {
+                check: ['./configs/*'],
+                ignore: ['externs*.js']
+            },
+            compilationUnits: {
+                unit3: {
+                    sources: ['../source3.js', '../source4.js'],
+                    externs: ['../externs2.js', '../externs3.js'],
+                    buildOptions: ['--flagfile', '../test_flagfile']
+                },
+                unit4: {
+                    sources: ['../source3.js', '../source4.js'],
+                    externs: ['../externs2.js', '../externs3.js'],
+                    buildOptions: ['--flagfile', '../test_flagfile']
+                }
+            }
+        };
+
+        fs.writeFileSync(configPath1, JSON.stringify(config1, null, 2));
+        fs.writeFileSync(configPath2, JSON.stringify(config2, null, 2));
+        fs.writeFileSync(configPath3, JSON.stringify(config3, null, 2));
+
+        // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
+        child_process.exec('node ./src/bin.js --ignore-compiled-code -c ' + configPath1,
+                           function (err, stdout, stderr) {
+                               if (err) {
+                                   expect(stderr.indexOf('source3.js')).not.toBe(-1);
+                                   expect(stderr.indexOf('source4.js')).not.toBe(-1);
+                                   done();
+                               } else {
+                                   fail('Expected the ccbuild to fail!');
+                               }
+                           });
+        // jscs:enable requireCamelCaseOrUpperCaseIdentifiers
+        this.resourcesToDelete.push(configPath1);
+        this.resourcesToDelete.push(configPath2);
+        this.resourcesToDelete.push(configPath3);
+        this.resourcesToDelete.push(temporaryConfigDirectory);
+    });
+
+    it('checkFs inside config hierarchy -- verificationError & --ignore-errors & --ignore-warnings', function (done) {
+        var configPath1 = path.join(__dirname, 'config1.ccbuild');
+        var configPath2 = path.join(__dirname, 'data', 'config2.ccbuild');
+        var configPath3 = path.join(__dirname, 'data', 'configs', 'config3.ccbuild');
+        var temporaryConfigDirectory = path.join(__dirname, 'data', 'configs');
+        try {
+            fs.mkdirSync(temporaryConfigDirectory);
+        } catch (err) {
+            console.error(err);
+        }
+
+        var config1 = {
+            sources: ['./data/source1.js'],
+            externs: ['data/externs1.js'],
+            checkFs: {
+                check: ['data/source1.js'],
+                ignore: ['externs*.js']
+            },
+            buildOptions: [
+                '--compilation_level', 'ADVANCED_OPTIMIZATIONS',
+                '--warning_level', 'VERBOSE',
+                '--env', 'CUSTOM'
+            ],
+            compilationUnits: {
+                unit1: {
+                    buildOptions: ['--flagfile', './data/test_flagfile']
+                }
+            },
+            next: {}
+        };
+        config1.next[path.relative(path.dirname(configPath1), configPath2)] = {
+            inheritSources: true,
+            inheritExterns: true,
+            inheritBuildOptions: true
+        };
+        var config2 = {
+            buildOptions: config1.buildOptions,
+            checkFs: {
+                check: ['.'],
+                ignore: ['externs*.js']
+            },
+            compilationUnits: {
+                unit2: {
+                    sources: ['source2.js'],
+                    externs: ['./externs2.js'],
+                    buildOptions: ['--flagfile', './test_flagfile']
+                }
+            },
+            next: {}
+        };
+        config2.next[path.relative(path.dirname(configPath2), configPath3)] = {
+            inheritSources: true,
+            inheritExterns: true,
+            inheritBuildOptions: true
+        };
+        var config3 = {
+            sources: ['../source1.js'],
+            externs: ['../externs1.js'],
+            buildOptions: config1.buildOptions,
+            checkFs: {
+                check: ['./configs/*'],
+                ignore: ['externs*.js']
+            },
+            compilationUnits: {
+                unit3: {
+                    sources: ['../source3.js', '../source4.js'],
+                    externs: ['../externs2.js', '../externs3.js'],
+                    buildOptions: ['--flagfile', '../test_flagfile']
+                },
+                unit4: {
+                    sources: ['../source3.js', '../source4.js'],
+                    externs: ['../externs2.js', '../externs3.js'],
+                    buildOptions: ['--flagfile', '../test_flagfile']
+                }
+            }
+        };
+
+        fs.writeFileSync(configPath1, JSON.stringify(config1, null, 2));
+        fs.writeFileSync(configPath2, JSON.stringify(config2, null, 2));
+        fs.writeFileSync(configPath3, JSON.stringify(config3, null, 2));
+
+        // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
+        child_process.exec('node ./src/bin.js --ignore-compiled-code --ignore-warnings --ignore-errors ' +
+                           '-c ' + configPath1,
+                           function (err, stdout, stderr) {
+                               if (err) {
+                                   expect(stderr.length).toBe(0);
+                                   done();
+                               } else {
+                                   fail('Expected the ccbuild to fail!');
+                               }
+                           });
+        // jscs:enable requireCamelCaseOrUpperCaseIdentifiers
+        this.resourcesToDelete.push(configPath1);
+        this.resourcesToDelete.push(configPath2);
+        this.resourcesToDelete.push(configPath3);
+        this.resourcesToDelete.push(temporaryConfigDirectory);
+    });
+
+    it('checkFs -- --ignore-check-fs', function (done) {
+        var config = {
+            checkFs: {
+                check: ['data/*']
+            },
+            compilationUnits: {}
+        };
+
+        var configPath = path.join(__dirname, 'config1.ccbuild');
+        fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
+        // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
+        child_process.exec('node ./src/bin.js --ignore-check-fs --config ./test/unit_test/config1.ccbuild',
+                           function (err, stdout, stderr) {
+                               if (err) {
+                                   done.fail(err);
+                               } else {
+                                   expect(stderr.length).toBe(0);
+                                   done();
+                               }
+                           });
+        // jscs:enable requireCamelCaseOrUpperCaseIdentifiers
+        this.resourcesToDelete.push(configPath);
+    });
+
+    it('checkFs -- --stop-on-error', function (done) {
+        var config = {
+            checkFs: {
+                check: ['data/*']
+            },
+            compilationUnits: {}
+        };
+
+        var configPath = path.join(__dirname, 'config1.ccbuild');
+        fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
+        // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
+        child_process.exec('node ./src/bin.js --stop-on-error --config ./test/unit_test/config1.ccbuild',
+                           function (err, stdout, stderr) {
+                               if (err) {
+                                   var filesToCheck = ['externs1.js', 'externs2.js', 'externs3.js', 'source1.js',
+                                                       'source2.js', 'source3.js', 'source4.js'];
+                                   var filesInErrorMessage = filesToCheck.filter(function (file) {
+                                       return stderr.indexOf(file) !== -1;
+                                   });
+                                   expect(filesInErrorMessage.length).toBe(1);
+                                   done();
+                               } else {
+                                   fail('Expected the ccbuild to fail!');
+                               }
+                           });
+        // jscs:enable requireCamelCaseOrUpperCaseIdentifiers
+        this.resourcesToDelete.push(configPath);
+    });
 });
