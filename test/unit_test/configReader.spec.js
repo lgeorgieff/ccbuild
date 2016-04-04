@@ -26,7 +26,7 @@ describe('config_reader', function () {
          * @private
          * @const
          */
-        this.EMPTY_CONFIG = {checkIfFilesAreInUnit: {}, sources: [], externs: [], buildOptions: [],
+        this.EMPTY_CONFIG = {checkFs: {}, sources: [], externs: [], buildOptions: [],
                              compilationUnits: {}, next: {}};
         this.resourcesToDelete = [];
     });
@@ -1179,50 +1179,50 @@ describe('config_reader', function () {
         }).toThrowError();
     });
 
-    it('normalizes default checkIfFilesAreInUnit', function () {
+    it('normalizes default checkFs', function () {
         var config = {
-            checkIfFilesAreInUnit: {}
+            checkFs: {}
         };
         var normalizer = new configReader.ConfigurationNormalizer(config);
         var normalizedConfig = normalizer.normalize();
         var expectedConfig = Object.assign({}, this.EMPTY_CONFIG);
-        expectedConfig.checkIfFilesAreInUnit = {check: [], ignore: [], fileExtensions: ['.js', '.json']};
+        expectedConfig.checkFs = {check: [], ignore: [], fileExtensions: ['.js', '.json']};
         expect(normalizedConfig).toEqual(expectedConfig);
     });
 
-    it('normalizes set checkIfFilesAreInUnit.fileExtensions', function () {
+    it('normalizes set checkFs.fileExtensions', function () {
         var config = {
-            checkIfFilesAreInUnit: {fileExtensions: ['.js', '', '.txt']}
+            checkFs: {fileExtensions: ['.js', '', '.txt']}
         };
         var normalizer = new configReader.ConfigurationNormalizer(config);
         var normalizedConfig = normalizer.normalize();
         var expectedConfig = Object.assign({}, this.EMPTY_CONFIG);
-        expectedConfig.checkIfFilesAreInUnit = {check: [], ignore: [], fileExtensions: ['.js', '', '.txt']};
+        expectedConfig.checkFs = {check: [], ignore: [], fileExtensions: ['.js', '', '.txt']};
         expect(normalizedConfig).toEqual(expectedConfig);
     });
 
-    it('normalizes set checkIfFilesAreInUnit.check', function () {
+    it('normalizes set checkFs.check', function () {
         var config = {
-            checkIfFilesAreInUnit: {check: ['file1.js', '/tmp/files/file2.json', 'src/file3.js']}
+            checkFs: {check: ['file1.js', '/tmp/files/file2.json', 'src/file3.js']}
         };
         var normalizer = new configReader.ConfigurationNormalizer(config, __dirname);
         var normalizedConfig = normalizer.normalize();
         var expectedConfig = Object.assign({}, this.EMPTY_CONFIG);
-        expectedConfig.checkIfFilesAreInUnit = {check: [path.join(__dirname, 'file1.js'), '/tmp/files/file2.json',
+        expectedConfig.checkFs = {check: [path.join(__dirname, 'file1.js'), '/tmp/files/file2.json',
                                                         path.join(__dirname, 'src/file3.js')],
                                                 ignore: [],
                                                 fileExtensions: ['.js', '.json']};
         expect(normalizedConfig).toEqual(expectedConfig);
     });
 
-    it('normalizes set checkIfFilesAreInUnit.ignore', function () {
+    it('normalizes set checkFs.ignore', function () {
         var config = {
-            checkIfFilesAreInUnit: {ignore: ['file1.js', '/tmp/files/file2.json', 'src/file3.js']}
+            checkFs: {ignore: ['file1.js', '/tmp/files/file2.json', 'src/file3.js']}
         };
         var normalizer = new configReader.ConfigurationNormalizer(config, __dirname);
         var normalizedConfig = normalizer.normalize();
         var expectedConfig = Object.assign({}, this.EMPTY_CONFIG);
-        expectedConfig.checkIfFilesAreInUnit = {ignore: [path.join(__dirname, 'file1.js'), '/tmp/files/file2.json',
+        expectedConfig.checkFs = {ignore: [path.join(__dirname, 'file1.js'), '/tmp/files/file2.json',
                                                          path.join(__dirname, 'src/file3.js')],
                                                 check: [],
                                                 fileExtensions: ['.js', '.json']};

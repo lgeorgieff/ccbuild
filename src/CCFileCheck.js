@@ -243,7 +243,7 @@ CCFileCheck.prototype._processConfigs = function (cliArgs) {
                         Array.prototype.push.apply(sourcesFound, configObject.compilationUnits[objectKeys[i]].sources);
                     }
                     processedConfigFiles.push(configFilePath);
-                    return self._checkFiles(cliArgs, configObject.checkIfFilesAreInUnit, sourcesFound, configFilePath)
+                    return self._checkFiles(cliArgs, configObject.checkFs, sourcesFound, configFilePath)
                         .then(function () {
                             return Q.all(Object.keys(configObject.next).map(function (nextConfigFilePath) {
                                 return processConfig(nextConfigFilePath, configObject);
@@ -297,7 +297,7 @@ CCFileCheck.prototype._processConfigs = function (cliArgs) {
  * @returns {Promise} A Promise holding no further value.
  * @param {{stopOnError: boolean}} cliArgs An object containing all CLI arguments.
  * @param {{check: !Array<string>, ignore: !Array<string>, fileExtensions: !Array<string>}} settingsFromConfig All
- *        settings defined in `checkIfFilesAreInUnit` of the currently processed configuration file.
+ *        settings defined in `checkFs` of the currently processed configuration file.
  * @param {Array<string>} sourcesFound All sources found in all the compilation units defined in the currently processed
  *        configuraton file.
  * @param {string} configFilePath The file path of the currently processed configuration file.

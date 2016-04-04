@@ -261,20 +261,17 @@ ConfigurationNormalizer.prototype.normalize = function () {
     result.externs = this._resolvePaths(ConfigurationNormalizer._mapStringArray(this._config.externs, 'externs'));
     result.buildOptions = ConfigurationNormalizer._normalizeBuildOptions(this._config.buildOptions);
 
-    result.checkIfFilesAreInUnit = {};
-    if (util.isObject(this._config.checkIfFilesAreInUnit)) {
-        result.checkIfFilesAreInUnit.check = self._resolvePaths(
-            ConfigurationNormalizer._mapStringArray(this._config.checkIfFilesAreInUnit.check,
-                                                    'checkIfFilesAreInUnit.check'));
-        result.checkIfFilesAreInUnit.ignore = self._resolvePaths(
-            ConfigurationNormalizer._mapStringArray(this._config.checkIfFilesAreInUnit.ignore,
-                                                    'checkIfFilesAreInUnit.ignore'));
-        if (this._config.checkIfFilesAreInUnit.fileExtensions == null) {
-            result.checkIfFilesAreInUnit.fileExtensions = ['.js', '.json'];
+    result.checkFs = {};
+    if (util.isObject(this._config.checkFs)) {
+        result.checkFs.check = self._resolvePaths(
+            ConfigurationNormalizer._mapStringArray(this._config.checkFs.check, 'checkFs.check'));
+        result.checkFs.ignore = self._resolvePaths(
+            ConfigurationNormalizer._mapStringArray(this._config.checkFs.ignore, 'checkFs.ignore'));
+        if (this._config.checkFs.fileExtensions == null) {
+            result.checkFs.fileExtensions = ['.js', '.json'];
         } else {
-            result.checkIfFilesAreInUnit.fileExtensions =
-                ConfigurationNormalizer._mapStringArray(this._config.checkIfFilesAreInUnit.fileExtensions,
-                                                        'checkIfFilesAreInUnit.fileExtensions');
+            result.checkFs.fileExtensions =
+                ConfigurationNormalizer._mapStringArray(this._config.checkFs.fileExtensions, 'checkFs.fileExtensions');
         }
     }
 
@@ -400,7 +397,7 @@ function mergeConfigurations (configuration, configurationPath, parentConfigurat
     }
 
     return {
-        checkIfFilesAreInUnit: configuration.checkIfFilesAreInUnit,
+        checkFs: configuration.checkFs,
         sources: resultSources,
         externs: resultExterns,
         outputFile: configuration.outputFile,

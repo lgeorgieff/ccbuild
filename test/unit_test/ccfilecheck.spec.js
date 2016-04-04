@@ -252,12 +252,12 @@ describe('CCFileCheck class', function () {
         beforeAll(function () {
             var config1 = {};
             var config2 = {
-                checkIfFilesAreInUnit: {
+                checkFs: {
                     check: []
                 }
             };
             var config3 = {
-                checkIfFilesAreInUnit: {
+                checkFs: {
                     check: ['.']
                 },
                 sources: ['source2.js'],
@@ -268,7 +268,7 @@ describe('CCFileCheck class', function () {
                 }
             };
             var config4 = {
-                checkIfFilesAreInUnit: {
+                checkFs: {
                     check: ['.'],
                     ignore: ['.']
                 },
@@ -280,7 +280,7 @@ describe('CCFileCheck class', function () {
                 }
             };
             var config5 = {
-                checkIfFilesAreInUnit: {
+                checkFs: {
                     check: ['.'],
                     fileExtensions: ['.js']
                 },
@@ -292,7 +292,7 @@ describe('CCFileCheck class', function () {
                 }
             };
             var config6 = {
-                checkIfFilesAreInUnit: {
+                checkFs: {
                     check: ['.']
                 },
                 compilationUnits: {
@@ -302,7 +302,7 @@ describe('CCFileCheck class', function () {
                 }
             };
             var config7 = {
-                checkIfFilesAreInUnit: {
+                checkFs: {
                     check: ['.'],
                     fileExtensions: ['.js']
                 },
@@ -363,7 +363,7 @@ describe('CCFileCheck class', function () {
             });
         });
 
-        it('signals done in case checkIfFilesAreInUnit is not defined: {', function (done) {
+        it('signals done in case checkFs is not defined: {', function (done) {
             var ccfc = new CCFileCheck([process.argv[0], process.argv[1], '-c', path.join('dir-1', 'config1.ccbuild')]);
 
             ccfc.on('verificationSuccess', function (f) {
@@ -381,7 +381,7 @@ describe('CCFileCheck class', function () {
             });
         });
 
-        it('signals done in case checkIfFilesAreInUnit.check is empty', function (done) {
+        it('signals done in case checkFs.check is empty', function (done) {
             var ccfc = new CCFileCheck([process.argv[0], process.argv[1], '-c', path.join('dir-1', 'config2.ccbuild')]);
 
             ccfc.on('verificationSuccess', function (f) {
@@ -611,7 +611,7 @@ describe('CCFileCheck class', function () {
     describe('with no access to file system', function () {
         beforeAll(function () {
             var config98 = {
-                checkIfFilesAreInUnit: {
+                checkFs: {
                     check: ['.']
                 },
                 compilationUnits: {
@@ -621,7 +621,7 @@ describe('CCFileCheck class', function () {
                 }
             };
             var config99 = {
-                checkIfFilesAreInUnit: {
+                checkFs: {
                     check: ['.']
                 },
                 compilationUnits: {
