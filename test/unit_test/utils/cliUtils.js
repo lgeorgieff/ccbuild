@@ -41,7 +41,11 @@ var expectedUsage = 'Usage: ' + scriptName + ' [-h|--help] [-v|--version] [--clo
         '                          are ignored.\n' +
         '                          You may specify multiple compilation units.\n' +
         '                          If no compilation unit is specified, all units\n' +
-        '                          defined in the configuration files will be processed.\n\n' +
+        '                          defined in the configuration files will be processed.\n' +
+        ' --ignore-check-fs        Ignore the processing of the configuration property\n' +
+        '                          "checkFs" which is responsible for checking whether\n' +
+        '                          specified files are included in the defined\n' +
+        '                          compilation units.\n\n' +
         'ccbuild exits with the return code 0 in case of successful compilation(s) this\n' +
         'includes warnings as well. In case of compilation errors the return code is 1.\n';
 

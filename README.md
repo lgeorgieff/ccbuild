@@ -42,6 +42,10 @@ Checks and compiles JavaScript files via the Closure Compiler.
                           You may specify multiple compilation units.
                           If no compilation unit is specified, all units
                           defined in the configuration files will be processed.
+ --ignore-check-fs        Ignore the processing of the configuration property
+                          "checkFs" which is responsible for checking whether
+                          specified files are included in the defined
+                          compilation units.
 
 ccbuild exits with the return code 0 in case of successful compilation(s) this
 includes warnings as well. In case of compilation errors the return code is 1.

@@ -167,38 +167,42 @@ function CCFileCheck (argv) {
         self.emit('argsParsed', contribPath);
     });
 
-    self.on('argsParsed', function (cliArgs) {
-        var processConfigsOperation;
-        if (cliArgs.configs) {
-            processConfigsOperation = self._processConfigs(/** @type {{stopOnError: boolean}} */
-                (cliArgs));
+    self.once('argsParsed', function (cliArgs) {
+        if (cliArgs.ignoreCheckFs) {
+            self.emit('done');
         } else {
-            processConfigsOperation = configReader.getLocalConfigFiles()
-                .then(function (configFiles) {
-                    cliArgs.configs = configFiles;
-                    return self._processConfigs(/** @type {{stopOnError: boolean}} */
-                        (cliArgs));
+            var processConfigsOperation;
+            if (cliArgs.configs) {
+                processConfigsOperation = self._processConfigs(/** @type {{stopOnError: boolean}} */
+                    (cliArgs));
+            } else {
+                processConfigsOperation = configReader.getLocalConfigFiles()
+                    .then(function (configFiles) {
+                        cliArgs.configs = configFiles;
+                        return self._processConfigs(/** @type {{stopOnError: boolean}} */
+                            (cliArgs));
+                    });
+            }
+
+            processConfigsOperation
+                .then(function (args) {
+                    /**
+                     * States that the verification process is finished for all defined files.
+                     *
+                     * @event CCFileCheck#done
+                     */
+                    self.emit('done');
+                })
+                .catch(function (err) {
+                    /**
+                     * States that an error occurred during the verification process.
+                     *
+                     * @event CCFileCheck#error
+                     * @param {Error} err The occurred error object.
+                     */
+                    self.emit('error', err);
                 });
         }
-
-        processConfigsOperation
-            .then(function (args) {
-                /**
-                 * States that the verification process is finished for all defined files.
-                 *
-                 * @event CCFileCheck#done
-                 */
-                self.emit('done');
-            })
-            .catch(function (err) {
-                /**
-                 * States that an error occurred during the verification process.
-                 *
-                 * @event CCFileCheck#error
-                 * @param {Error} err The occurred error object.
-                 */
-                self.emit('error', err);
-            });
     });
 }
 

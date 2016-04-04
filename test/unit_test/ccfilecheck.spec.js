@@ -212,6 +212,13 @@ describe('CCFileCheck class', function () {
         });
     });
 
+    it('processes --ignores-check-fs', function (done) {
+        var ccfc = new CCFileCheck([process.argv[0], process.argv[1], '--ignore-check-fs']);
+        ccfc.on('done', function (args) {
+            done();
+        });
+    });
+
     it('processes -c configPath', function (done) {
         var ccfc = new CCFileCheck([process.argv[0], process.argv[1], '-c', 'configPath']);
         ccfc.on('argsParsed', function (args) {
@@ -420,6 +427,27 @@ describe('CCFileCheck class', function () {
                 filesToCheck.forEach(function (fileToCheck) {
                     expect(verificationSuccessHandler).toHaveBeenCalledWith(fileToCheck, configPath);
                 });
+                done();
+            });
+        });
+
+        it('signals done in case --ignore-check-fs is set', function (done) {
+            var configPath = path.resolve(path.join('dir-2', 'config3.ccbuild'));
+
+            var ccfc = new CCFileCheck([process.argv[0], process.argv[1], '--ignore-check-fs']);
+            ccfc.on('verificationSuccess', function (err) {
+                fail('Did not expect "verificationSuccess" to be fired!');
+            });
+
+            ccfc.on('verificationError', function (err) {
+                fail('Did not expect "verificationError" to be fired!');
+            });
+
+            ccfc.on('error', function (err) {
+                fail('Did not expect "error" to be fired!');
+            });
+
+            ccfc.on('done', function () {
                 done();
             });
         });
