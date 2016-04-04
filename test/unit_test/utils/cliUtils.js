@@ -10,7 +10,7 @@ var expectedUsage = 'Usage: ' + scriptName + ' [-h|--help] [-v|--version] [--clo
         '           [--config-help] [--closure-version] [--compiler-path]\n' +
         '           [--contrib-path] [--ignore-warnings] [-ignore-errors]\n' +
         '           [-c|--config PATH]... [--ignore-compiled-code] [--stop-on-error]\n' +
-        '           [--stop-on-warning] [-u|--unit UNIT_NAME]...\n\n' +
+        '           [--stop-on-warning] [-u|--unit UNIT_NAME]... [--ignore-check-fs]\n\n' +
         'Checks and compiles JavaScript files via the Closure Compiler.\n\n' +
         '  -h|--help               Display this message and exit.\n' +
         '  -v|--version            Display version information and exit.\n' +

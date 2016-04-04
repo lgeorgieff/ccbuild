@@ -7,7 +7,7 @@ Usage: ccbuild [-h|--help] [-v|--version] [--closure-help]
            [--closure-version] [--compiler-path] [--contrib-path]
            [--ignore-warnings] [-ignore-errors] [-c|--config PATH]...
            [--ignore-compiled-code] [--stop-on-error] [--config-help]
-           [-u|--unit UNIT_NAME]...
+           [-u|--unit UNIT_NAME]... [--ignore-check-fs]
 
 Checks and compiles JavaScript files via the Closure Compiler.
 
