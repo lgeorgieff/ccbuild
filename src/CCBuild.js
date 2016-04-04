@@ -176,7 +176,7 @@ function CCBuild (argv) {
         process.chdir(originalWorkingDirectory);
     });
 
-    self.on('argsParsed', function (cliArgs) {
+    self.once('argsParsed', function (cliArgs) {
         if (cliArgs.configs) {
             self._processConfigs(/** @type {{configs: Array<string>}} */ (cliArgs));
         } else {
