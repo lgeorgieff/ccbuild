@@ -158,5 +158,22 @@ To check whether certain files are used in any of the compilation unit you may u
     // ...
 ```
 
+The class CCFileCheck fires the following events:
+ * CCFileCheck#argsError
+ * CCFileCheck#help
+ * CCFileCheck#version
+ * CCFileCheck#configHelp
+ * CCFileCheck#closureHelp
+ * CCFileCheck#closureVersion
+ * CCFileCheck#argsParsed
+ * CCFileCheck#compilerPath
+ * CCFileCheck#contribPath
+ * CCFileCheck#configError
+ * CCFileCheck#circularDependencyError
+ * CCFileCheck#verificationSuccess
+ * CCFileCheck#verificationError
+ * CCFileCheck#done
+ * CCFileCheck#error
+
 # License
 This project is released under [MIT license](./LICENSE). Note: that each referenced npm package that is used has its own license and potentially it has further dependencies. Please check each package individually whether it confirms to your OSS licensing rules.
