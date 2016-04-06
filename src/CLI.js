@@ -140,48 +140,51 @@ CLI.getUsage = function () {
  * @returns {Promise<string>} A promise that holds the help text for the config file format as a string value.
  */
 CLI.getConfigFileHelp = function () {
+    var configSample = {
+        checkFs: {
+            check: ['<GLOB paths to files to be checked whether they are included in any compilation unit>'],
+            fileExtensions: ['<file extensions of files to be checked. This filter is applied on files ' +
+                             'resulting from "check". If nothing is specified, the default is set to ".js" and ' +
+                             '".json">'],
+            ignore: ['<GLOB paths to files that are ignored from checking>']
+        },
+        sources: ['<source file paths to be included in all compilation units defined in this config>'],
+        externs: ['<extern file paths to be included in all compilation units defined in this config>'],
+        buildOptions: ['<options to be used for all compilation units defined in this config>'],
+        compilationUnits: {
+            'unit 1': {
+                externs: ['<source file paths to be used only for this compilation unit>'],
+                sources: ['<extern file paths to be used only for this compilation unit>'],
+                buildOptions: ['<options to be used only for this compilation unit>']
+            },
+            'unit 2': {
+                externs: ['<source file paths to be used only for this compilation unit>'],
+                sources: ['<extern file paths to be used only for this compilation unit>'],
+                outputFile: 'file path to resulting code',
+                buildOptions: ['<options to be used only for this compilation unit>']
+            }
+        },
+        next: {
+            '<file path to the next config relative to this config>': {
+                inheritSources: '<boolean>',
+                inheritExterns: '<boolean>',
+                inheritBuildOptions: '<boolean>'
+            },
+            '<file path to another config relative to this config>': {
+                inheritSources: '<boolean>',
+                inheritExterns: '<boolean>',
+                inheritBuildOptions: '<boolean>'
+            }
+        }
+    };
+
     var deferred = Q.defer();
     CLI.getSelfName().then(function (selfName) {
         deferred.resolve(
             'The configuration files for ' + selfName + ' use the JSON format and are of the\n' +
                 'following form:\n\n' +
-                '{\n' +
-                '  "checkFs": {\n' +
-                '    "check": ["<GLOB paths to files to be checked whether they are included in any compilation unit>' +
-                '"],\n' +
-                '    "fileExtensions": ["<file extensions of files to be checked. This filter is applied on files ' +
-                'resulting from \"check\". If nothing is specified, the default is set to \".js\" and \".json\">"],\n' +
-                '    "ignore": ["<GLOB paths to files that are ignored from checking>"]\n' +
-                '  },\n' +
-                '  "sources": [<source file paths to be included in all compilation units defined in this config>],\n' +
-                '  "externs": [<extern file paths to be included in all compilation units defined in this config>],\n' +
-                '  "buildOptions": [<options to be used for all compilation units defined in this config>],\n' +
-                '  "compilationUnits": {\n' +
-                '    "unit 1": {\n' +
-                '      "externs": [<source file paths to be used only for this compilation unit>],\n' +
-                '      "sources": [<extern file paths to be used only for this compilation unit>],\n' +
-                '      "buildOptions": [<options to be used only for this compilation unit>]\n' +
-                '    },\n' +
-                '    "unit 2": {\n' +
-                '      "externs": [<source file paths to be used only for this compilation unit>],\n' +
-                '      "sources": [<extern file paths to be used only for this compilation unit>],\n' +
-                '      "outputFile": "file path to resulting code",\n' +
-                '      "buildOptions": [<options to be used only for this compilation unit>]\n' +
-                '    },\n' +
-                '  },\n' +
-                '  "next": {\n' +
-                '    "<file path to the next config relative to this config>": {\n' +
-                '      "inheritSources": <boolean>,\n' +
-                '      "inheritExterns": <boolean>,\n' +
-                '      "inheritBuildOptions": <boolean>\n' +
-                '    },\n' +
-                '    "<file path to another config relative to this config>": {\n' +
-                '      "inheritSources": <boolean>,\n' +
-                '      "inheritExterns": <boolean>,\n' +
-                '      "inheritBuildOptions": <boolean>\n' +
-                '    }\n' +
-                '  }\n' +
-                '}\n\n' +
+                JSON.stringify(configSample, null, 2) +
+                '\n\n' +
                 'Note: buildOptions can be either an array of strings or an object as specified\n' +
                 'at https://www.npmjs.com/package/google-closure-compiler#specifying-options.');
     }).catch(deferred.reject);

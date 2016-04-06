@@ -61,25 +61,49 @@ A configuration file is of the following form:
 ```json
 {
   "checkFs": {
-    "check": ["<GLOB paths to files to be checked whether they are included in any compilation unit>"],
-    "fileExtensions": ["<file extensions of files to be checked. This filter is applied on files resulting from \"check\". If nothing is specified, the default is set to \".js\" and \".json\">"],
-    "ignore": ["<GLOB paths to files that are ignored from checking>"]
+    "check": [
+      "<GLOB paths to files to be checked whether they are included in any compilation unit>"
+    ],
+    "fileExtensions": [
+      "<file extensions of files to be checked. This filter is applied on files resulting from \"check\". If nothing is specified, the default is set to \".js\" and \".json\">"
+    ],
+    "ignore": [
+      "<GLOB paths to files that are ignored from checking>"
+    ]
   },
-  "sources": ["<source file paths to be included in all compilation units defined in this config>"],
-  "externs": ["<extern file paths to be included in all compilation units defined in this config>"],
-  "buildOptions": ["<options to be used for all compilation units defined in this config>"],
+  "sources": [
+    "<source file paths to be included in all compilation units defined in this config>"
+  ],
+  "externs": [
+    "<extern file paths to be included in all compilation units defined in this config>"
+  ],
+  "buildOptions": [
+    "<options to be used for all compilation units defined in this config>"
+  ],
   "compilationUnits": {
     "unit 1": {
-      "externs": ["<source file paths to be used only for this compilation unit>"],
-      "sources": ["<extern file paths to be used only for this compilation unit>"],
-      "buildOptions": ["<options to be used only for this compilation unit>"]
+      "externs": [
+        "<source file paths to be used only for this compilation unit>"
+      ],
+      "sources": [
+        "<extern file paths to be used only for this compilation unit>"
+      ],
+      "buildOptions": [
+        "<options to be used only for this compilation unit>"
+      ]
     },
     "unit 2": {
-      "externs": ["<source file paths to be used only for this compilation unit>"],
-      "sources": ["<extern file paths to be used only for this compilation unit>"],
-      "outputFile": "<file path to resulting code>",
-      "buildOptions": ["<options to be used only for this compilation unit>"]
-    },
+      "externs": [
+        "<source file paths to be used only for this compilation unit>"
+      ],
+      "sources": [
+        "<extern file paths to be used only for this compilation unit>"
+      ],
+      "outputFile": "file path to resulting code",
+      "buildOptions": [
+        "<options to be used only for this compilation unit>"
+      ]
+    }
   },
   "next": {
     "<file path to the next config relative to this config>": {

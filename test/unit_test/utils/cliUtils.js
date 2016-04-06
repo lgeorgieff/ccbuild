@@ -56,37 +56,61 @@ var expectedConfigHelp = 'The configuration files for ' + scriptName + ' use the
         'following form:\n\n' +
         '{\n' +
         '  "checkFs": {\n' +
-        '    "check": ["<GLOB paths to files to be checked whether they are included in any compilation unit>"],\n' +
-        '    "fileExtensions": ["<file extensions of files to be checked. This filter is applied on files ' +
-        'resulting from \"check\". If nothing is specified, the default is set to \".js\" and \".json\">"],\n' +
-        '    "ignore": ["<GLOB paths to files that are ignored from checking>"]\n' +
+        '    "check": [\n' +
+        '      "<GLOB paths to files to be checked whether they are included in any compilation unit>"\n' +
+        '    ],\n' +
+        '    "fileExtensions": [\n' +
+        '      "<file extensions of files to be checked. This filter is applied on files resulting from ' +
+        '\\\"check\\\". If nothing is specified, the default is set to \\\".js\\\" and \\\".json\\\">"\n' +
+        '    ],\n' +
+        '    "ignore": [\n' +
+        '      "<GLOB paths to files that are ignored from checking>"\n' +
+        '    ]\n' +
         '  },\n' +
-        '  "sources": [<source file paths to be included in all compilation units defined in this config>],\n' +
-        '  "externs": [<extern file paths to be included in all compilation units defined in this config>],\n' +
-        '  "buildOptions": [<options to be used for all compilation units defined in this config>],\n' +
+        '  "sources": [\n' +
+        '    "<source file paths to be included in all compilation units defined in this config>"\n' +
+        '  ],\n' +
+        '  "externs": [\n' +
+        '    "<extern file paths to be included in all compilation units defined in this config>"\n' +
+        '  ],\n' +
+        '  "buildOptions": [\n' +
+        '    "<options to be used for all compilation units defined in this config>"\n' +
+        '  ],\n' +
         '  "compilationUnits": {\n' +
         '    "unit 1": {\n' +
-        '      "externs": [<source file paths to be used only for this compilation unit>],\n' +
-        '      "sources": [<extern file paths to be used only for this compilation unit>],\n' +
-        '      "buildOptions": [<options to be used only for this compilation unit>]\n' +
+        '      "externs": [\n' +
+        '        "<source file paths to be used only for this compilation unit>"\n' +
+        '      ],\n' +
+        '      "sources": [\n' +
+        '        "<extern file paths to be used only for this compilation unit>"\n' +
+        '      ],\n' +
+        '      "buildOptions": [\n' +
+        '        "<options to be used only for this compilation unit>"\n' +
+        '      ]\n' +
         '    },\n' +
         '    "unit 2": {\n' +
-        '      "externs": [<source file paths to be used only for this compilation unit>],\n' +
-        '      "sources": [<extern file paths to be used only for this compilation unit>],\n' +
+        '      "externs": [\n' +
+        '        "<source file paths to be used only for this compilation unit>"\n' +
+        '      ],\n' +
+        '      "sources": [\n' +
+        '        "<extern file paths to be used only for this compilation unit>"\n' +
+        '      ],\n' +
         '      "outputFile": "file path to resulting code",\n' +
-        '      "buildOptions": [<options to be used only for this compilation unit>]\n' +
-        '    },\n' +
+        '      "buildOptions": [\n' +
+        '        "<options to be used only for this compilation unit>"\n' +
+        '      ]\n' +
+        '    }\n' +
         '  },\n' +
         '  "next": {\n' +
         '    "<file path to the next config relative to this config>": {\n' +
-        '      "inheritSources": <boolean>,\n' +
-        '      "inheritExterns": <boolean>,\n' +
-        '      "inheritBuildOptions": <boolean>\n' +
+        '      "inheritSources": "<boolean>",\n' +
+        '      "inheritExterns": "<boolean>",\n' +
+        '      "inheritBuildOptions": "<boolean>"\n' +
         '    },\n' +
         '    "<file path to another config relative to this config>": {\n' +
-        '      "inheritSources": <boolean>,\n' +
-        '      "inheritExterns": <boolean>,\n' +
-        '      "inheritBuildOptions": <boolean>\n' +
+        '      "inheritSources": "<boolean>",\n' +
+        '      "inheritExterns": "<boolean>",\n' +
+        '      "inheritBuildOptions": "<boolean>"\n' +
         '    }\n' +
         '  }\n' +
         '}\n\n' +
