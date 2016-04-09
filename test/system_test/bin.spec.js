@@ -18,12 +18,6 @@ var fs = require('fs');
  */
 var util = require('util');
 
-/**
- * @ignore
- * @suppress {duplicate}
- */
-var CCBuild = /** @type {function(new:CCBuild, Array<string>)} */ (require('../../src/CCBuild.js'));
-
 // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
 /**
  * @ignore
