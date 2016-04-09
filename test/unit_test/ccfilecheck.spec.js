@@ -40,7 +40,7 @@ var CCFileCheck = /** @type {function(new:CCFileCheck, Array<string>)} */ (requi
  * @ignore
  * @suppress {duplicate}
  */
-var cliUtils = require('./utils/cliUtils.js');
+var cliUtils = require('../utils/cliUtils.js');
 
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 60000;
 

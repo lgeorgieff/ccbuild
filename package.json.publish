@@ -52,7 +52,9 @@
     "mock-fs": "^3.8.0"
   },
   "scripts": {
-    "test": "JASMINE_CONFIG_PATH=test/jasmine.spec.json jasmine",
+    "test": "npm run test_unit && npm run test_system",
+    "test_unit": "JASMINE_CONFIG_PATH=test/unit_test/jasmine.spec.json jasmine",
+    "test_system": "JASMINE_CONFIG_PATH=test/system_test/jasmine.spec.json jasmine",
     "lint_js": "if [ $(find src/ -name '*.js' | wc -l) -gt 0 ] || [ $(find test/ -name '*.js' | wc -l) -gt 0 ]; then jscs --config src/.jscsrc src/ test/; fi",
     "lint": "npm run lint_js",
     "generate_doc": "npm run clean && jsdoc --configure doc/.jsdocrc src",

@@ -1,6 +1,7 @@
 {
   "excludeFiles": [
-    "test/unit_test/data/**"
+    "test/unit_test/data/**",
+    "test/system_test/data/**"
   ],
   "disallowMultipleSpaces": true,
   "disallowMultipleLineBreaks": true,

@@ -28,7 +28,7 @@ var CLI = /** @type {function(new:CLI, Array<string>)} */ (require('../../src/CL
  * @ignore
  * @suppress {duplicate}
  */
-var cliUtils = require('./utils/cliUtils.js');
+var cliUtils = require('../utils/cliUtils.js');
 
 describe('CLI class', function () {
     it('accepts default parameter when instantiating', function () {
