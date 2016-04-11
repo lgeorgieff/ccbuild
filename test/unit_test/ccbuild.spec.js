@@ -52,7 +52,7 @@ var CCBuild = /** @type {function(new:CCBuild, Array<string>)} */ (proxyquire('.
  */
 var cliUtils = require('../utils/cliUtils.js');
 
-fdescribe('CCBuild class', function () {
+describe('CCBuild class', function () {
     it('accepts default parameter when instantiating', function () {
         expect(new CCBuild([])).toEqual(jasmine.any(CCBuild));
         expect(new CCBuild()).toEqual(jasmine.any(CCBuild));
@@ -249,16 +249,15 @@ fdescribe('CCBuild class', function () {
         });
 
         it('processes --closure-help', function (done) {
+            var helpText = 'some help';
             runMock = jasmine.createSpy('compiler.run').and.callFake(function (cb) {
-                cb(0, 'closure help', '');
+                cb(0, helpText, '');
             });
-            CCMock.compiler.COMPILER_PATH = compilerPath;
 
             var ccbuild = new CCBuild([process.argv[0], process.argv[1], '--closure-help']);
             var eventHandler = jasmine.createSpy('eventHandler');
             ccbuild.on('closureHelp', function (closureHelp) {
-                expect(CCMock.compiler).toHaveBeenCalledWith(['--help']);
-                expect(closureHelp).toBe('closure help\n');
+                expect(closureHelp).toBe(helpText + '\n');
                 done();
             });
         });

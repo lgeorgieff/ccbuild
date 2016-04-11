@@ -20,12 +20,6 @@ var util = require('util');
 
 /**
  * @ignore
- * @suppress {duplicate}
- */
-var CC = require('google-closure-compiler');
-
-/**
- * @ignore
  * @suppress {dupicate}
  */
 var mockFs = require('mock-fs');
@@ -34,15 +28,35 @@ var mockFs = require('mock-fs');
  * @ignore
  * @suppress {duplicate}
  */
-var CCFileCheck = /** @type {function(new:CCFileCheck, Array<string>)} */ (require('../../src/CCFileCheck.js'));
+var proxyquire = require('proxyquire');
+
+var compilerPath = 'compiler/path';
+var contribPath = 'contrib/path';
+function CC (compilerArguments) { }
+CC.prototype.run = function (cb) {};
+
+var CCMock = {
+    compiler: CC,
+    grunt: undefined,
+    gulp: undefined
+};
+
+/**
+ * @ignore
+ * @suppress {duplicate}
+ */
+var CCFileCheck = /** @type {function(new:CCFileCheck, Array<string>)} */ (proxyquire('../../src/CCFileCheck.js', {
+    'google-closure-compiler': CCMock,
+    './CLI.js': proxyquire('../../src/CLI.js', {
+        'google-closure-compiler': CCMock
+    })
+}));
 
 /**
  * @ignore
  * @suppress {duplicate}
  */
 var cliUtils = require('../utils/cliUtils.js');
-
-jasmine.DEFAULT_TIMEOUT_INTERVAL = 60000;
 
 describe('CCFileCheck class', function () {
     it('accepts default parameter when instantiating', function () {
@@ -94,46 +108,64 @@ describe('CCFileCheck class', function () {
         });
     });
 
-    it('processes --closure-help', function (done) {
-        var ccfc = new CCFileCheck([process.argv[0], process.argv[1], '--closure-help']);
-        var eventHandler = jasmine.createSpy('eventHandler');
-        ccfc.on('closureHelp', function (closureHelp) {
-            expect(closureHelp.length).toBeGreaterThan(0);
-            done();
-        });
-    });
+    describe('with google-closure-compiler mock', function () {
+        var runMock;
 
-    it('processes --closure-version', function (done) {
-        var ccfc = new CCFileCheck([process.argv[0], process.argv[1], '--closure-version']);
-        ccfc.on('closureVersion', function (closureVersion) {
-            var compiler = new CC.compiler(['--version']);
-            compiler.run(function (code, stdout, stderr) {
-                if (code !== 0 || stderr) {
-                    done.fail(new Error(code + ': ' + stderr));
-                } else {
-                    expect(closureVersion).toBe(stdout);
-                    expect(closureVersion.length).toBeGreaterThan(0);
-                    done();
-                }
+        beforeEach(function () {
+            runMock = jasmine.createSpy('compiler.run').and.callFake(function (cb) {
+                cb(0, '', '');
+            });
+            CCMock.compiler = jasmine.createSpy('compiler').and.callFake(function (compilerArguments) {
+                var cc = new CC(compilerArguments);
+                cc.run = runMock;
+                return cc;
+            });
+
+            CCMock.compiler.COMPILER_PATH = compilerPath;
+            CCMock.compiler.CONTRIB_PATH = contribPath;
+        });
+
+        it('processes --closure-help', function (done) {
+            var helpText = 'some help';
+            runMock = jasmine.createSpy('compiler.run').and.callFake(function (cb) {
+                cb(0, helpText, '');
+            });
+
+            var ccfc = new CCFileCheck([process.argv[0], process.argv[1], '--closure-help']);
+            var eventHandler = jasmine.createSpy('eventHandler');
+            ccfc.on('closureHelp', function (closureHelp) {
+                expect(closureHelp).toBe(helpText + '\n');
+                done();
             });
         });
-    });
 
-    it('processes --compiler-path', function (done) {
-        var ccfc = new CCFileCheck([process.argv[0], process.argv[1], '--compiler-path']);
-        ccfc.on('compilerPath', function (compilerPath) {
-            expect(compilerPath).toBe(CC.compiler.COMPILER_PATH);
-            expect(compilerPath.length).toBeGreaterThan(0);
-            done();
+        it('processes --closure-version', function (done) {
+            var versionText = '123';
+            runMock = jasmine.createSpy('compiler.run').and.callFake(function (cb) {
+                cb(0, versionText, '');
+            });
+
+            var ccfc = new CCFileCheck([process.argv[0], process.argv[1], '--closure-version']);
+            ccfc.on('closureVersion', function (closureVersion) {
+                expect(closureVersion).toBe(versionText);
+                done();
+            });
         });
-    });
 
-    it('processes --contrib-path', function (done) {
-        var ccfc = new CCFileCheck([process.argv[0], process.argv[1], '--contrib-path']);
-        ccfc.on('contribPath', function (contribPath) {
-            expect(contribPath).toBe(CC.compiler.CONTRIB_PATH);
-            expect(contribPath.length).toBeGreaterThan(0);
-            done();
+        it('processes --compiler-path', function (done) {
+            var ccfc = new CCFileCheck([process.argv[0], process.argv[1], '--compiler-path']);
+            ccfc.on('compilerPath', function (_compilerPath) {
+                expect(_compilerPath).toBe(compilerPath);
+                done();
+            });
+        });
+
+        it('processes --contrib-path', function (done) {
+            var ccfc = new CCFileCheck([process.argv[0], process.argv[1], '--contrib-path']);
+            ccfc.on('contribPath', function (_contribPath) {
+                expect(_contribPath).toBe(contribPath);
+                done();
+            });
         });
     });
 
@@ -634,85 +666,5 @@ describe('CCFileCheck class', function () {
                 done();
             });
         });
-    });
-
-    describe('with no access to file system', function () {
-        beforeAll(function () {
-            var config98 = {
-                checkFs: {
-                    check: ['.']
-                },
-                compilationUnits: {
-                    unit1: {
-                        sources: ['source1.js']
-                    }
-                }
-            };
-            var config99 = {
-                checkFs: {
-                    check: ['.']
-                },
-                compilationUnits: {
-                    unit1: {
-                        sources: ['source1.js']
-                    }
-                }
-            };
-
-            var fakeFs = {
-                'dir-2': {
-                    'config98.ccbuild': JSON.stringify(config98)
-                },
-                'dir-3': mockFs.directory({mode: parseInt('222', 8),
-                                           items: {
-                                               'config99.ccbuild': JSON.stringify(config99)
-                                           }})
-            };
-            mockFs(fakeFs);
-        });
-
-        it('signals error in case a folder cannot be accessed', function (done) {
-            var ccfc = new CCFileCheck([process.argv[0], process.argv[1],
-                                        '-c', path.join('dir-3', 'config99.ccbuild'),
-                                        '-c', path.join('dir-2', 'config98.ccbuild')]);
-            ccfc.on('verificationSuccess', function (f) {
-                fail('Did not expect "verificationSuccess" to be fired!');
-            });
-            ccfc.on('verificationError', function (f) {
-                fail('Did not expect "verificationError" to be fired!');
-            });
-
-            var errorHandler = jasmine.createSpy('errorHandler');
-            ccfc.on('error', errorHandler);
-
-            ccfc.on('done', function () {
-                expect(errorHandler.calls.count()).toBe(1);
-                expect(errorHandler).toHaveBeenCalledWith(jasmine.any(Error));
-                expect(errorHandler.calls.mostRecent().args[0].code).toBe('EACCES');
-                done();
-            });
-        }, 2000);
-
-        it('signals error in case a folder cannot be accessed -- --stop-on-error', function (done) {
-            var ccfc = new CCFileCheck([process.argv[0], process.argv[1], '--stop-on-error',
-                                        '-c', path.join('dir-3', 'config99.ccbuild'),
-                                        '-c', path.join('dir-2', 'config98.ccbuild')]);
-            ccfc.on('verificationSuccess', function (f) {
-                fail('Did not expect "verificationSuccess" to be fired!');
-            });
-            ccfc.on('verificationError', function (f) {
-                fail('Did not expect "verificationError" to be fired!');
-            });
-
-            var errorHandler = jasmine.createSpy('errorHandler');
-            ccfc.on('error', errorHandler);
-
-            ccfc.on('done', function () {
-                expect(errorHandler.calls.count()).toBe(1);
-                expect(errorHandler).toHaveBeenCalledWith(jasmine.any(Error));
-                expect(errorHandler.calls.mostRecent().args[0].code).toBe('EACCES');
-                done();
-            });
-        }, 2000);
     });
 });
