@@ -16,7 +16,35 @@ var path = require('path');
  * @ignore
  * @suppress {duplicate}
  */
-var CCBuild = /** @type {function(new:CCBuild, Array<string>)} */ (require('../../src/CCBuild.js'));
+var mockFs = require('mock-fs');
+
+/**
+ * @ignore
+ * @suppress {duplicate}
+ */
+var proxyquire = require('proxyquire');
+
+var compilerPath = 'compiler/path';
+var contribPath = 'contrib/path';
+function CC (compilerArguments) { }
+CC.prototype.run = function (cb) {};
+
+var CCMock = {
+    compiler: CC,
+    grunt: undefined,
+    gulp: undefined
+};
+
+/**
+ * @ignore
+ * @suppress {duplicate}
+ */
+var CCBuild = /** @type {function(new:CCBuild, Array<string>)} */ (proxyquire('../../src/CCBuild.js', {
+    'google-closure-compiler': CCMock,
+    './CLI.js': proxyquire('../../src/CLI.js', {
+        'google-closure-compiler': CCMock
+    })
+}));
 
 /**
  * @ignore
@@ -24,7 +52,7 @@ var CCBuild = /** @type {function(new:CCBuild, Array<string>)} */ (require('../.
  */
 var cliUtils = require('../utils/cliUtils.js');
 
-describe('CCBuild class', function () {
+fdescribe('CCBuild class', function () {
     it('accepts default parameter when instantiating', function () {
         expect(new CCBuild([])).toEqual(jasmine.any(CCBuild));
         expect(new CCBuild()).toEqual(jasmine.any(CCBuild));
@@ -200,6 +228,274 @@ describe('CCBuild class', function () {
                 filteredUnits: ['unit1', 'unit2']
             });
             done();
+        });
+    });
+
+    describe('with google-closure-compiler-mock', function () {
+        var runMock;
+
+        beforeEach(function () {
+            runMock = jasmine.createSpy('compiler.run').and.callFake(function (cb) {
+                cb(0, '', '');
+            });
+            CCMock.compiler = jasmine.createSpy('compiler').and.callFake(function (compilerArguments) {
+                var cc = new CC(compilerArguments);
+                cc.run = runMock;
+                return cc;
+            });
+
+            CCMock.compiler.COMPILER_PATH = compilerPath;
+            CCMock.compiler.CONTRIB_PATH = contribPath;
+        });
+
+        it('processes --closure-help', function (done) {
+            runMock = jasmine.createSpy('compiler.run').and.callFake(function (cb) {
+                cb(0, 'closure help', '');
+            });
+            CCMock.compiler.COMPILER_PATH = compilerPath;
+
+            var ccbuild = new CCBuild([process.argv[0], process.argv[1], '--closure-help']);
+            var eventHandler = jasmine.createSpy('eventHandler');
+            ccbuild.on('closureHelp', function (closureHelp) {
+                expect(CCMock.compiler).toHaveBeenCalledWith(['--help']);
+                expect(closureHelp).toBe('closure help\n');
+                done();
+            });
+        });
+
+        it('processes --closure-version', function (done) {
+            runMock = jasmine.createSpy('compiler.run').and.callFake(function (cb) {
+                cb(0, '1234', '');
+            });
+
+            var ccbuild = new CCBuild([process.argv[0], process.argv[1], '--closure-version']);
+            ccbuild.on('closureVersion', function (closureVersion) {
+                expect(CCMock.compiler).toHaveBeenCalledWith(['--version']);
+                expect(closureVersion).toBe('1234');
+                done();
+            });
+        });
+
+        it('processes --compiler-path', function (done) {
+            CCMock.compiler.COMPILER_PATH = compilerPath;
+            var ccbuild = new CCBuild([process.argv[0], process.argv[1], '--compiler-path']);
+            ccbuild.on('compilerPath', function (_compilerPath) {
+                expect(_compilerPath).toBe(compilerPath);
+                done();
+            });
+        });
+
+        it('processes --contrib-path', function (done) {
+            CCMock.compiler.CONTRIB_PATH = contribPath;
+            var ccbuild = new CCBuild([process.argv[0], process.argv[1], '--contrib-path']);
+            ccbuild.on('contribPath', function (_contribPath) {
+                expect(_contribPath).toBe(contribPath);
+                done();
+            });
+        });
+
+        describe('with fs-mock', function () {
+            beforeAll(function () {
+                var config2 = {
+                    sources: ['./data/source4.js'],
+                    buildOptions: [
+                        '--compilation_level', 'ADVANCED_OPTIMIZATIONS',
+                        '--warning_level', 'VERBOSE',
+                        '--env', 'CUSTOM',
+                        '--flagfile', './data/test_flagfile'
+                    ],
+                    compilationUnits: {
+                        unit1: {
+                        }
+                    }
+                };
+                var config3 = {
+                    sources: ['./data/source1.js'],
+                    externs: ['data/externs1.js'],
+                    buildOptions: [
+                        '--compilation_level', 'ADVANCED_OPTIMIZATIONS',
+                        '--warning_level', 'VERBOSE',
+                        '--env', 'CUSTOM',
+                        '--flagfile', './data/test_flagfile'
+                    ],
+                    compilationUnits: {
+                        unit1: {
+                        },
+                        unit2: {
+                            sources: ['data/source2.js']
+                        },
+                        unit3: {
+                            sources: ['./data/source3.js', './data/source4.js'],
+                            externs: ['./data/externs2.js', 'data/externs3.js']
+                        }
+                    }
+                };
+                var config4 = {
+                    sources: ['./data/source1.js'],
+                    externs: ['data/externs1.js'],
+                    buildOptions: [
+                        '--compilation_level', 'ADVANCED_OPTIMIZATIONS',
+                        '--warning_level', 'VERBOSE',
+                        '--env', 'CUSTOM'
+                    ],
+                    compilationUnits: {
+                        unit1: {
+                            buildOptions: ['--flagfile', './data/test_flagfile']
+                        }
+                    },
+                    next: {
+                        'data/config5.ccbuild': {
+                            inheritSources: true,
+                            inheritExterns: true,
+                            inheritBuildOptions: true
+                        }
+                    }
+                };
+
+                var config5 = {
+                    buildOptions: config4.buildOptions,
+                    compilationUnits: {
+                        unit2: {
+                            sources: ['source2.js'],
+                            externs: ['./externs2.js'],
+                            buildOptions: ['--flagfile', './test_flagfile']
+                        }
+                    },
+                    next: {
+                        'configs/config6': {
+                            inheritSources: true,
+                            inheritExterns: true,
+                            inheritBuildOptions: true
+                        }
+                    }
+                };
+                var config6 = {
+                    sources: ['../source1.js'],
+                    externs: ['../externs1.js'],
+                    buildOptions: config4.buildOptions,
+                    compilationUnits: {
+                        unit3: {
+                            sources: ['../source3.js', '../source4.js'],
+                            externs: ['../externs2.js', '../externs3.js'],
+                            buildOptions: ['--flagfile', '../test_flagfile']
+                        },
+                        unit4: {
+                            sources: ['../source3.js', '../source4.js'],
+                            externs: ['../externs2.js', '../externs3.js'],
+                            buildOptions: ['--flagfile', '../test_flagfile']
+                        }
+                    }
+                };
+
+                var fakeFs = {
+                    'test/unit_test/': {
+                        'config2.ccbuild': JSON.stringify(config2, null, 2),
+                        'config3.ccbuild': JSON.stringify(config3, null, 2),
+                        'config4.ccbuild': JSON.stringify(config4, null, 2),
+                        data: {
+                            'config5.ccbuild': JSON.stringify(config5, null, 2),
+                            configs: {
+                                'config6': JSON.stringify(config6, null, 2)
+                            }
+                        }
+                    }
+                };
+                mockFs(fakeFs);
+            });
+
+            afterAll(function () {
+                mockFs.restore();
+            });
+
+            it('emits done after finished with config -- 1 errornous compilation unit', function (done) {
+                runMock = jasmine.createSpy('compiler.run').and.callFake(function (cb) {
+                    cb(1, '', 'an error');
+                });
+
+                var configPath = path.join(__dirname, 'config2.ccbuild');
+                var ccbuild = new CCBuild([process.argv[0], process.argv[1], '--config', configPath]);
+                var compilationErrordHandler = jasmine.createSpy('compilationErrorHandler');
+                ccbuild.on('compilationError', compilationErrordHandler);
+                ccbuild.on('done', function () {
+                    expect(compilationErrordHandler.calls.count()).toBe(1);
+                    expect(compilationErrordHandler).toHaveBeenCalledWith('unit1', jasmine.any(Error));
+                    expect(CCMock.compiler.calls.count()).toBe(1);
+                    expect(CCMock.compiler).toHaveBeenCalledWith(jasmine.arrayContaining([
+                        '--compilation_level', 'ADVANCED_OPTIMIZATIONS',
+                        '--warning_level', 'VERBOSE',
+                        '--env', 'CUSTOM',
+                        '--flagfile', './data/test_flagfile',
+                        '--js', path.join(__dirname, 'data', 'source4.js')]));
+                    done();
+                });
+            });
+
+            it('emits done after finished with config -- 3 compilation units incl. error', function (done) {
+                var callCount = 0;
+                runMock = jasmine.createSpy('compiler.run').and.callFake(function (cb) {
+                    if (callCount < 2) cb(0, '', '');
+                    if (callCount >= 2) cb(1, '', 'an error');
+                    ++callCount;
+                });
+
+                var configPath = path.join(__dirname, 'config3.ccbuild');
+                var ccbuild = new CCBuild([process.argv[0], process.argv[1], '--config', configPath]);
+
+                var compiledHandler = jasmine.createSpy('compiledHandler');
+                var compilationErrorHandler = jasmine.createSpy('compilationErrorHandler');
+                ccbuild.on('compiled', compiledHandler);
+                ccbuild.on('compilationError', compilationErrorHandler);
+                ccbuild.on('done', function () {
+                    expect(compiledHandler.calls.count()).toBe(2);
+                    expect(compiledHandler)
+                        .toHaveBeenCalledWith(jasmine.any(String), jasmine.any(String), jasmine.any(String));
+                    expect(compilationErrorHandler.calls.count()).toBe(1);
+                    expect(compilationErrorHandler).toHaveBeenCalledWith(jasmine.any(String), jasmine.any(Error));
+                    done();
+                });
+            });
+
+            it('emits done after finished with multiple configs -- 4 compilation units', function (done) {
+                runMock = jasmine.createSpy('compiler.run').and.callFake(function (cb) {
+                    cb(0, '', '');
+                });
+
+                var configPath1 = path.join(__dirname, 'config4.ccbuild');
+
+                var ccbuild = new CCBuild([process.argv[0], process.argv[1], '--config', configPath1]);
+                var compiledHandler = jasmine.createSpy('compiledHandler');
+                ccbuild.on('compiled', compiledHandler);
+                ccbuild.on('done', function () {
+                    expect(compiledHandler.calls.count()).toBe(4);
+                    expect(compiledHandler).toHaveBeenCalledWith('unit1', jasmine.any(String), jasmine.any(String));
+                    expect(compiledHandler).toHaveBeenCalledWith('unit2', jasmine.any(String), jasmine.any(String));
+                    expect(compiledHandler).toHaveBeenCalledWith('unit3', jasmine.any(String), jasmine.any(String));
+                    expect(compiledHandler).toHaveBeenCalledWith('unit4', jasmine.any(String), jasmine.any(String));
+                    done();
+                });
+            });
+
+            it('emits done after finished with multiple configs -- 4 compilation units incl. errors', function (done) {
+                var callCount = 0;
+                runMock = jasmine.createSpy('compiler.run').and.callFake(function (cb) {
+                    if (callCount < 2) cb(0, '', '');
+                    if (callCount >= 2) cb(1, '', 'an error');
+                    ++callCount;
+                });
+
+                var configPath1 = path.join(__dirname, 'config4.ccbuild');
+
+                var ccbuild = new CCBuild([process.argv[0], process.argv[1], '--config', configPath1]);
+                var compiledHandler = jasmine.createSpy('compiledHandler');
+                ccbuild.on('compiled', compiledHandler);
+                var compilationErrorHandler = jasmine.createSpy('compilationErrorHandler');
+                ccbuild.on('compilationError', compilationErrorHandler);
+                ccbuild.on('done', function () {
+                    expect(compiledHandler.calls.count()).toBe(2);
+                    expect(compilationErrorHandler.calls.count()).toBe(2);
+                    done();
+                });
+            });
         });
     });
 });
