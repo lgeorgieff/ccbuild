@@ -16,13 +16,26 @@ var path = require('path');
  * @ignore
  * @suppress {duplicate}
  */
-var CC = require('google-closure-compiler');
+var proxyquire = require('proxyquire');
+
+var compilerPath = 'compiler/path';
+var contribPath = 'contrib/path';
+function CC (compilerArguments) { }
+CC.prototype.run = function (cb) {};
+
+var CCMock = {
+    compiler: CC,
+    grunt: undefined,
+    gulp: undefined
+};
 
 /**
  * @ignore
  * @suppress {duplicate}
  */
-var CLI = /** @type {function(new:CLI, Array<string>)} */ (require('../../src/CLI.js'));
+var CLI = /** @type {function(new:CLI, Array<string>)} */ (proxyquire('../../src/CLI.js', {
+    'google-closure-compiler': CCMock
+}));
 
 /**
  * @ignore
@@ -80,46 +93,64 @@ describe('CLI class', function () {
         });
     });
 
-    it('processes --closure-help', function (done) {
-        var cli = new CLI([process.argv[0], process.argv[1], '--closure-help']);
-        var eventHandler = jasmine.createSpy('eventHandler');
-        cli.on('closureHelp', function (closureHelp) {
-            expect(closureHelp.length).toBeGreaterThan(0);
-            done();
-        });
-    });
+    describe('with google-closure-compiler mock', function () {
+        var runMock;
 
-    it('processes --closure-version', function (done) {
-        var cli = new CLI([process.argv[0], process.argv[1], '--closure-version']);
-        cli.on('closureVersion', function (closureVersion) {
-            var compiler = new CC.compiler(['--version']);
-            compiler.run(function (code, stdout, stderr) {
-                if (code !== 0 || stderr) {
-                    done.fail(new Error(code + ': ' + stderr));
-                } else {
-                    expect(closureVersion).toBe(stdout);
-                    expect(closureVersion.length).toBeGreaterThan(0);
-                    done();
-                }
+        beforeEach(function () {
+            runMock = jasmine.createSpy('compiler.run').and.callFake(function (cb) {
+                cb(0, '', '');
+            });
+            CCMock.compiler = jasmine.createSpy('compiler').and.callFake(function (compilerArguments) {
+                var cc = new CC(compilerArguments);
+                cc.run = runMock;
+                return cc;
+            });
+
+            CCMock.compiler.COMPILER_PATH = compilerPath;
+            CCMock.compiler.CONTRIB_PATH = contribPath;
+        });
+
+        it('processes --closure-help', function (done) {
+            var helpText = 'some help';
+            runMock = jasmine.createSpy('compiler.run').and.callFake(function (cb) {
+                cb(0, helpText, '');
+            });
+
+            var cli = new CLI([process.argv[0], process.argv[1], '--closure-help']);
+            var eventHandler = jasmine.createSpy('eventHandler');
+            cli.on('closureHelp', function (closureHelp) {
+                expect(closureHelp).toBe(helpText + '\n');
+                done();
             });
         });
-    });
 
-    it('processes --compiler-path', function (done) {
-        var cli = new CLI([process.argv[0], process.argv[1], '--compiler-path']);
-        cli.on('compilerPath', function (compilerPath) {
-            expect(compilerPath).toBe(CC.compiler.COMPILER_PATH);
-            expect(compilerPath.length).toBeGreaterThan(0);
-            done();
+        it('processes --closure-version', function (done) {
+            var versionText = '123';
+            runMock = jasmine.createSpy('compiler.run').and.callFake(function (cb) {
+                cb(0, versionText, '');
+            });
+
+            var cli = new CLI([process.argv[0], process.argv[1], '--closure-version']);
+            cli.on('closureVersion', function (closureVersion) {
+                expect(closureVersion).toBe(versionText);
+                done();
+            });
         });
-    });
 
-    it('processes --contrib-path', function (done) {
-        var cli = new CLI([process.argv[0], process.argv[1], '--contrib-path']);
-        cli.on('contribPath', function (contribPath) {
-            expect(contribPath).toBe(CC.compiler.CONTRIB_PATH);
-            expect(contribPath.length).toBeGreaterThan(0);
-            done();
+        it('processes --compiler-path', function (done) {
+            var cli = new CLI([process.argv[0], process.argv[1], '--compiler-path']);
+            cli.on('compilerPath', function (_compilerPath) {
+                expect(_compilerPath).toBe(compilerPath);
+                done();
+            });
+        });
+
+        it('processes --contrib-path', function (done) {
+            var cli = new CLI([process.argv[0], process.argv[1], '--contrib-path']);
+            cli.on('contribPath', function (_contribPath) {
+                expect(_contribPath).toBe(contribPath);
+                done();
+            });
         });
     });
 
