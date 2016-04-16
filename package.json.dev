@@ -61,6 +61,7 @@
     "precompile": "npm run compile_closure_compiler",
     "compile": "if [ $(find src/ -name '*.js' | wc -l) -gt 0 ]; then java -jar tools/closure_compiler/build/compiler.jar --flagfile src/.closure_compiler.flagfile --js src/ > /dev/null; fi",
     "validate": "npm run lint && npm run compile && npm run test",
+    "prepublish": "npm run generate_doc",
     "publish": "./tools/publish.sh"
   }
 }
