@@ -157,14 +157,14 @@ function CCFileCheck (argv) {
          */
         self.emit('contribPath', contribPath);
     });
-    this._cli.on('argsParsed', function (contribPath) {
+    this._cli.on('argsParsed', function (args) {
         /**
          * States that the parsing of CLI arguments was finished was set and that the contrib path information is ready.
          *
          * @event CCFileCheck#argsParsed
          * @param {Object} args The parsed argument object.
          */
-        self.emit('argsParsed', contribPath);
+        self.emit('argsParsed', args);
     });
 
     self.once('argsParsed', function (cliArgs) {
