@@ -46,7 +46,7 @@ var utils = require('./utils');
  * @ignore
  * @suppress {duplicate}
  */
-var configReader = require('./configReader.js');
+var configurationReader = require('./configurationReader.js');
 
 /**
  * @ignore
@@ -241,7 +241,7 @@ CCBuild.prototype._processConfigs = function (cliArgs) {
         // We ignore duplicate configuration files. This can be for example the case if the same configuration file is
         // specified viw the CLI argument --config|-c and via the next property in a parent configuration file.
         if (processedConfigFiles.indexOf(configFilePath) === -1) {
-            configReader.readAndParseConfiguration(configFilePath, parentConfig, rootVariableManager)
+            configurationReader.readAndParseConfiguration(configFilePath, parentConfig)
                 .then(function (configObject) {
                     globalContainsJsOutputFile = configObject.buildOptions.indexOf('--js_output_file') !== -1;
                     globalContainsJs = configObject.buildOptions.indexOf('--js') !== -1;
@@ -379,7 +379,7 @@ CCBuild.prototype._compile = function (compilerConfiguration) {
 
     var compilerArguments;
     try {
-        compilerArguments = configReader.getCompilerArguments(compilerConfiguration);
+        compilerArguments = configurationReader.getCompilerArguments(compilerConfiguration);
     } catch (err) {
         self.emit('configError', compilerConfiguration.unitName, err);
         deferred.reject({compilationUnit: compilerConfiguration.unitName, error: err});

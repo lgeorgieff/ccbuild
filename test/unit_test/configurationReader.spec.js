@@ -18,7 +18,17 @@ var fs = require('fs');
  */
 var util = require('util');
 
-var configReader = require('../../src/configReader');
+/**
+ * @ignore
+ * @suppress {duplicate}
+ */
+var ConfigurationNormalizer = require('../../src/ConfigurationNormalizer.js');
+
+/**
+ * @ignore
+ * @suppress {duplicate}
+ */
+var configurationReader = require('../../src/configurationReader');
 
 describe('config_reader', function () {
     beforeEach(function () {
@@ -42,221 +52,6 @@ describe('config_reader', function () {
                 }
             });
         }
-    });
-
-    it('normalize undefined', function () {
-        var configNormalizer = new configReader.ConfigurationNormalizer();
-        var normalizedConfig = configNormalizer.normalize();
-        expect(normalizedConfig).toEqual(this.EMPTY_CONFIG);
-    });
-
-    it('normalize null', function () {
-        var configNormalizer = new configReader.ConfigurationNormalizer(null);
-        var normalizedConfig = configNormalizer.normalize();
-        expect(normalizedConfig).toEqual(this.EMPTY_CONFIG);
-    });
-
-    it('normalize empty object', function () {
-        var configNormalizer = new configReader.ConfigurationNormalizer({});
-        var normalizedConfig = configNormalizer.normalize();
-        expect(normalizedConfig).toEqual(this.EMPTY_CONFIG);
-    });
-
-    it('normalize sources', function () {
-        var config = {sources: ['abc', 'def', '']};
-        var configNormalizer = new configReader.ConfigurationNormalizer(config, __dirname);
-        var normalizedConfig = configNormalizer.normalize();
-        expect(normalizedConfig).toBeDefined();
-        expect(normalizedConfig.sources).toBeDefined();
-        expect(normalizedConfig.sources.length).toBe(3);
-        expect(normalizedConfig.sources).toContain(path.resolve(__dirname, 'abc'));
-        expect(normalizedConfig.sources).toContain(path.resolve(__dirname, 'def'));
-        expect(normalizedConfig.sources).toContain(path.resolve(__dirname, ''));
-        expect(normalizedConfig.externs).toEqual([]);
-        expect(normalizedConfig.buildOptions).toEqual([]);
-        expect(normalizedConfig.compilationUnits).toEqual({});
-        expect(normalizedConfig.next).toEqual({});
-    });
-
-    it('normalize undefined sources', function () {
-        var config = {sources: undefined};
-        var configNormalizer = new configReader.ConfigurationNormalizer(config, __dirname);
-        var normalizedConfig = configNormalizer.normalize();
-        expect(normalizedConfig).toBeDefined();
-        expect(normalizedConfig.sources).toEqual([]);
-        expect(normalizedConfig.externs).toEqual([]);
-        expect(normalizedConfig.buildOptions).toEqual([]);
-        expect(normalizedConfig.compilationUnits).toEqual({});
-        expect(normalizedConfig.next).toEqual({});
-    });
-
-    it('normalize null sources', function () {
-        var config = {sources: null};
-        var configNormalizer = new configReader.ConfigurationNormalizer(config, __dirname);
-        var normalizedConfig = configNormalizer.normalize();
-        expect(normalizedConfig).toBeDefined();
-        expect(normalizedConfig.sources).toEqual([]);
-        expect(normalizedConfig.externs).toEqual([]);
-        expect(normalizedConfig.buildOptions).toEqual([]);
-        expect(normalizedConfig.compilationUnits).toEqual({});
-        expect(normalizedConfig.next).toEqual({});
-    });
-
-    it('normalize externs', function () {
-        var config = {externs: ['abc', '/def/tmp.txt', 'folder/tmp.txt']};
-        var configNormalizer = new configReader.ConfigurationNormalizer(config, __dirname);
-        var normalizedConfig = configNormalizer.normalize();
-        expect(normalizedConfig).toBeDefined();
-        expect(normalizedConfig.externs).toBeDefined();
-        expect(normalizedConfig.externs.length).toBe(3);
-        expect(normalizedConfig.externs).toContain(path.resolve(__dirname, 'abc'));
-        expect(normalizedConfig.externs).toContain(path.resolve('/def/tmp.txt'));
-        expect(normalizedConfig.externs).toContain(path.resolve(__dirname, 'folder/tmp.txt'));
-        expect(normalizedConfig.sources).toEqual([]);
-        expect(normalizedConfig.buildOptions).toEqual([]);
-        expect(normalizedConfig.compilationUnits).toEqual({});
-        expect(normalizedConfig.next).toEqual({});
-    });
-
-    it('normalize undefined externs', function () {
-        var config = {externs: undefined};
-        var configNormalizer = new configReader.ConfigurationNormalizer(config, __dirname);
-        var normalizedConfig = configNormalizer.normalize();
-        expect(normalizedConfig).toBeDefined();
-        expect(normalizedConfig.externs).toEqual([]);
-        expect(normalizedConfig.sources).toEqual([]);
-        expect(normalizedConfig.buildOptions).toEqual([]);
-        expect(normalizedConfig.compilationUnits).toEqual({});
-        expect(normalizedConfig.next).toEqual({});
-    });
-
-    it('normalize null externs', function () {
-        var config = {externs: null};
-        var configNormalizer = new configReader.ConfigurationNormalizer(config, __dirname);
-        var normalizedConfig = configNormalizer.normalize();
-        expect(normalizedConfig).toBeDefined();
-        expect(normalizedConfig.externs).toEqual([]);
-        expect(normalizedConfig.sources).toEqual([]);
-        expect(normalizedConfig.buildOptions).toEqual([]);
-        expect(normalizedConfig.compilationUnits).toEqual({});
-        expect(normalizedConfig.next).toEqual({});
-    });
-
-    it('normalize buildOptions object', function () {
-        // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
-        var config = {
-            buildOptions: {
-                compilation_level: 'ADVANCED',
-                language_in: 'ECMASCRIPT6_STRICT',
-                debug: true,
-                jscomp_off: ['checkRegExp', 'checkTypes', 'checkVars'],
-                does_not_exist: false
-            }
-        };
-        // jscs:enable RequireCamelCaseOrUpperCaseIdentifiers
-
-        var configNormalizer = new configReader.ConfigurationNormalizer(config, __dirname);
-        var normalizedConfig = configNormalizer.normalize();
-        expect(normalizedConfig).toBeDefined();
-        expect(normalizedConfig.sources).toEqual([]);
-        expect(normalizedConfig.externs).toEqual([]);
-        expect(normalizedConfig.buildOptions).toEqual(
-            ['--compilation_level', 'ADVANCED',
-             '--language_in', 'ECMASCRIPT6_STRICT',
-             '--debug',
-             '--jscomp_off', 'checkRegExp',
-             '--jscomp_off', 'checkTypes',
-             '--jscomp_off', 'checkVars']);
-        expect(normalizedConfig.compilationUnits).toEqual({});
-        expect(normalizedConfig.next).toEqual({});
-    });
-
-    it('normalize buildOptions array', function () {
-        var config = {
-            buildOptions:
-            ['--compilation_level', 'ADVANCED',
-             '--language_in', 'ECMASCRIPT6_STRICT',
-             '--debug',
-             '--jscomp_off', 'checkRegExp',
-             '--jscomp_off', 'checkTypes',
-             '--jscomp_off', 'checkVars']};
-        var configNormalizer = new configReader.ConfigurationNormalizer(config, __dirname);
-        var normalizedConfig = configNormalizer.normalize();
-        expect(normalizedConfig).toBeDefined();
-        expect(normalizedConfig.sources).toEqual([]);
-        expect(normalizedConfig.externs).toEqual([]);
-        expect(normalizedConfig.buildOptions).toEqual(
-            ['--compilation_level', 'ADVANCED',
-             '--language_in', 'ECMASCRIPT6_STRICT',
-             '--debug',
-             '--jscomp_off', 'checkRegExp',
-             '--jscomp_off', 'checkTypes',
-             '--jscomp_off', 'checkVars']);
-        expect(normalizedConfig.compilationUnits).toEqual({});
-        expect(normalizedConfig.next).toEqual({});
-    });
-
-    it('normalize invalid externs', function () {
-        var configNormalizer = new configReader.ConfigurationNormalizer({externs: {}});
-        expect(configNormalizer.normalize.bind(configNormalizer)).toThrow(jasmine.any(Error));
-
-        configNormalizer = new configReader.ConfigurationNormalizer({externs: [{}]});
-        expect(configNormalizer.normalize.bind(configNormalizer)).toThrow(jasmine.any(Error));
-
-        configNormalizer = new configReader.ConfigurationNormalizer({externs: [12]});
-        expect(configNormalizer.normalize.bind(configNormalizer)).toThrow(jasmine.any(Error));
-
-        configNormalizer = new configReader.ConfigurationNormalizer({externs: ['abc', 12, 'def']});
-        expect(configNormalizer.normalize.bind(configNormalizer)).toThrow(jasmine.any(Error));
-
-        configNormalizer = new configReader.ConfigurationNormalizer({externs: ['abc', undefined, 'def']});
-        expect(configNormalizer.normalize.bind(configNormalizer)).toThrow(jasmine.any(Error));
-
-        configNormalizer = new configReader.ConfigurationNormalizer({externs: ['abc', null, 'def']});
-        expect(configNormalizer.normalize.bind(configNormalizer)).toThrow(jasmine.any(Error));
-    });
-
-    it('normalize invalid sources', function () {
-        var configNormalizer = new configReader.ConfigurationNormalizer({sources: {}});
-        expect(configNormalizer.normalize.bind(configNormalizer)).toThrow(jasmine.any(Error));
-
-        configNormalizer = new configReader.ConfigurationNormalizer({sources: [{}]});
-        expect(configNormalizer.normalize.bind(configNormalizer)).toThrow(jasmine.any(Error));
-
-        configNormalizer = new configReader.ConfigurationNormalizer({sources: [12]});
-        expect(configNormalizer.normalize.bind(configNormalizer)).toThrow(jasmine.any(Error));
-
-        configNormalizer = new configReader.ConfigurationNormalizer({sources: ['abc', 12, 'def']});
-        expect(configNormalizer.normalize.bind(configNormalizer)).toThrow(jasmine.any(Error));
-
-        configNormalizer = new configReader.ConfigurationNormalizer({sources: ['abc', undefined, 'def']});
-        expect(configNormalizer.normalize.bind(configNormalizer)).toThrow(jasmine.any(Error));
-
-        configNormalizer = new configReader.ConfigurationNormalizer({sources: ['abc', null, 'def']});
-        expect(configNormalizer.normalize.bind(configNormalizer)).toThrow(jasmine.any(Error));
-    });
-
-    it('normalize invalid buildOptions', function () {
-        var configNormalizer = new configReader.ConfigurationNormalizer({buildOptions: {compilation_level: undefined}});
-        expect(configNormalizer.normalize.bind(configNormalizer)).toThrow(jasmine.any(Error));
-
-        configNormalizer = new configReader.ConfigurationNormalizer({buildOptions: {compilation_level: null}});
-        expect(configNormalizer.normalize.bind(configNormalizer)).toThrow(jasmine.any(Error));
-
-        configNormalizer = new configReader.ConfigurationNormalizer({buildOptions: {compilation_level: 2}});
-        expect(configNormalizer.normalize.bind(configNormalizer)).toThrow(jasmine.any(Error));
-
-        configNormalizer = new configReader.ConfigurationNormalizer({buildOptions: {compilation_level: {}}});
-        expect(configNormalizer.normalize.bind(configNormalizer)).toThrow(jasmine.any(Error));
-
-        configNormalizer = new configReader.ConfigurationNormalizer({buildOptions: {compilation_level: [1]}});
-        expect(configNormalizer.normalize.bind(configNormalizer)).toThrow(jasmine.any(Error));
-
-        configNormalizer = new configReader.ConfigurationNormalizer({buildOptions: {compilation_level: [undefined]}});
-        expect(configNormalizer.normalize.bind(configNormalizer)).toThrow(jasmine.any(Error));
-
-        configNormalizer = new configReader.ConfigurationNormalizer({buildOptions: {compilation_level: [null]}});
-        expect(configNormalizer.normalize.bind(configNormalizer)).toThrow(jasmine.any(Error));
     });
 
     it('getLocalConfigFiles', function (done) {
@@ -287,7 +82,7 @@ describe('config_reader', function () {
         createConfigs('.');
         createConfigs(testDirectory);
 
-        configReader.getLocalConfigFiles().then(function (configFilePaths) {
+        configurationReader.getLocalConfigFiles().then(function (configFilePaths) {
             expect(configFilePaths.length).toBe(loadedConfigFilePaths.length);
             expect(configFilePaths).toEqual(jasmine.arrayContaining(loadedConfigFilePaths));
             done();
@@ -299,78 +94,6 @@ describe('config_reader', function () {
             return path.join(testDirectory, filePath);
         }));
         this.resourcesToDelete.push(testDirectory);
-    });
-
-    it('normalize build options with = characters', function () {
-        var config = Object.assign({}, this.EMPTY_CONFIG);
-        config.buildOptions = [
-            '--js=file1.js',
-            '--js=file2.js',
-            '--js', 'file3.js'
-        ];
-        var configNormalizer = new configReader.ConfigurationNormalizer(config);
-        var normalizedConfiguration = configNormalizer.normalize();
-        expect(normalizedConfiguration.buildOptions).toBeDefined();
-        expect(normalizedConfiguration.buildOptions).toEqual(jasmine.any(Array));
-        expect(normalizedConfiguration.buildOptions.length).toBe(6);
-        expect(normalizedConfiguration.buildOptions)
-            .toEqual(['--js', 'file1.js', '--js', 'file2.js', '--js', 'file3.js']);
-
-        config.buildOptions = [
-            '--js=file1.js',
-            '--js=file2.js',
-            '--js', 'file3.js',
-            '--externs=externs1.js',
-            '--externs', 'externs1.js',
-            '--externs=externs2.js'
-        ];
-        configNormalizer = new configReader.ConfigurationNormalizer(config);
-        normalizedConfiguration = configNormalizer.normalize();
-        expect(normalizedConfiguration.buildOptions).toBeDefined();
-        expect(normalizedConfiguration.buildOptions).toEqual(jasmine.any(Array));
-        expect(normalizedConfiguration.buildOptions.length).toBe(12);
-        expect(normalizedConfiguration.buildOptions)
-            .toEqual(['--js', 'file1.js', '--js', 'file2.js', '--js', 'file3.js', '--externs', 'externs1.js',
-                      '--externs', 'externs1.js', '--externs', 'externs2.js']);
-
-        config.buildOptions = [
-            '--js=file1.js',
-            '--js=file2.js',
-            '--js', 'file3.js',
-            '--externs=externs1.js',
-            '--externs', 'externs1.js',
-            '--externs=externs2.js',
-            '--js=fil=e4.js'
-        ];
-        configNormalizer = new configReader.ConfigurationNormalizer(config);
-        normalizedConfiguration = configNormalizer.normalize();
-        expect(normalizedConfiguration.buildOptions).toBeDefined();
-        expect(normalizedConfiguration.buildOptions).toEqual(jasmine.any(Array));
-        expect(normalizedConfiguration.buildOptions.length).toBe(14);
-        expect(normalizedConfiguration.buildOptions)
-            .toEqual(['--js', 'file1.js', '--js', 'file2.js', '--js', 'file3.js', '--externs', 'externs1.js',
-                      '--externs', 'externs1.js', '--externs', 'externs2.js', '--js', 'fil=e4.js']);
-
-        config.buildOptions = [
-            '--js=file1.js',
-            '--js=file2.js',
-            '--js', 'file3.js',
-            '--externs=externs1.js',
-            '--externs', 'externs1.js',
-            '--externs=externs2.js',
-            '--js=fil=e4.js',
-            '--js=fil=e4.js=',
-            '--js='
-        ];
-        configNormalizer = new configReader.ConfigurationNormalizer(config);
-        normalizedConfiguration = configNormalizer.normalize();
-        expect(normalizedConfiguration.buildOptions).toBeDefined();
-        expect(normalizedConfiguration.buildOptions).toEqual(jasmine.any(Array));
-        expect(normalizedConfiguration.buildOptions.length).toBe(18);
-        expect(normalizedConfiguration.buildOptions)
-            .toEqual(['--js', 'file1.js', '--js', 'file2.js', '--js', 'file3.js', '--externs', 'externs1.js',
-                      '--externs', 'externs1.js', '--externs', 'externs2.js', '--js', 'fil=e4.js', '--js', 'fil=e4.js=',
-                      '--js', '']);
     });
 
     it('merge buildOptions inherit', function (done) {
@@ -392,8 +115,9 @@ describe('config_reader', function () {
         config1.next[testConfigPath] = {
             inheritBuildOptions: true
         };
-        var configNormalizer = new configReader.ConfigurationNormalizer(config1);
-        config1 = configNormalizer.normalize();
+
+        var cn = new ConfigurationNormalizer(config1);
+        config1 = cn.normalize();
 
         var config2 = {
             buildOptions: [
@@ -407,11 +131,11 @@ describe('config_reader', function () {
             ]
         };
 
-        configNormalizer = new configReader.ConfigurationNormalizer(config2);
-        config2 = configNormalizer.normalize();
+        cn = new ConfigurationNormalizer(config2);
+        config2 = cn.normalize();
         fs.writeFileSync(testConfigPath, JSON.stringify(config2, null, 2), 'utf8');
 
-        configReader.readAndParseConfiguration(testConfigPath, config1).then(function (mergedConfig) {
+        configurationReader.readAndParseConfiguration(testConfigPath, config1).then(function (mergedConfig) {
             expect(mergedConfig).toBeDefined();
             expect(mergedConfig.sources).toEqual([]);
             expect(mergedConfig.externs).toEqual([]);
@@ -462,8 +186,8 @@ describe('config_reader', function () {
         config1.next[testConfigPath] = {
             inheritBuildOptions: false
         };
-        var configNormalizer = new configReader.ConfigurationNormalizer(config1);
-        config1 = configNormalizer.normalize();
+        var cn = new ConfigurationNormalizer(config1);
+        config1 = cn.normalize();
 
         var config2 = {
             buildOptions: [
@@ -477,11 +201,11 @@ describe('config_reader', function () {
             ]
         };
 
-        configNormalizer = new configReader.ConfigurationNormalizer(config2);
-        config2 = configNormalizer.normalize();
+        cn = new ConfigurationNormalizer(config2);
+        config2 = cn.normalize();
         fs.writeFileSync(testConfigPath, JSON.stringify(config2, null, 2), 'utf8');
 
-        configReader.readAndParseConfiguration(testConfigPath, config1).then(function (mergedConfig) {
+        configurationReader.readAndParseConfiguration(testConfigPath, config1).then(function (mergedConfig) {
             expect(mergedConfig).toBeDefined();
             expect(mergedConfig.sources).toEqual([]);
             expect(mergedConfig.externs).toEqual([]);
@@ -543,8 +267,8 @@ describe('config_reader', function () {
             inheritExterns: true,
             inheritBuildOptions: true
         };
-        var configNormalizer = new configReader.ConfigurationNormalizer(config1);
-        config1 = configNormalizer.normalize();
+        var cn = new ConfigurationNormalizer(config1);
+        config1 = cn.normalize();
 
         var config2 = {
             sources: [
@@ -589,12 +313,12 @@ describe('config_reader', function () {
             }
         };
 
-        configNormalizer = new configReader.ConfigurationNormalizer(config2);
-        config2 = configNormalizer.normalize();
+        cn = new ConfigurationNormalizer(config2);
+        config2 = cn.normalize();
 
         fs.writeFileSync(testConfigPath, JSON.stringify(config2, null, 2), 'utf8');
 
-        configReader.readAndParseConfiguration(testConfigPath, config1).then(function (mergedConfig) {
+        configurationReader.readAndParseConfiguration(testConfigPath, config1).then(function (mergedConfig) {
             expect(mergedConfig).toBeDefined();
             expect(mergedConfig).toEqual(jasmine.any(Object));
             expect(mergedConfig.sources).toBeDefined();
@@ -735,8 +459,8 @@ describe('config_reader', function () {
             inheritExterns: false,
             inheritBuildOptions: false
         };
-        var configNormalizer = new configReader.ConfigurationNormalizer(config1);
-        config1 = configNormalizer.normalize();
+        var cn = new ConfigurationNormalizer(config1);
+        config1 = cn.normalize();
 
         var config2 = {
             sources: [
@@ -781,12 +505,12 @@ describe('config_reader', function () {
             }
         };
 
-        configNormalizer = new configReader.ConfigurationNormalizer(config2);
-        config2 = configNormalizer.normalize();
+        cn = new ConfigurationNormalizer(config2);
+        config2 = cn.normalize();
 
         fs.writeFileSync(testConfigPath, JSON.stringify(config2, null, 2), 'utf8');
 
-        configReader.readAndParseConfiguration(testConfigPath, config1).then(function (mergedConfig) {
+        configurationReader.readAndParseConfiguration(testConfigPath, config1).then(function (mergedConfig) {
             expect(mergedConfig).toBeDefined();
             expect(mergedConfig).toEqual(jasmine.any(Object));
             expect(mergedConfig.sources).toBeDefined();
@@ -965,7 +689,7 @@ describe('config_reader', function () {
             unitBuildOptions: []
         };
 
-        var compilerArguments = configReader.getCompilerArguments(unitConfiguration1);
+        var compilerArguments = configurationReader.getCompilerArguments(unitConfiguration1);
         var expectedCompilerArguments = [
             '--js', path.resolve('file1.js'),
             '--js', path.resolve('/tmp/file2.js'),
@@ -1008,7 +732,7 @@ describe('config_reader', function () {
             globalBuildOptions: buildOptions2,
             unitBuildOptions: []
         };
-        compilerArguments = configReader.getCompilerArguments (unitConfiguration2);
+        compilerArguments = configurationReader.getCompilerArguments (unitConfiguration2);
         expectedCompilerArguments = [
             '--js', path.resolve('file3.js'),
             '--js', path.resolve('/tmp/file2.js'),
@@ -1051,7 +775,7 @@ describe('config_reader', function () {
             globalBuildOptions: buildOptions2,
             unitBuildOptions: compilationUnit3.buildOptions
         };
-        compilerArguments = configReader.getCompilerArguments (unitConfiguration3);
+        compilerArguments = configurationReader.getCompilerArguments (unitConfiguration3);
         expectedCompilerArguments = [
             '--js', path.resolve('file3.js'),
             '--js', path.resolve('/tmp/file2.js'),
@@ -1076,7 +800,7 @@ describe('config_reader', function () {
     });
 
     it('processes empty config for unit properly', function () {
-        expect(configReader.getCompilerArguments ({})).toEqual([]);
+        expect(configurationReader.getCompilerArguments ({})).toEqual([]);
     });
 
     it('processes outputFile config properly', function () {
@@ -1085,7 +809,7 @@ describe('config_reader', function () {
             unitSources: ['sources1.js'],
             outputFile: 'out.js'
         };
-        var compilerArguments = configReader.getCompilerArguments (unitConfiguration1);
+        var compilerArguments = configurationReader.getCompilerArguments (unitConfiguration1);
         expect(compilerArguments.length).toBe(6);
         expect(compilerArguments).toEqual(jasmine.arrayContaining(['--js', 'sources1.js', '--externs', 'externs1.js',
                                                                    '--js_output_file', 'out.js']));
@@ -1096,7 +820,7 @@ describe('config_reader', function () {
             unitBuildOptions: ['--js', 'source2.js'],
             unitSources: ['source1.js']
         };
-        var compilerArguments = configReader.getCompilerArguments (unitConfiguration1);
+        var compilerArguments = configurationReader.getCompilerArguments (unitConfiguration1);
         expect(compilerArguments.length).toBe(4);
         expect(compilerArguments).toEqual(jasmine.arrayContaining(['--js', 'source1.js',
                                                                    '--js', 'source2.js']));
@@ -1107,7 +831,7 @@ describe('config_reader', function () {
             globalBuildOptions: ['--js', 'source2.js'],
             unitSources: ['source1.js']
         };
-        var compilerArguments = configReader.getCompilerArguments(unitConfiguration1);
+        var compilerArguments = configurationReader.getCompilerArguments(unitConfiguration1);
         expect(compilerArguments.length).toBe(4);
         expect(compilerArguments).toEqual(jasmine.arrayContaining(['--js', 'source1.js',
                                                                    '--js', 'source2.js']));
@@ -1118,7 +842,7 @@ describe('config_reader', function () {
             unitBuildOptions: ['--externs', 'externs2.js'],
             unitExterns: ['externs1.js']
         };
-        var compilerArguments = configReader.getCompilerArguments(unitConfiguration1);
+        var compilerArguments = configurationReader.getCompilerArguments(unitConfiguration1);
         expect(compilerArguments.length).toBe(4);
         expect(compilerArguments).toEqual(jasmine.arrayContaining(['--externs', 'externs1.js',
                                                                    '--externs', 'externs2.js']));
@@ -1129,7 +853,7 @@ describe('config_reader', function () {
             globalBuildOptions: ['--externs', 'externs2.js'],
             unitExterns: ['externs1.js']
         };
-        var compilerArguments = configReader.getCompilerArguments(unitConfiguration1);
+        var compilerArguments = configurationReader.getCompilerArguments(unitConfiguration1);
         expect(compilerArguments.length).toBe(4);
         expect(compilerArguments).toEqual(jasmine.arrayContaining(['--externs', 'externs1.js',
                                                                    '--externs', 'externs2.js']));
@@ -1140,7 +864,7 @@ describe('config_reader', function () {
             unitBuildOptions: ['--js_output_file', 'out.js'],
             unitExterns: ['externs1.js']
         };
-        var compilerArguments = configReader.getCompilerArguments(unitConfiguration1);
+        var compilerArguments = configurationReader.getCompilerArguments(unitConfiguration1);
         expect(compilerArguments.length).toBe(4);
         expect(compilerArguments).toEqual(jasmine.arrayContaining(['--externs', 'externs1.js',
                                                                    '--js_output_file', 'out.js']));
@@ -1151,7 +875,7 @@ describe('config_reader', function () {
             globalBuildOptions: ['--js_output_file', 'out.js'],
             unitExterns: ['externs1.js']
         };
-        var compilerArguments = configReader.getCompilerArguments(unitConfiguration1);
+        var compilerArguments = configurationReader.getCompilerArguments(unitConfiguration1);
         expect(compilerArguments.length).toBe(4);
         expect(compilerArguments).toEqual(jasmine.arrayContaining(['--externs', 'externs1.js',
                                                                    '--js_output_file', 'out.js']));
@@ -1164,7 +888,7 @@ describe('config_reader', function () {
             unitExterns: ['externs1.js']
         };
         expect(function () {
-            configReader.getCompilerArguments(unitConfiguration1);
+            configurationReader.getCompilerArguments(unitConfiguration1);
         }).toThrowError();
     });
 
@@ -1175,7 +899,7 @@ describe('config_reader', function () {
             unitExterns: ['externs1.js']
         };
         expect(function () {
-            configReader.getCompilerArguments(unitConfiguration1);
+            configurationReader.getCompilerArguments(unitConfiguration1);
         }).toThrowError();
     });
 
@@ -1183,7 +907,7 @@ describe('config_reader', function () {
         var config = {
             checkFs: {}
         };
-        var normalizer = new configReader.ConfigurationNormalizer(config);
+        var normalizer = new ConfigurationNormalizer(config);
         var normalizedConfig = normalizer.normalize();
         var expectedConfig = Object.assign({}, this.EMPTY_CONFIG);
         expectedConfig.checkFs = {check: [], ignore: [], fileExtensions: ['.js', '.json']};
@@ -1194,7 +918,7 @@ describe('config_reader', function () {
         var config = {
             checkFs: {fileExtensions: ['.js', '', '.txt']}
         };
-        var normalizer = new configReader.ConfigurationNormalizer(config);
+        var normalizer = new ConfigurationNormalizer(config);
         var normalizedConfig = normalizer.normalize();
         var expectedConfig = Object.assign({}, this.EMPTY_CONFIG);
         expectedConfig.checkFs = {check: [], ignore: [], fileExtensions: ['.js', '', '.txt']};
@@ -1205,7 +929,7 @@ describe('config_reader', function () {
         var config = {
             checkFs: {check: ['file1.js', '/tmp/files/file2.json', 'src/file3.js']}
         };
-        var normalizer = new configReader.ConfigurationNormalizer(config, __dirname);
+        var normalizer = new ConfigurationNormalizer(config, __dirname);
         var normalizedConfig = normalizer.normalize();
         var expectedConfig = Object.assign({}, this.EMPTY_CONFIG);
         expectedConfig.checkFs = {check: [path.join(__dirname, 'file1.js'), '/tmp/files/file2.json',
@@ -1219,7 +943,7 @@ describe('config_reader', function () {
         var config = {
             checkFs: {ignore: ['file1.js', '/tmp/files/file2.json', 'src/file3.js']}
         };
-        var normalizer = new configReader.ConfigurationNormalizer(config, __dirname);
+        var normalizer = new ConfigurationNormalizer(config, __dirname);
         var normalizedConfig = normalizer.normalize();
         var expectedConfig = Object.assign({}, this.EMPTY_CONFIG);
         expectedConfig.checkFs = {ignore: [path.join(__dirname, 'file1.js'), '/tmp/files/file2.json',
