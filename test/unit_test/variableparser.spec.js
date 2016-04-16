@@ -9,7 +9,8 @@ var VariableParser = /** @type {function(new:VariableParser, VariableManager)} *
  * @ignore
  * @suppress {duplicate}
  */
-var VariableManager = /** @type {function(new:VariableManager)} */ (require('../../src/VariableManager.js'));
+var VariableManager = /** @type {function(new:VariableManager, VariableManager=)} */
+    (require('../../src/VariableManager.js'));
 
 describe('Class VariableParser', function () {
     it('throws in case constructed without a parameter', function () {

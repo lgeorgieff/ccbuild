@@ -28,6 +28,8 @@ var compilerPath = 'compiler/path';
 var contribPath = 'contrib/path';
 function CC (compilerArguments) { }
 CC.prototype.run = function (cb) {};
+CC.COMPILER_PATH = compilerPath;
+CC.CONTRIB_PATH = contribPath;
 
 var CCMock = {
     compiler: CC,
