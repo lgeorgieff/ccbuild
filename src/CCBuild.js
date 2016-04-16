@@ -55,6 +55,12 @@ var configurationReader = require('./configurationReader.js');
 var CLI = /** @type {function(new:CLI, Array<string>)}*/ (require('./CLI.js'));
 
 /**
+ * @ignore
+ * @suppress {duplicate}
+ */
+var VariableManager = /** @type {function(new:VariableManager, VariableManager=)}*/ (require('./VariableManager.js'));
+
+/**
  * Instantiates a CCBuild object.
  *
  * @classdesc This class parses the passed arguments array and starts processing the configuration files and the
@@ -176,13 +182,17 @@ function CCBuild (argv) {
         process.chdir(originalWorkingDirectory);
     });
 
+    this._variableManager = new VariableManager();
+    this._variableManager.set('CWD', process.cwd());
+    this._variableManager.set('CONTRIB_PATH', CC.compiler.CONTRIB_PATH);
+
     self.once('argsParsed', function (cliArgs) {
         if (cliArgs.configs) {
-            self._processConfigs(/** @type {{configs: Array<string>}} */ (cliArgs));
+            self._processConfigs(/** @type {{configs: Array<string>}} */ (cliArgs), self._variableManager);
         } else {
-            configReader.getLocalConfigFiles().then(function (configFiles) {
+            configurationReader.getLocalConfigFiles().then(function (configFiles) {
                 cliArgs.configs = configFiles;
-                self._processConfigs(/** @type {{configs: Array<string>}} */ (cliArgs));
+                self._processConfigs(/** @type {{configs: Array<string>}} */ (cliArgs), self._variableManager);
             });
         }
     });
@@ -197,10 +207,11 @@ util.inherits(CCBuild, events.EventEmitter);
  * @private
  *
  * @param {{configs: Array<string>}} cliArgs An object containing all CLI arguments.
+ * @param {VariableManager} rootVariableManager The root variable manager that is used for variable resolution.
  *
  * @suppress {misplacedTypeAnnotation}
  */
-CCBuild.prototype._processConfigs = function (cliArgs) {
+CCBuild.prototype._processConfigs = function (cliArgs, rootVariableManager) {
     var self = this;
 
     /**
@@ -241,7 +252,7 @@ CCBuild.prototype._processConfigs = function (cliArgs) {
         // We ignore duplicate configuration files. This can be for example the case if the same configuration file is
         // specified viw the CLI argument --config|-c and via the next property in a parent configuration file.
         if (processedConfigFiles.indexOf(configFilePath) === -1) {
-            configurationReader.readAndParseConfiguration(configFilePath, parentConfig)
+            configurationReader.readAndParseConfiguration(configFilePath, parentConfig, rootVariableManager)
                 .then(function (configObject) {
                     globalContainsJsOutputFile = configObject.buildOptions.indexOf('--js_output_file') !== -1;
                     globalContainsJs = configObject.buildOptions.indexOf('--js') !== -1;

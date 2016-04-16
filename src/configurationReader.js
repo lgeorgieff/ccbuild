@@ -28,7 +28,7 @@ var utils = require('./utils');
  * @ignore
  * @suppress {duplicate}
  */
-var ConfigurationNormalizer = /** @type {function(new:ConfigurationNormalizer, Object=, string=)}*/
+var ConfigurationNormalizer = /** @type {function(new:ConfigurationNormalizer, Object=, string=, VariableManager=)}*/
     (require('./ConfigurationNormalizer.js'));
 
 /**
@@ -176,8 +176,9 @@ function mergeConfigurations (configuration, configurationPath, parentConfigurat
  * @param {string} configPath The path to the configuration file that should be read and parsed.
  * @param {Object=} parentConfig An optional configuration object that represents the parent configuration of the
  *        current configuration file. This is used for inehritung configuration settings.
+ * @param {VariableManager} variableManager An object that is used for variable resolution.
  */
-function readAndParseConfiguration (configPath, parentConfig) {
+function readAndParseConfiguration (configPath, parentConfig, variableManager) {
     var deferred = Q.defer();
     var absoluteConfigPath = path.resolve(configPath);
 
@@ -187,7 +188,8 @@ function readAndParseConfiguration (configPath, parentConfig) {
         } else {
             try {
                 var configObject = /** @type {Object} */ (JSON.parse(/** @type {string} */ (data)));
-                var configNormalizer = new ConfigurationNormalizer(configObject, path.dirname(absoluteConfigPath));
+                var configNormalizer =
+                        new ConfigurationNormalizer(configObject, path.dirname(absoluteConfigPath), variableManager);
                 var normalizedConfig = configNormalizer.normalize();
                 deferred.resolve(mergeConfigurations(normalizedConfig, absoluteConfigPath, parentConfig));
             } catch (jsonError) {

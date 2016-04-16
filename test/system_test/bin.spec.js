@@ -1053,7 +1053,7 @@ describe('bin', function () {
         var configPath = path.join(__dirname, 'config1.ccbuild');
         fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
         // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
-        child_process.exec('node ./src/bin.js --config ./test/system_test/config1.ccbuild',
+        child_process.exec('node ./src/bin.js --config ' + configPath,
                            function (err, stdout, stderr) {
                                if (err) {
                                    done.fail(err);

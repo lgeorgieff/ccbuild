@@ -47,7 +47,7 @@ function VariableParser (variableManager) {
  * @throws {Error} Thrown in case a variable name is used that is not defined in the {@link VariableManager} registered
  *         to this instance..
  */
-VariableParser.prototype.parse = function (str) {
+VariableParser.prototype.resolve = function (str) {
     if (!util.isString(str)) throw new Error('"str" must by of type string!');
     var self = this;
     var result = str;

@@ -19,6 +19,20 @@ var path = require('path');
 var utils = require('./utils');
 
 /**
+ * @ignore
+ * @suppress {duplicate}
+ */
+var VariableManager = /** @type {function(new:VariableManager, VariableManager=)} */
+    (require('./VariableManager.js'));
+
+/**
+ * @ignore
+ * @suppress {duplicate}
+ */
+var VariableParser = /** @type {function(new:VariableParser, VariableManager)} */
+    (require('./VariableParser.js'));
+
+/**
  * Constructor function for Configurationormalizer.
  *
  * @constructor
@@ -26,14 +40,21 @@ var utils = require('./utils');
  *
  * @param {Object=} config The loaded configuration object. If `undefined` or `null` is passed `{}` is used.
  * @param {string=} basePath The path against each relative path of the configuration is resolved.
+ * @param {VariableManager=} variableManager An optional object that contains all variables and their values that can
+ *        be used in the configuration file.
  * @throws {Error} Thrown if `config` is not `undefined`, `null` or an object.
  */
-function ConfigurationNormalizer (config, basePath) {
+function ConfigurationNormalizer (config, basePath, variableManager) {
     if (config === undefined || config === null || util.isObject(config)) {
         this._config = config || {};
     } else {
-        throw new Error('config must be of the type object|null|undefined but is ' + config + '!');
+        throw new Error('"config" must be of the type object|null|undefined but is ' + config + '!');
     }
+    if (variableManager && !(variableManager instanceof VariableManager)) {
+        throw new Error('"variableManager" must be of the type object|null|undefined!');
+    }
+
+    this._variableParser = new VariableParser(variableManager || new VariableManager());
 
     if (basePath == null) this._basePath = process.cwd();
     else this._basePath = basePath;
@@ -188,6 +209,24 @@ ConfigurationNormalizer._normalizeBuildOptions = function (buildOptions, compila
 };
 
 /**
+ * Replaces all variables identifiers by their values.
+ *
+ * @private
+ *
+ * @returns {Array<string>} The parsed strings.
+ * @param {Array<string>} strs The strings read from the configuration file.
+ * @throws {Error} Thrown if `strs` is not a string array.
+ * @throws {Error} Thrown if an undefined variable identifier is used.
+ */
+ConfigurationNormalizer.prototype._resolveVariables = function (strs) {
+    var self = this;
+    if (!utils.isStringArray(strs)) throw new Error('"strs" must be a string array!');
+    return strs.map(function (str) {
+        return self._variableParser.resolve(str);
+    });
+};
+
+/**
  * Starts the normalization process of the `buildOptions` data that was passed to the constructor function.
  *
  * @returns {Object} An array representing the normalized buildOptions.
@@ -196,60 +235,74 @@ ConfigurationNormalizer._normalizeBuildOptions = function (buildOptions, compila
 ConfigurationNormalizer.prototype.normalize = function () {
     var self = this;
     var result = {};
-    result.sources = this._resolvePaths(ConfigurationNormalizer._mapStringArray(this._config.sources, 'sources'));
-    result.externs = this._resolvePaths(ConfigurationNormalizer._mapStringArray(this._config.externs, 'externs'));
-    result.buildOptions = ConfigurationNormalizer._normalizeBuildOptions(this._config.buildOptions);
+    result.sources = this._resolvePaths(
+        this._resolveVariables(ConfigurationNormalizer._mapStringArray(this._config.sources, 'sources')));
+    result.externs = this._resolvePaths(
+        this._resolveVariables(ConfigurationNormalizer._mapStringArray(this._config.externs, 'externs')));
+    result.buildOptions =
+        this._resolveVariables(ConfigurationNormalizer._normalizeBuildOptions(this._config.buildOptions));
 
     result.checkFs = {};
     if (util.isObject(this._config.checkFs)) {
-        result.checkFs.check = self._resolvePaths(
-            ConfigurationNormalizer._mapStringArray(this._config.checkFs.check, 'checkFs.check'));
-        result.checkFs.ignore = self._resolvePaths(
-            ConfigurationNormalizer._mapStringArray(this._config.checkFs.ignore, 'checkFs.ignore'));
+        result.checkFs.check = self._resolvePaths(this._resolveVariables(
+            ConfigurationNormalizer._mapStringArray(this._config.checkFs.check, 'checkFs.check')));
+        result.checkFs.ignore = self._resolvePaths(this._resolveVariables(
+            ConfigurationNormalizer._mapStringArray(this._config.checkFs.ignore, 'checkFs.ignore')));
         if (this._config.checkFs.fileExtensions == null) {
             result.checkFs.fileExtensions = ['.js', '.json'];
         } else {
-            result.checkFs.fileExtensions =
-                ConfigurationNormalizer._mapStringArray(this._config.checkFs.fileExtensions, 'checkFs.fileExtensions');
+            result.checkFs.fileExtensions = this._resolveVariables(
+                ConfigurationNormalizer._mapStringArray(this._config.checkFs.fileExtensions, 'checkFs.fileExtensions'));
         }
     }
 
     if (util.isObject(this._config.compilationUnits)) {
-        result.compilationUnits = Object.keys(this._config.compilationUnits).reduce(function (accumulator, key) {
-            accumulator[key] = {};
-            accumulator[key].sources =
-                self._resolvePaths(
-                    ConfigurationNormalizer._mapStringArray(self._config.compilationUnits[key].sources, 'sources'));
-            accumulator[key].externs =
-                self._resolvePaths(
-                    ConfigurationNormalizer._mapStringArray(self._config.compilationUnits[key].externs, 'externs'));
-            accumulator[key].buildOptions =
-                ConfigurationNormalizer._normalizeBuildOptions(self._config.compilationUnits[key].buildOptions, key);
-            if (self._config.compilationUnits[key].outputFile) {
-                accumulator[key].outputFile =
-                        self._resolvePath(self._config.compilationUnits[key].outputFile);
-            }
-            return accumulator;
-        }, {}) || {};
+        result.compilationUnits = Object.keys(this._config.compilationUnits)
+            .map(function (key) {
+                return self._variableParser.resolve(key);
+            })
+            .reduce(function (accumulator, key) {
+                accumulator[key] = {};
+                accumulator[key].sources =
+                    self._resolvePaths(self._resolveVariables(
+                        ConfigurationNormalizer._mapStringArray(
+                            self._config.compilationUnits[key].sources, 'sources')));
+                accumulator[key].externs =
+                    self._resolvePaths(self._resolveVariables(
+                        ConfigurationNormalizer._mapStringArray(
+                            self._config.compilationUnits[key].externs, 'externs')));
+                accumulator[key].buildOptions =
+                    self._resolveVariables(ConfigurationNormalizer._normalizeBuildOptions(
+                        self._config.compilationUnits[key].buildOptions, key));
+                if (self._config.compilationUnits[key].outputFile) {
+                    accumulator[key].outputFile =
+                        self._resolvePath(self._variableParser.resolve(self._config.compilationUnits[key].outputFile));
+                }
+                return accumulator;
+            }, {}) || {};
     } else {
         result.compilationUnits = {};
     }
 
     if (util.isObject(this._config.next)) {
-        result.next = Object.keys(this._config.next).reduce(function (accumulator, key) {
-            var resolvedPath = path.resolve(self._basePath, key);
-            accumulator[resolvedPath] = {};
-            accumulator[resolvedPath].inheritSources =
-                ConfigurationNormalizer._mapBooleanProperty(
-                    self._config.next[key].inheritSources, key, 'inheritSources');
-            accumulator[resolvedPath].inheritExterns =
-                ConfigurationNormalizer._mapBooleanProperty(
-                    self._config.next[key].inheritExterns, key, 'inheritExterns');
-            accumulator[resolvedPath].inheritBuildOptions =
-                ConfigurationNormalizer._mapBooleanProperty(
-                    self._config.next[key].inheritBuildOptions, key, 'inheritBuildOptions');
-            return accumulator;
-        }, {}) || {};
+        result.next = Object.keys(this._config.next)
+            .map(function (key) {
+                return self._variableParser.resolve(key);
+            })
+            .reduce(function (accumulator, key) {
+                var resolvedPath = path.resolve(self._basePath, key);
+                accumulator[resolvedPath] = {};
+                accumulator[resolvedPath].inheritSources =
+                    ConfigurationNormalizer._mapBooleanProperty(
+                        self._config.next[key].inheritSources, key, 'inheritSources');
+                accumulator[resolvedPath].inheritExterns =
+                    ConfigurationNormalizer._mapBooleanProperty(
+                        self._config.next[key].inheritExterns, key, 'inheritExterns');
+                accumulator[resolvedPath].inheritBuildOptions =
+                    ConfigurationNormalizer._mapBooleanProperty(
+                        self._config.next[key].inheritBuildOptions, key, 'inheritBuildOptions');
+                return accumulator;
+            }, {}) || {};
     } else {
         result.next = {};
     }
