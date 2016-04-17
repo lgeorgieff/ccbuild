@@ -258,24 +258,22 @@ ConfigurationNormalizer.prototype.normalize = function () {
 
     if (util.isObject(this._config.compilationUnits)) {
         result.compilationUnits = Object.keys(this._config.compilationUnits)
-            .map(function (key) {
-                return self._variableParser.resolve(key);
-            })
             .reduce(function (accumulator, key) {
-                accumulator[key] = {};
-                accumulator[key].sources =
+                var finalKey = self._variableParser.resolve(key);
+                accumulator[finalKey] = {};
+                accumulator[finalKey].sources =
                     self._resolvePaths(self._resolveVariables(
                         ConfigurationNormalizer._mapStringArray(
                             self._config.compilationUnits[key].sources, 'sources')));
-                accumulator[key].externs =
+                accumulator[finalKey].externs =
                     self._resolvePaths(self._resolveVariables(
                         ConfigurationNormalizer._mapStringArray(
                             self._config.compilationUnits[key].externs, 'externs')));
-                accumulator[key].buildOptions =
+                accumulator[finalKey].buildOptions =
                     self._resolveVariables(ConfigurationNormalizer._normalizeBuildOptions(
                         self._config.compilationUnits[key].buildOptions, key));
                 if (self._config.compilationUnits[key].outputFile) {
-                    accumulator[key].outputFile =
+                    accumulator[finalKey].outputFile =
                         self._resolvePath(self._variableParser.resolve(self._config.compilationUnits[key].outputFile));
                 }
                 return accumulator;
@@ -286,11 +284,8 @@ ConfigurationNormalizer.prototype.normalize = function () {
 
     if (util.isObject(this._config.next)) {
         result.next = Object.keys(this._config.next)
-            .map(function (key) {
-                return self._variableParser.resolve(key);
-            })
             .reduce(function (accumulator, key) {
-                var resolvedPath = path.resolve(self._basePath, key);
+                var resolvedPath = path.resolve(self._basePath, self._variableParser.resolve(key));
                 accumulator[resolvedPath] = {};
                 accumulator[resolvedPath].inheritSources =
                     ConfigurationNormalizer._mapBooleanProperty(
