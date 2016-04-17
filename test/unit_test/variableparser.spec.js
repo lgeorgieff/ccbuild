@@ -74,6 +74,11 @@ describe('Class VariableParser', function () {
             expect(vp.resolve(str)).toBe('value1lodash abc ${World!  !!=\\}Hello World!');
         });
 
+        it('parse() replaces multiple occurrence of the same variable by it value', function () {
+            var str = '${var1} and another ${var1}';
+            expect(vp.resolve(str)).toBe('value1 and another value1');
+        });
+
         it('parse() throws an error in case an undefined variable name is used', function () {
             expect(function () {
                 vp.resolve('${}');

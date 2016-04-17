@@ -51,7 +51,7 @@ VariableParser.prototype.resolve = function (str) {
     if (!util.isString(str)) throw new Error('"str" must by of type string!');
     var self = this;
     var result = str;
-    var identifiers = utils.arrayToSet(str.match(VARIABLE_EXPRESSION) || []);
+    var identifiers = str.match(VARIABLE_EXPRESSION) || [];
     identifiers.forEach(function (identifier) {
         result = result.replace(identifier, self._variableManager.get(self._referenceToName(identifier)));
     });
