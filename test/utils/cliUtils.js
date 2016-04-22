@@ -68,10 +68,12 @@ var expectedConfigHelp = 'The configuration files for ' + scriptName + ' use the
         '    ]\n' +
         '  },\n' +
         '  "sources": [\n' +
-        '    "<source file paths to be included in all compilation units defined in this config>"\n' +
+        '    "<source file paths to be included in all compilation units defined in this config>",\n' +
+        '    "${CWD}/file.js"\n' +
         '  ],\n' +
         '  "externs": [\n' +
-        '    "<extern file paths to be included in all compilation units defined in this config>"\n' +
+        '    "<extern file paths to be included in all compilation units defined in this config>",\n' +
+        '    "${CONTRIB_PATH}/nodejs/os.js"\n' +
         '  ],\n' +
         '  "buildOptions": [\n' +
         '    "<options to be used for all compilation units defined in this config>"\n' +

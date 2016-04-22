@@ -56,6 +56,8 @@ errors the return code is 1.
 _ccbuild_ operates on configuration files, i.e. without any configuration file nothing will happen. Usually the configuration files should be named in the form of *.ccbuild.
 If no configuration file is specified via CLI, the `$CWD` is searched for all files of the form *.ccbuild. If at least one is found, it will be processed. In case multiple files are found, all of them are processed. To specify any configuration file via CLI, the option -c <FILE PATH> or --config <FILE PATH> must be used. It is possible to specify multiple configuration files. In case at least one configuration file is specified via CLI, `$CWD` is not searched for any default configuration file. A configuration file may reference another configuration file. In case circular references are found, a second run on a configuration file that was already processed will not be started. All relative paths in the fields _sources_, _externs_ and the _next_ property are resolved against the `__dirname` of the configuration file in which they are defined. Any file paths that are defined via the _buildOptions_ property must be defined relative to the location of the configuration file.
 
+Configuration files may use the variables `${CWD}` and `${CONTRIB_PATH}`. `${CWD}` is the path to the working directory of the calling node process. `${CONTRIB_PATH}` is the contribution path of the Closure Compiler where for example externs are located. Both variables may be used in any location inside the configuration file.
+
 A configuration file is of the following form:
 
 ```json
@@ -72,10 +74,12 @@ A configuration file is of the following form:
     ]
   },
   "sources": [
-    "<source file paths to be included in all compilation units defined in this config>"
+    "<source file paths to be included in all compilation units defined in this config>",
+    "${CWD}/file.js"
   ],
   "externs": [
-    "<extern file paths to be included in all compilation units defined in this config>"
+    "<extern file paths to be included in all compilation units defined in this config>",
+    "${CONTRIB_PATH}/nodejs/os.js"
   ],
   "buildOptions": [
     "<options to be used for all compilation units defined in this config>"

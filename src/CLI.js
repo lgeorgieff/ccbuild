@@ -148,8 +148,10 @@ CLI.getConfigFileHelp = function () {
                              '".json">'],
             ignore: ['<GLOB paths to files that are ignored from checking>']
         },
-        sources: ['<source file paths to be included in all compilation units defined in this config>'],
-        externs: ['<extern file paths to be included in all compilation units defined in this config>'],
+        sources: ['<source file paths to be included in all compilation units defined in this config>',
+                  '${CWD}/file.js'],
+        externs: ['<extern file paths to be included in all compilation units defined in this config>',
+                  '${CONTRIB_PATH}/nodejs/os.js'],
         buildOptions: ['<options to be used for all compilation units defined in this config>'],
         compilationUnits: {
             'unit 1': {
