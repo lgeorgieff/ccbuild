@@ -192,8 +192,9 @@ function readAndParseConfiguration (configPath, parentConfig, variableManager) {
                         new ConfigurationNormalizer(configObject, path.dirname(absoluteConfigPath), variableManager);
                 var normalizedConfig = configNormalizer.normalize();
                 deferred.resolve(mergeConfigurations(normalizedConfig, absoluteConfigPath, parentConfig));
-            } catch (jsonError) {
-                deferred.reject(new Error('Could not read the configuration file "' + configPath + '"!\n' + jsonError));
+            } catch (configError) {
+                deferred.reject(new Error('Could not read the configuration file "' + configPath + '"!\n' +
+                                          configError));
             }
         }
     });
