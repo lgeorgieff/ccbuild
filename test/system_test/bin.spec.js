@@ -1458,7 +1458,7 @@ describe('bin', function () {
             buildOptions: config1.buildOptions,
             checkFs: {
                 check: ['.'],
-                ignore: ['externs*.js', 'source3.js', 'source4.js']
+                ignore: ['externs*.js', 'source3.js', 'source4.js', 'source5.js']
             },
             compilationUnits: {
                 unit2: {

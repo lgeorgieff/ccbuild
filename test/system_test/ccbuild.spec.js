@@ -392,4 +392,72 @@ describe('CCBuild class', function () {
         this.resourcesToDelete.push(configPath3);
         this.resourcesToDelete.push(temporaryConfigDirectory);
     });
+
+    it('emits done after finished with config including variables -- 1 compilation unit', function (done) {
+        var whitelistPath = path.join(__dirname, 'whitelist.txt');
+        var jsPath = path.join(__dirname, 'data', 'source5.js');
+        var whitelistContent = jsPath + ':  constant os assigned a value more than once.';
+
+        var config = {
+            compilationUnits: {
+                unit1: {
+                    sources: ['${CWD}' + path.sep + 'test' + path.sep + 'system_test' + path.sep + 'data' + path.sep +
+                              'source5.js'],
+                    externs: [path.join('data', 'externs4.js'),
+                              '${CONTRIB_PATH}' + path.sep + 'nodejs' + path.sep + 'os.js'],
+                    buildOptions: [
+                        '--compilation_level', 'ADVANCED_OPTIMIZATIONS',
+                        '--warning_level', 'VERBOSE',
+                        '--env', 'CUSTOM',
+                        '--flagfile', './data/test_flagfile',
+                        '--warnings_whitelist_file', whitelistPath
+                    ]
+                }
+            }
+        };
+
+        var configPath = path.join(__dirname, 'config1.ccbuild');
+        fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
+        fs.writeFileSync(whitelistPath, whitelistContent);
+        var ccbuild = new CCBuild([process.argv[0], process.argv[1], '--config', configPath]);
+        ccbuild.on('compiled', function (compilationName, stdout, stderr) {
+            expect(stdout.length).toBeGreaterThan(0);
+            expect(stderr.length).toBeGreaterThan(0);
+            ccbuild.on('done', done);
+        });
+        ccbuild.on('configError', function (err) {
+            fail(err);
+        });
+        this.resourcesToDelete.push(configPath, whitelistPath);
+    }, 5000);
+
+    it('emits done after finished with config including variables -- 1 compilation unit', function (done) {
+        var config = {
+            compilationUnits: {
+                unit1: {
+                    sources: [path.join('data', 'source5.js')],
+                    externs: [path.join('data', 'externs4.js'),
+                              '${SOME_NON_EXISTING_PATH}' + path.sep + 'nodejs' + path.sep + 'os.js'],
+                    buildOptions: [
+                        '--compilation_level', 'ADVANCED_OPTIMIZATIONS',
+                        '--warning_level', 'VERBOSE',
+                        '--env', 'CUSTOM',
+                        '--flagfile', './data/test_flagfile'
+                    ]
+                }
+            }
+        };
+
+        var configPath = path.join(__dirname, 'config1.ccbuild');
+        fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
+        var ccbuild = new CCBuild([process.argv[0], process.argv[1], '--config', configPath]);
+        ccbuild.on('compiled', function (compilationName, stdout, stderr) {
+            fail('Expected compilation process to fail');
+        });
+        ccbuild.on('configError', function (err) {
+            expect(err).toEqual(jasmine.any(Error));
+            ccbuild.on('done', done);
+        });
+        this.resourcesToDelete.push(configPath);
+    });
 });
