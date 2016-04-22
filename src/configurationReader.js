@@ -176,7 +176,7 @@ function mergeConfigurations (configuration, configurationPath, parentConfigurat
  * @param {string} configPath The path to the configuration file that should be read and parsed.
  * @param {Object=} parentConfig An optional configuration object that represents the parent configuration of the
  *        current configuration file. This is used for inehritung configuration settings.
- * @param {VariableManager} variableManager An object that is used for variable resolution.
+ * @param {VariableManager=} variableManager An object that is used for variable resolution.
  */
 function readAndParseConfiguration (configPath, parentConfig, variableManager) {
     var deferred = Q.defer();
