@@ -39,7 +39,7 @@
     "npm": ">=3.0.0"
   },
   "dependencies": {
-    "async": "^1.5.2",
+    "async": "^2.0.0-rc.3",
     "google-closure-compiler": "^20160315.2.0",
     "q": "^1.4.1",
     "glob": "^7.0.3",
