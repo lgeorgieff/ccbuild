@@ -53,6 +53,8 @@
 
 --extra_annotation_name=emits
 
+--warnings_whitelist_file=./src/warnings_whitelist.txt
+
 --env CUSTOM
 
 --externs=./tools/node.js_closure_compiler_externs/zlib.js

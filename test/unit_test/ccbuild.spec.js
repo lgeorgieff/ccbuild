@@ -24,6 +24,12 @@ var mockFs = require('mock-fs');
  */
 var proxyquire = require('proxyquire');
 
+/**
+ * @ignore
+ * @suppress {duplicate}
+ */
+var fs = require('fs');
+
 var compilerPath = 'compiler/path';
 var contribPath = 'contrib/path';
 function CC (compilerArguments) { }
@@ -37,6 +43,11 @@ var CCMock = {
     gulp: undefined
 };
 
+var PACKAGE_JSON = JSON.parse(fs.readFileSync(path.join(__dirname, '..', '..', 'package.json'), 'utf-8'));
+var rpjMock = function (packageJson, cb) {
+    cb(undefined, PACKAGE_JSON);
+};
+
 /**
  * @ignore
  * @suppress {duplicate}
@@ -44,7 +55,8 @@ var CCMock = {
 var CCBuild = /** @type {function(new:CCBuild, Array<string>)} */ (proxyquire('../../src/CCBuild.js', {
     'google-closure-compiler': CCMock,
     './CLI.js': proxyquire('../../src/CLI.js', {
-        'google-closure-compiler': CCMock
+        'google-closure-compiler': CCMock,
+        'read-package-json': rpjMock
     })
 }));
 
@@ -53,7 +65,6 @@ var CCBuild = /** @type {function(new:CCBuild, Array<string>)} */ (proxyquire('.
  * @suppress {duplicate}
  */
 var cliUtils = require('../utils/cliUtils.js');
-
 describe('CCBuild class', function () {
     it('accepts default parameter when instantiating', function () {
         expect(new CCBuild([])).toEqual(jasmine.any(CCBuild));

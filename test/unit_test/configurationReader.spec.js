@@ -54,7 +54,7 @@ describe('config_reader', function () {
         }
     });
 
-    it('getLocalConfigFiles', function (done) {
+    xit('getLocalConfigFiles', function (done) {
         var configFilePaths = ['.ccbuild', 'ccbuild.ccbuild', 'config.ccbuild', 'config', 'ccbuild', 'conig.ccbuildx',
                                'conig.build'];
         var loadedConfigFilePaths = ['.ccbuild', 'ccbuild.ccbuild', 'config.ccbuild']
@@ -78,7 +78,6 @@ describe('config_reader', function () {
                 fs.writeFileSync(filePath, '');
             });
         };
-
         createConfigs('.');
         createConfigs(testDirectory);
 

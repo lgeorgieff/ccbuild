@@ -247,7 +247,7 @@ CLI.getCCVersion = function () {
  */
 function getPropertyValueFromPackageJson (propertyName) {
     var deferred = Q.defer();
-    rpj('./package.json', function (err, data) {
+    rpj(path.join(__dirname, '..', 'package.json'), function (err, data) {
         if (err) deferred.reject(err);
         else deferred.resolve(data[propertyName]);
     });

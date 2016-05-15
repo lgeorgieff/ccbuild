@@ -40,6 +40,12 @@ var CLI = /** @type {function(new:CLI, Array<string>)}*/ (require('./CLI.js'));
  * @ignore
  * @suppress {duplicate}
  */
+var VariableManager = require('./VariableManager.js');
+
+/**
+ * @ignore
+ * @suppress {duplicate}
+ */
 var configurationReader = require('./configurationReader.js');
 
 /**
@@ -236,7 +242,7 @@ CCFileCheck.prototype._processConfigs = function (cliArgs) {
         // We ignore duplicate configuration files. This can be for example the case if the same configuration file is
         // specified viw the CLI argument --config|-c and via the next property in a parent configuration file.
         if (processedConfigFiles.indexOf(configFilePath) === -1) {
-            return configurationReader.readAndParseConfiguration(configFilePath, parentConfig)
+            return configurationReader.readAndParseConfiguration(configFilePath, parentConfig, VariableManager.create())
                 .then(function (configObject) {
                     var sourcesFound = [];
                     Array.prototype.push.apply(sourcesFound, configObject.sources);

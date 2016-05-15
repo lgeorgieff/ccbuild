@@ -93,7 +93,6 @@ function CCBuild (argv) {
     if (!argv) argv = [];
     if (!util.isArray(argv)) throw Error('"argv" must be a string array!');
     events.EventEmitter.call(this);
-
     this._cli = new CLI(argv);
     var self = this;
     this._cli.on('argsError', function (err) {
@@ -182,9 +181,7 @@ function CCBuild (argv) {
         process.chdir(originalWorkingDirectory);
     });
 
-    this._variableManager = new VariableManager();
-    this._variableManager.set('CWD', process.cwd());
-    this._variableManager.set('CONTRIB_PATH', CC.compiler.CONTRIB_PATH);
+    this._variableManager = VariableManager.create();
 
     self.once('argsParsed', function (cliArgs) {
         if (cliArgs.configs) {

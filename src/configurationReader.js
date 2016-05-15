@@ -45,6 +45,7 @@ var DEFAULT_CONFIG_EXTENSION = '.ccbuild';
  */
 function getLocalConfigFiles () {
     var deferred = Q.defer();
+
     fs.readdir('.', function (err, fileNames) {
         var configPromises = fileNames.map(function (fileName) {
             var configDeferred = Q.defer();

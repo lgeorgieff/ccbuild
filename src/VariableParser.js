@@ -34,7 +34,10 @@ var VARIABLE_EXPRESSION = /\$\{([a-z]|[A-Z]|[0-9]|_|\$)*\}/gm;
  * @param {VariableManager} variableManager An object that handles variable names to variable values.
  */
 function VariableParser (variableManager) {
-    if (!(variableManager instanceof VariableManager)) throw new Error('"variableManager" must be a valid instance!');
+    if (!(variableManager instanceof
+          /** @type {function(new:VariableManager, VariableManager=)} */ (VariableManager))) {
+        throw new Error('"variableManager" must be a valid instance!');
+    }
     this._variableManager = variableManager;
 }
 

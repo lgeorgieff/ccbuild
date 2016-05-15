@@ -50,11 +50,13 @@ function ConfigurationNormalizer (config, basePath, variableManager) {
     } else {
         throw new Error('"config" must be of the type object|null|undefined but is ' + config + '!');
     }
-    if (variableManager && !(variableManager instanceof VariableManager)) {
+    if (variableManager && !(variableManager instanceof
+                             /** @type {function(new:VariableManager, VariableManager=)} */ (VariableManager))) {
         throw new Error('"variableManager" must be of the type object|null|undefined!');
     }
 
-    this._variableParser = new VariableParser(variableManager || new VariableManager());
+    this._variableParser = new VariableParser(
+        variableManager || new /** @type {function(new:VariableManager, VariableManager=)} */(VariableManager)());
 
     if (basePath == null) this._basePath = process.cwd();
     else this._basePath = basePath;

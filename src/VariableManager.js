@@ -4,6 +4,12 @@
  * @ignore
  * @suppress {duplicate}
  */
+var CC = require('google-closure-compiler');
+
+/**
+ * @ignore
+ * @suppress {duplicate}
+ */
 var util = require('util');
 
 /**
@@ -74,4 +80,18 @@ VariableManager.prototype.has = function (variableName) {
     return Object.prototype.hasOwnProperty.call(this._variables, variableName);
 };
 
-module.exports = VariableManager;
+/**
+ * A factory method for getting a VariableManager instance with the default values of `CWD` and `CONTRIB_PATH`.
+ *
+ * @static
+ *
+ * @returns {VariableManager} A new {@link VariableManager} instance.
+ */
+VariableManager.create = function () {
+    let vm = new /**  @type {function(new:VariableManager, VariableManager=)} */(VariableManager)();
+    vm.set('CWD', process.cwd());
+    vm.set('CONTRIB_PATH', CC.compiler.CONTRIB_PATH);
+    return vm;
+};
+
+module.exports = /** @type {function(new:VariableManager, VariableManager=)} */ (VariableManager);

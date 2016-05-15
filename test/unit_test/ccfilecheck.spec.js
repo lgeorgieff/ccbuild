@@ -41,6 +41,11 @@ var CCMock = {
     gulp: undefined
 };
 
+var PACKAGE_JSON = JSON.parse(fs.readFileSync(path.join(__dirname, '..', '..', 'package.json'), 'utf-8'));
+var rpjMock = function (packageJson, cb) {
+    cb(undefined, PACKAGE_JSON);
+};
+
 /**
  * @ignore
  * @suppress {duplicate}
@@ -48,7 +53,8 @@ var CCMock = {
 var CCFileCheck = /** @type {function(new:CCFileCheck, Array<string>)} */ (proxyquire('../../src/CCFileCheck.js', {
     'google-closure-compiler': CCMock,
     './CLI.js': proxyquire('../../src/CLI.js', {
-        'google-closure-compiler': CCMock
+        'google-closure-compiler': CCMock,
+        'read-package-json': rpjMock
     })
 }));
 
