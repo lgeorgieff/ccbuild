@@ -258,6 +258,7 @@ CCBuild.prototype._processConfigs = function (cliArgs, rootVariableManager) {
                     var objectKeys = Object.keys(configObject.compilationUnits);
                     var i = 0;
                     var outputFile;
+                    var err;
                     for (; i !== objectKeys.length; ++i) {
                         localContainsJsOutputFile = configObject.compilationUnits[objectKeys[i]].buildOptions
                             .indexOf('--js_output_file') !== -1;
@@ -273,7 +274,7 @@ CCBuild.prototype._processConfigs = function (cliArgs, rootVariableManager) {
 
                         if (!cliArgs.filteredUnits || cliArgs.filteredUnits.length === 0 ||
                             cliArgs.filteredUnits.indexOf(objectKeys[i]) !== -1) {
-                            compilationUnits.push({
+                            var compilationUnit = {
                                 workingDirectory: path.dirname(configFilePath),
                                 unitName: objectKeys[i],
                                 globalSources: configObject.sources,
@@ -283,10 +284,20 @@ CCBuild.prototype._processConfigs = function (cliArgs, rootVariableManager) {
                                 globalBuildOptions: configObject.buildOptions,
                                 unitBuildOptions: configObject.compilationUnits[objectKeys[i]].buildOptions,
                                 outputFile: outputFile
-                            });
+                            };
+
+                            if (compilationUnit.globalSources.length === 0 &&
+                                compilationUnit.unitSources.length === 0) {
+                                err = new Error('No source files defined for the compilation unit "' +
+                                                compilationUnit.unitName + '"!\n' +
+                                                'Consider to set the "sources" property in either the global or a ' +
+                                                'unit section.');
+                                self.emit('configError', err);
+                            } else {
+                                compilationUnits.push(compilationUnit);
+                            }
                         }
                     }
-                    var err;
                     if (localContainsJsOutputFile || globalContainsJsOutputFile) {
                         err = new Error('Encountered the option "--js_output_file" in buildOptions in the ' +
                                         'compilation unit "' + objectKeys[i] + '". Use the property "outputFile" ' +
