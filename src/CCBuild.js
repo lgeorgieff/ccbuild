@@ -287,11 +287,13 @@ CCBuild.prototype._processConfigs = function (cliArgs, rootVariableManager) {
                             };
 
                             if (compilationUnit.globalSources.length === 0 &&
-                                compilationUnit.unitSources.length === 0) {
+                                compilationUnit.unitSources.length === 0 &&
+                                compilationUnit.globalBuildOptions.indexOf('--js') === -1 &&
+                                compilationUnit.unitBuildOptions.indexOf('--js') === -1) {
                                 err = new Error('No source files defined for the compilation unit "' +
                                                 compilationUnit.unitName + '"!\n' +
-                                                'Consider to set the "sources" property in either the global or a ' +
-                                                'unit section.');
+                                                'Consider to set the "sources" or "buildOptions" property in either ' +
+                                                'the global or a unit section.');
                                 self.emit('configError', err);
                             } else {
                                 compilationUnits.push(compilationUnit);
