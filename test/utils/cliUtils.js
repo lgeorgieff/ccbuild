@@ -10,7 +10,8 @@ var expectedUsage = 'Usage: ' + scriptName + ' [-h|--help] [-v|--version] [--clo
         '           [--config-help] [--closure-version] [--compiler-path]\n' +
         '           [--contrib-path] [--ignore-warnings] [-ignore-errors]\n' +
         '           [-c|--config PATH]... [--ignore-compiled-code] [--stop-on-error]\n' +
-        '           [--stop-on-warning] [-u|--unit UNIT_NAME]... [--ignore-check-fs]\n\n' +
+        '           [--stop-on-warning] [-u|--unit UNIT_NAME]... [--ignore-check-fs]\n' +
+        '           [-n|--next NEXT_ENTRY]...\n\n' +
         'Checks and compiles JavaScript files via the Closure Compiler.\n\n' +
         '  -h|--help               Display this message and exit.\n' +
         '  -v|--version            Display version information and exit.\n' +
@@ -42,6 +43,15 @@ var expectedUsage = 'Usage: ' + scriptName + ' [-h|--help] [-v|--version] [--clo
         '                          You may specify multiple compilation units.\n' +
         '                          If no compilation unit is specified, all units\n' +
         '                          defined in the configuration files will be processed.\n' +
+        ' -n|--next NEXT_ENTRY     Filter the configuration files that are defined in the\n' +
+        '                          "next" property and are taken into account to be\n' +
+        '                          processed as next ' + scriptName + ' configuration.\n' +
+        '                          All other configuration files listed in the "next"\n' +
+        '                          properties are ignored.\n' +
+        '                          You may specify multiple next entries.\n' +
+        '                          If no "next" property is specified, all configuration\n' +
+        '                          files defined in any "next" property of any processed\n' +
+        '                          configuration file will be processed.\n' +
         ' --ignore-check-fs        Ignore the processing of the configuration property\n' +
         '                          "checkFs" which is responsible for checking whether\n' +
         '                          specified files are included in the defined\n' +

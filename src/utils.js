@@ -55,6 +55,19 @@ function arrayToSet (arr, comp) {
 }
 
 /**
+ * check whether an item is contained in an array.
+ *
+ * @return {boolean} `true` in case the given item is contained in the given array. `false` otherwise.
+ *
+ * @param {*} arr The array that is checked for hte given item.
+ * @param {*=} item The item that is cecked for existence in the given array.
+ */
+function arrayContains (arr, item) {
+    if (!Array.isArray(arr)) return false;
+    return arr.indexOf(item) !== -1;
+}
+
+/**
  * Check whether the passed argument is an array that only contains string values.
  *
  * @returns {boolean} `true` if the `arg` is an array which only contains string values. `false` otherwise.
@@ -443,6 +456,26 @@ function getAllFilesFromDirectory (directory, fileExtensions) {
 }
 
 /**
+ * Join all paths to the given base path.
+ *
+ * @return {Array<string>} An array including all the paths that are joined with the given base path.
+ *
+ * @param {string} basePath The path that is used for all paths as base path for join operations.
+ * @param {Array<string>} paths An array of paths that will be joint with the given base path.
+ */
+function joinPaths (basePath, paths) {
+    if (!util.isString(basePath) || basePath.length === 0 || !isStringArray(paths)) {
+        if (!isStringArray(paths)) return [];
+        else return paths.slice();
+    }
+
+    return paths.map(function (p) {
+        if (path.isAbsolute(p)) return p;
+        return path.join(basePath, p);
+    });
+}
+
+/**
  * Flattens an multi-dimensional array into a single-dimensional array.
  *
  * @private
@@ -498,3 +531,5 @@ module.exports.isFile = isFile;
 module.exports.isDirectory = isDirectory;
 module.exports.getAllFilesFromDirectory = getAllFilesFromDirectory;
 module.exports.getAllFilesFromDirectories = getAllFilesFromDirectories;
+module.exports.joinPaths = joinPaths;
+module.exports.arrayContains = arrayContains;

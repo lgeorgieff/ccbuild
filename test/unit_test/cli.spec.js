@@ -309,7 +309,7 @@ describe('CLI class', function () {
         });
     });
 
-    it('parses multiple --unit and -u options nad removes duplicates', function (done) {
+    it('parses multiple --unit and -u options and removes duplicates', function (done) {
         var cli = new CLI([process.argv[0], process.argv[1], '--unit', 'unit1', '-u', 'unit3', '-u', 'unit2',
                            '--unit', 'unit4', '-u', 'unit1', '--unit', 'unit3']);
         cli.on('argsError', fail);
@@ -332,6 +332,69 @@ describe('CLI class', function () {
 
     it('signals argsError in case no value is provided for -u', function (done) {
         var cli = new CLI([process.argv[0], process.argv[1], '-u']);
+        cli.on('argsError', function (err) {
+            expect(err).toEqual(jasmine.any(Error));
+            done();
+        });
+        cli.on('argsParsed', fail);
+    });
+
+    it('parses -n option', function (done) {
+        var cli = new CLI([process.argv[0], process.argv[1], '-n', 'next1']);
+        cli.on('argsError', fail);
+        cli.on('argsParsed', function (options) {
+            expect(options).toEqual({filteredNextEntries: [path.resolve('next1')]});
+            done();
+        });
+    });
+
+    it('parses --next option', function (done) {
+        var cli = new CLI([process.argv[0], process.argv[1], '--next', 'next1']);
+        cli.on('argsError', fail);
+        cli.on('argsParsed', function (options) {
+            expect(options).toEqual({filteredNextEntries: [path.resolve('next1')]});
+            done();
+        });
+    });
+
+    it('parses multiple --next and -n options', function (done) {
+        var cli = new CLI([process.argv[0], process.argv[1], '--next', path.join('/', 'abc', 'def', 'next1'), '-n',
+                           path.join('ghi', 'next3'), '-n', 'next2', '--next', 'next4']);
+        cli.on('argsError', fail);
+        cli.on('argsParsed', function (options) {
+            expect(options).toEqual(jasmine.objectContaining({filteredNextEntries: jasmine.arrayContaining(
+                [path.join('/', 'abc', 'def', 'next1'), path.resolve('next2'), path.resolve('ghi', 'next3'),
+                 path.resolve('next4')])}));
+            expect(options.filteredNextEntries.length).toBe(4);
+            done();
+        });
+    });
+
+    it('parses multiple --next and -n options and removes duplicates', function (done) {
+        var cli = new CLI([process.argv[0], process.argv[1], '--next', 'next1', '-n', 'next3', '-n', 'next2',
+                           '--next', 'next4', '-n', 'next1', '--next', 'next3', '-n', path.join('ghi', 'next3'),
+                           '--next', path.join('/', 'abc', 'def', 'next1')]);
+        cli.on('argsError', fail);
+        cli.on('argsParsed', function (options) {
+            expect(options).toEqual(jasmine.objectContaining({filteredNextEntries: jasmine.arrayContaining(
+                [path.resolve('next1'), path.resolve('next2'), path.resolve('next3'), path.resolve('next4'),
+                 path.resolve('ghi', 'next3'), path.resolve('next4')])}));
+            expect(options.filteredNextEntries.length).toBe(6);
+            done();
+        });
+    });
+
+    it('signals argsError in case no value is provided for --next', function (done) {
+        var cli = new CLI([process.argv[0], process.argv[1], '--next']);
+        cli.on('argsError', function (err) {
+            expect(err).toEqual(jasmine.any(Error));
+            done();
+        });
+        cli.on('argsParsed', fail);
+    });
+
+    it('signals argsError in case no value is provided for -n', function (done) {
+        var cli = new CLI([process.argv[0], process.argv[1], '-n']);
         cli.on('argsError', function (err) {
             expect(err).toEqual(jasmine.any(Error));
             done();

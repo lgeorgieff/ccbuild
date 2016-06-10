@@ -487,6 +487,70 @@ describe('CCBuild class', function () {
                 });
             });
 
+            it('emits done after finished with multiple configs -- 4 compilation units & 1x --next NEXT_ENTRY',
+               function (done) {
+                   runMock = jasmine.createSpy('compiler.run').and.callFake(function (cb) {
+                       cb(0, '', '');
+                   });
+
+                   var configPath1 = path.join(__dirname, 'config4.ccbuild');
+
+                   var ccbuild = new CCBuild([process.argv[0], process.argv[1], '--config', configPath1,
+                                              '--next', 'does/not/exist']);
+                   var compiledHandler = jasmine.createSpy('compiledHandler');
+                   ccbuild.on('compiled', compiledHandler);
+                   ccbuild.on('done', function () {
+                       expect(compiledHandler.calls.count()).toBe(1);
+                       expect(compiledHandler).toHaveBeenCalledWith('unit1', jasmine.any(String), jasmine.any(String));
+                       done();
+                   });
+               });
+
+            it('emits done after finished with multiple configs -- 4 compilation units & 2x --next NEXT_ENTRY',
+               function (done) {
+                   runMock = jasmine.createSpy('compiler.run').and.callFake(function (cb) {
+                       cb(0, '', '');
+                   });
+
+                   var configPath1 = path.join(__dirname, 'config4.ccbuild');
+
+                   var ccbuild = new CCBuild([process.argv[0], process.argv[1], '--config', configPath1,
+                                              '--next', 'does/not/exist',
+                                              '-n', path.join(__dirname, 'data/config5.ccbuild')]);
+                   var compiledHandler = jasmine.createSpy('compiledHandler');
+                   ccbuild.on('compiled', compiledHandler);
+                   ccbuild.on('done', function () {
+                       expect(compiledHandler.calls.count()).toBe(2);
+                       expect(compiledHandler).toHaveBeenCalledWith('unit1', jasmine.any(String), jasmine.any(String));
+                       expect(compiledHandler).toHaveBeenCalledWith('unit2', jasmine.any(String), jasmine.any(String));
+                       done();
+                   });
+               });
+
+            it('emits done after finished with multiple configs -- 4 compilation units & 3x --next NEXT_ENTRY',
+               function (done) {
+                   runMock = jasmine.createSpy('compiler.run').and.callFake(function (cb) {
+                       cb(0, '', '');
+                   });
+
+                   var configPath1 = path.join(__dirname, 'config4.ccbuild');
+
+                   var ccbuild = new CCBuild([process.argv[0], process.argv[1], '--config', configPath1,
+                                              '--next', 'does/not/exist',
+                                              '-n', path.join(__dirname, 'data/config5.ccbuild'),
+                                              '-n', path.join(__dirname, 'data/configs/config6')]);
+                   var compiledHandler = jasmine.createSpy('compiledHandler');
+                   ccbuild.on('compiled', compiledHandler);
+                   ccbuild.on('done', function () {
+                       expect(compiledHandler.calls.count()).toBe(4);
+                       expect(compiledHandler).toHaveBeenCalledWith('unit1', jasmine.any(String), jasmine.any(String));
+                       expect(compiledHandler).toHaveBeenCalledWith('unit2', jasmine.any(String), jasmine.any(String));
+                       expect(compiledHandler).toHaveBeenCalledWith('unit3', jasmine.any(String), jasmine.any(String));
+                       expect(compiledHandler).toHaveBeenCalledWith('unit4', jasmine.any(String), jasmine.any(String));
+                       done();
+                   });
+               });
+
             it('emits done after finished with multiple configs -- 4 compilation units incl. errors', function (done) {
                 var callCount = 0;
                 runMock = jasmine.createSpy('compiler.run').and.callFake(function (cb) {

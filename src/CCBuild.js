@@ -318,10 +318,14 @@ CCBuild.prototype._processConfigs = function (cliArgs, rootVariableManager) {
                         deferred.reject(err);
                     } else {
                         processedConfigFiles.push(configFilePath);
-
-                        Q.allSettled(Object.keys(configObject.next).map(function (nextConfigFilePath) {
-                            return processConfig(nextConfigFilePath, configObject);
-                        }))
+                        Q.allSettled(Object.keys(configObject.next)
+                                     .filter(function (nextConfigFilePath) {
+                                         return !cliArgs.filteredNextEntries ||
+                                             utils.arrayContains(cliArgs.filteredNextEntries, nextConfigFilePath);
+                                     })
+                                     .map(function (nextConfigFilePath) {
+                                         return processConfig(nextConfigFilePath, configObject);
+                                     }))
                             .then(function (queuedCompilationUnitsPromises) {
                                 var queuedCompilationsUnits = queuedCompilationUnitsPromises.map(function (promise) {
                                     if (promise.state === 'fulfilled') return promise.value;

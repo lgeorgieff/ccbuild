@@ -230,6 +230,15 @@ describe('array functions', function () {
                  'extern1.js', '--js', 'file3.js'];
         expect(utils.mergeArguments(args1, args2)).toEqual(args3);
     });
+
+    it('arrayContains', function () {
+        expect(utils.arrayContains(null, 1)).toBe(false);
+        expect(utils.arrayContains([], 1)).toBe(false);
+        expect(utils.arrayContains(['1'], 1)).toBe(false);
+        expect(utils.arrayContains([0, 1, 2, 3], 4)).toBe(false);
+        expect(utils.arrayContains([0, 1, 2, 3, 4], 4)).toBe(true);
+        expect(utils.arrayContains([0, 1, 2, 3, 4])).toBe(false);
+    });
 });
 
 describe('utils\' isX', function () {
@@ -905,6 +914,47 @@ describe('utils\' list all files utility', function () {
                     done();
                 })
                 .catch(fail);
+        });
+    });
+
+    describe('utils\' path utility', function () {
+        describe('joinPaths', function () {
+            it('returns [] in case of bad basePath type', function () {
+                expect(utils.joinPaths()).toEqual([]);
+                expect(utils.joinPaths({}, [])).toEqual([]);
+            });
+
+            it('returns [] in case of bad paths type', function () {
+                expect(utils.joinPaths('')).toEqual([]);
+                expect(utils.joinPaths('', {})).toEqual([]);
+                expect(utils.joinPaths('', [{}])).toEqual([]);
+            });
+
+            it('returns empty array in case of empty paths', function () {
+                expect(utils.joinPaths('')).toEqual([]);
+            });
+
+            it('returns original paths in case of empty basePath', function () {
+                var paths = ['abc', path.join('def', 'ghi'), 'jkl'];
+                expect(utils.joinPaths('', paths)).toEqual(paths);
+                expect(utils.joinPaths('', paths)).not.toBe(paths);
+            });
+
+            it('returns joined paths joined on relative basePath', function () {
+                var paths = ['abc', path.join('def', 'ghi'), path.join('/', 'jkl', 'lmno', 'pqrs')];
+                var joinedPaths = [path.join('base', 'path', 'abc'), path.join('base', 'path', 'def', 'ghi'),
+                                   path.join('/', 'jkl', 'lmno', 'pqrs')];
+                var basePath = path.join('base', 'path');
+                expect(utils.joinPaths(basePath, paths)).toEqual(joinedPaths);
+            });
+
+            it('returns joined paths joined on absolue basePath', function () {
+                var paths = ['abc', path.join('def', 'ghi'), path.join('/', 'jkl', 'lmno', 'pqrs')];
+                var basePath = path.join('/', 'base', 'path');
+                var joinedPaths = [path.join('/', 'base', 'path', 'abc'), path.join('/', 'base', 'path', 'def', 'ghi'),
+                                   path.join('/', 'jkl', 'lmno', 'pqrs')];
+                expect(utils.joinPaths(basePath, paths)).toEqual(joinedPaths);
+            });
         });
     });
 });

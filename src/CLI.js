@@ -81,54 +81,61 @@ util.inherits(CLI, events.EventEmitter);
  * @returns {Promise<string>} A promise that holds the usage text as a string value.
  */
 CLI.getUsage = function () {
-    var deferred = Q.defer();
-    CLI.getSelfName().then(function (selfName) {
-        deferred.resolve(
-            'Usage: ' + selfName + ' [-h|--help] [-v|--version] [--closure-help]\n' +
-                '           [--config-help] [--closure-version] [--compiler-path]\n' +
-                '           [--contrib-path] [--ignore-warnings] [-ignore-errors]\n' +
-                '           [-c|--config PATH]... [--ignore-compiled-code] [--stop-on-error]\n' +
-                '           [--stop-on-warning] [-u|--unit UNIT_NAME]... [--ignore-check-fs]\n\n' +
-                'Checks and compiles JavaScript files via the Closure Compiler.\n\n' +
-                '  -h|--help               Display this message and exit.\n' +
-                '  -v|--version            Display version information and exit.\n' +
-                '  --closure-help          Display the usage for the Closure Compiler and exit.\n' +
-                '  --closure-version       Display the version of the Closure Compiler and exit.\n' +
-                '  --compiler-path         Display the path to the Closure Compiler and exit.\n' +
-                '  --contrib-path          Display the path to the contrib directory of the\n' +
-                '                          Closure Compiler and exit.\n' +
-                '  -c|--config PATH        Path to the configuration file ' + selfName + ' should\n' +
-                '                          use. If no configuration is specified ' + selfName + '\n' +
-                '                          checks the current directory for all files with the\n' +
-                '                          file extension ".nbuild". For every matched\n' +
-                '                          configuration file ' + selfName + ' performs a run.\n' +
-                '                          You may specify multiple configurations.\n' +
-                ' --config-help            Display a help message for the configuration file\n' +
-                '                          format and exit.\n' +
-                ' --ignore-warnings        Compilation warnings are not shown on stderr.\n' +
-                ' --ignore-errrors         Compilation errors are not shown on stderr.\n' +
-                ' --ignore-compiled-code   The compiled code is not shown on stdout.\n' +
-                ' --stop-on-error          All compilation processes are stopped in case a\n' +
-                '                          compilation error occurs. ' + selfName + ' will\n' +
-                '                          exit with the exit code 1.\n' +
-                ' --stop-on-warning        All compilation processes are stopped in case a\n' +
-                '                          compilation warning occurs. ' + selfName + ' will\n' +
-                '                          exit with the exit code 1.\n' +
-                ' -u|--unit UNIT_NAME      Filter the compilation units that are taken into\n' +
-                '                          account for the compilation process. All other units\n' +
-                '                          are ignored.\n' +
-                '                          You may specify multiple compilation units.\n' +
-                '                          If no compilation unit is specified, all units\n' +
-                '                          defined in the configuration files will be processed.\n' +
-                ' --ignore-check-fs        Ignore the processing of the configuration property\n' +
-                '                          "checkFs" which is responsible for checking whether\n' +
-                '                          specified files are included in the defined\n' +
-                '                          compilation units.\n\n' +
-                selfName + ' exits with the return code 0 in case of successful compilation(s) this\n' +
-                'includes warnings as well. In case of compilation errors and file verification\n' +
-                'errors the return code is 1.\n');
-    }).catch(deferred.reject);
-    return deferred.promise;
+    return CLI.getSelfName().then(function (selfName) {
+        return 'Usage: ' + selfName + ' [-h|--help] [-v|--version] [--closure-help]\n' +
+            '           [--config-help] [--closure-version] [--compiler-path]\n' +
+            '           [--contrib-path] [--ignore-warnings] [-ignore-errors]\n' +
+            '           [-c|--config PATH]... [--ignore-compiled-code] [--stop-on-error]\n' +
+            '           [--stop-on-warning] [-u|--unit UNIT_NAME]... [--ignore-check-fs]\n' +
+            '           [-n|--next NEXT_ENTRY]...\n\n' +
+            'Checks and compiles JavaScript files via the Closure Compiler.\n\n' +
+            '  -h|--help               Display this message and exit.\n' +
+            '  -v|--version            Display version information and exit.\n' +
+            '  --closure-help          Display the usage for the Closure Compiler and exit.\n' +
+            '  --closure-version       Display the version of the Closure Compiler and exit.\n' +
+            '  --compiler-path         Display the path to the Closure Compiler and exit.\n' +
+            '  --contrib-path          Display the path to the contrib directory of the\n' +
+            '                          Closure Compiler and exit.\n' +
+            '  -c|--config PATH        Path to the configuration file ' + selfName + ' should\n' +
+            '                          use. If no configuration is specified ' + selfName + '\n' +
+            '                          checks the current directory for all files with the\n' +
+            '                          file extension ".nbuild". For every matched\n' +
+            '                          configuration file ' + selfName + ' performs a run.\n' +
+            '                          You may specify multiple configurations.\n' +
+            ' --config-help            Display a help message for the configuration file\n' +
+            '                          format and exit.\n' +
+            ' --ignore-warnings        Compilation warnings are not shown on stderr.\n' +
+            ' --ignore-errrors         Compilation errors are not shown on stderr.\n' +
+            ' --ignore-compiled-code   The compiled code is not shown on stdout.\n' +
+            ' --stop-on-error          All compilation processes are stopped in case a\n' +
+            '                          compilation error occurs. ' + selfName + ' will\n' +
+            '                          exit with the exit code 1.\n' +
+            ' --stop-on-warning        All compilation processes are stopped in case a\n' +
+            '                          compilation warning occurs. ' + selfName + ' will\n' +
+            '                          exit with the exit code 1.\n' +
+            ' -u|--unit UNIT_NAME      Filter the compilation units that are taken into\n' +
+            '                          account for the compilation process. All other units\n' +
+            '                          are ignored.\n' +
+            '                          You may specify multiple compilation units.\n' +
+            '                          If no compilation unit is specified, all units\n' +
+            '                          defined in the configuration files will be processed.\n' +
+            ' -n|--next NEXT_ENTRY     Filter the configuration files that are defined in the\n' +
+            '                          "next" property and are taken into account to be\n' +
+            '                          processed as next ' + selfName + ' configuration.\n' +
+            '                          All other configuration files listed in the "next"\n' +
+            '                          properties are ignored.\n' +
+            '                          You may specify multiple next entries.\n' +
+            '                          If no "next" property is specified, all configuration\n' +
+            '                          files defined in any "next" property of any processed\n' +
+            '                          configuration file will be processed.\n' +
+            ' --ignore-check-fs        Ignore the processing of the configuration property\n' +
+            '                          "checkFs" which is responsible for checking whether\n' +
+            '                          specified files are included in the defined\n' +
+            '                          compilation units.\n\n' +
+            selfName + ' exits with the return code 0 in case of successful compilation(s) this\n' +
+            'includes warnings as well. In case of compilation errors and file verification\n' +
+            'errors the return code is 1.\n';
+    });
 };
 
 /**
@@ -180,17 +187,14 @@ CLI.getConfigFileHelp = function () {
         }
     };
 
-    var deferred = Q.defer();
-    CLI.getSelfName().then(function (selfName) {
-        deferred.resolve(
-            'The configuration files for ' + selfName + ' use the JSON format and are of the\n' +
-                'following form:\n\n' +
-                JSON.stringify(configSample, null, 2) +
-                '\n\n' +
-                'Note: buildOptions can be either an array of strings or an object as specified\n' +
-                'at https://www.npmjs.com/package/google-closure-compiler#specifying-options.');
-    }).catch(deferred.reject);
-    return deferred.promise;
+    return CLI.getSelfName().then(function (selfName) {
+        return 'The configuration files for ' + selfName + ' use the JSON format and are of the\n' +
+            'following form:\n\n' +
+            JSON.stringify(configSample, null, 2) +
+            '\n\n' +
+            'Note: buildOptions can be either an array of strings or an object as specified\n' +
+            'at https://www.npmjs.com/package/google-closure-compiler#specifying-options.';
+    });
 };
 
 /**
@@ -336,6 +340,22 @@ CLI.prototype._parseCliArgs = function (argv) {
                 result.filteredUnits.push(argv[++i]);
             }
             break;
+        case '-n':
+        case '--next':
+            if (i + 1 === argv.length) {
+                /**
+                 * States that the parsing process of the CLI arguments failed.
+                 *
+                 * @event CLI#argsError
+                 * @param {Error} err The error that occurred during argumentation parsing.
+                 */
+                this.emit('argsError', new Error('-n|--next requires a NEXT_ENTRY parameter'));
+                return;
+            } else {
+                if (!result.filteredNextEntries) result.filteredNextEntries = [];
+                result.filteredNextEntries.push(argv[++i]);
+            }
+            break;
         case '--config-help':
             /**
              * States that the option --config-help was set and that the help message for configuration files is ready.
@@ -412,6 +432,10 @@ CLI.prototype._parseCliArgs = function (argv) {
     }
     if (result.configs !== undefined) result.configs = utils.arrayToSet(result.configs);
     if (result.filteredUnits !== undefined) result.filteredUnits = utils.arrayToSet(result.filteredUnits);
+    if (result.filteredNextEntries !== undefined) {
+        result.filteredNextEntries = utils.joinPaths(process.cwd(), result.filteredNextEntries);
+        result.filteredNextEntries = utils.arrayToSet(result.filteredNextEntries);
+    }
     /**
      * States that the parsing of CLI arguments was finished was set and that the contrib path information is ready.
      *
