@@ -470,7 +470,7 @@ function joinPaths (basePath, paths) {
     }
 
     return paths.map(function (p) {
-        if (path.isAbsolute(p)) return p;
+        if (/** @type {{isAbsolute: function(string):boolean}} */ (path).isAbsolute(p)) return p;
         return path.join(basePath, p);
     });
 }

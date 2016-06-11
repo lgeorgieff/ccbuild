@@ -4,10 +4,11 @@ _ccbuild_ offers a thin layer on top of the [google-closure-compiler](https://ww
 # ccbuild options
 ```
 Usage: ccbuild [-h|--help] [-v|--version] [--closure-help]
-           [--closure-version] [--compiler-path] [--contrib-path]
-           [--ignore-warnings] [-ignore-errors] [-c|--config PATH]...
-           [--ignore-compiled-code] [--stop-on-error] [--config-help]
-           [-u|--unit UNIT_NAME]... [--ignore-check-fs]
+           [--config-help] [--closure-version] [--compiler-path]
+           [--contrib-path] [--ignore-warnings] [-ignore-errors]
+           [-c|--config PATH]... [--ignore-compiled-code] [--stop-on-error]
+           [--stop-on-warning] [-u|--unit UNIT_NAME]... [--ignore-check-fs]
+           [-n|--next NEXT_ENTRY]...
 
 Checks and compiles JavaScript files via the Closure Compiler.
 
@@ -42,6 +43,15 @@ Checks and compiles JavaScript files via the Closure Compiler.
                           You may specify multiple compilation units.
                           If no compilation unit is specified, all units
                           defined in the configuration files will be processed.
+ -n|--next NEXT_ENTRY     Filter the configuration files that are defined in the
+                          "next" property and are taken into account to be
+                          processed as next ccbuild configuration.
+                          All other configuration files listed in the "next"
+                          properties are ignored.
+                          You may specify multiple next entries.
+                          If no "next" property is specified, all configuration
+                          files defined in any "next" property of any processed
+                          configuration file will be processed.
  --ignore-check-fs        Ignore the processing of the configuration property
                           "checkFs" which is responsible for checking whether
                           specified files are included in the defined
