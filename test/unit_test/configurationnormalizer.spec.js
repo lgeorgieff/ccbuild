@@ -55,15 +55,33 @@ describe('Class ConfigurationNormalizer', function () {
     });
 
     it('normalize sources', function () {
-        var config = {sources: ['abc', 'def', '']};
+        var config = {sources: ['abc', 'def', '', '/ghi']};
         var configNormalizer = new ConfigurationNormalizer(config, __dirname);
         var normalizedConfig = configNormalizer.normalize();
         expect(normalizedConfig).toBeDefined();
         expect(normalizedConfig.sources).toBeDefined();
-        expect(normalizedConfig.sources.length).toBe(3);
-        expect(normalizedConfig.sources).toContain(path.resolve(__dirname, 'abc'));
-        expect(normalizedConfig.sources).toContain(path.resolve(__dirname, 'def'));
-        expect(normalizedConfig.sources).toContain(path.resolve(__dirname, ''));
+        expect(normalizedConfig.sources.length).toBe(4);
+        expect(normalizedConfig.sources).toContain(path.join('test', 'unit_test', 'abc'));
+        expect(normalizedConfig.sources).toContain(path.join('test', 'unit_test', 'def'));
+        expect(normalizedConfig.sources).toContain(path.join('test', 'unit_test'));
+        expect(normalizedConfig.sources).toContain('/ghi');
+        expect(normalizedConfig.externs).toEqual([]);
+        expect(normalizedConfig.buildOptions).toEqual([]);
+        expect(normalizedConfig.compilationUnits).toEqual({});
+        expect(normalizedConfig.next).toEqual({});
+    });
+
+    it('normalize sources - useAbsolutePaths', function () {
+        var config = {sources: ['abc', 'def', '', '/ghi']};
+        var configNormalizer = new ConfigurationNormalizer(config, __dirname, null, true);
+        var normalizedConfig = configNormalizer.normalize();
+        expect(normalizedConfig).toBeDefined();
+        expect(normalizedConfig.sources).toBeDefined();
+        expect(normalizedConfig.sources.length).toBe(4);
+        expect(normalizedConfig.sources).toContain(path.join(__dirname, 'abc'));
+        expect(normalizedConfig.sources).toContain(path.join(__dirname, 'def'));
+        expect(normalizedConfig.sources).toContain(__dirname);
+        expect(normalizedConfig.sources).toContain('/ghi');
         expect(normalizedConfig.externs).toEqual([]);
         expect(normalizedConfig.buildOptions).toEqual([]);
         expect(normalizedConfig.compilationUnits).toEqual({});
@@ -97,6 +115,22 @@ describe('Class ConfigurationNormalizer', function () {
     it('normalize externs', function () {
         var config = {externs: ['abc', '/def/tmp.txt', 'folder/tmp.txt']};
         var configNormalizer = new ConfigurationNormalizer(config, __dirname);
+        var normalizedConfig = configNormalizer.normalize();
+        expect(normalizedConfig).toBeDefined();
+        expect(normalizedConfig.externs).toBeDefined();
+        expect(normalizedConfig.externs.length).toBe(3);
+        expect(normalizedConfig.externs).toContain(path.join('test', 'unit_test', 'abc'));
+        expect(normalizedConfig.externs).toContain('/def/tmp.txt');
+        expect(normalizedConfig.externs).toContain(path.join('test', 'unit_test', 'folder/tmp.txt'));
+        expect(normalizedConfig.sources).toEqual([]);
+        expect(normalizedConfig.buildOptions).toEqual([]);
+        expect(normalizedConfig.compilationUnits).toEqual({});
+        expect(normalizedConfig.next).toEqual({});
+    });
+
+    it('normalize externs', function () {
+        var config = {externs: ['abc', '/def/tmp.txt', 'folder/tmp.txt']};
+        var configNormalizer = new ConfigurationNormalizer(config, __dirname, null, true);
         var normalizedConfig = configNormalizer.normalize();
         expect(normalizedConfig).toBeDefined();
         expect(normalizedConfig.externs).toBeDefined();
@@ -327,9 +361,9 @@ describe('Class ConfigurationNormalizer', function () {
         var vm;
         var cn;
         var normalizedConfig;
-        var cu1 = CC.compiler.CONTRIB_PATH + '/some/parts/' + CC.compiler.CONTRIB_PATH + '/' + process.cwd();
+        var config;
         beforeEach (function () {
-            var config = {
+            config = {
                 checkFs: {
                     check: ['.', '${CONTRIB_PATH}'],
                     ignore: ['${CONTRIB_PATH}', '${CWD}'],
@@ -366,133 +400,252 @@ describe('Class ConfigurationNormalizer', function () {
                     }
                 }
             };
-            vm = new VariableManager();
-            vm.set('CONTRIB_PATH', CC.compiler.CONTRIB_PATH);
-            vm.set('CWD', process.cwd());
-            cn = new ConfigurationNormalizer(config, null, vm);
-            normalizedConfig = cn.normalize();
         });
 
-        it('normalize variables in checkFs.check', function () {
-            expect(normalizedConfig.checkFs).toBeDefined();
-            expect(normalizedConfig.checkFs).not.toBeNull();
-            expect(normalizedConfig.checkFs.check).toBeDefined();
-            expect(normalizedConfig.checkFs.check).not.toBeNull();
-            expect(normalizedConfig.checkFs.check.length).toBe(2);
-            expect(normalizedConfig.checkFs.check).toEqual(jasmine.arrayContaining([process.cwd(),
-                                                                                    CC.compiler.CONTRIB_PATH]));
+        describe('with relative paths', function () {
+            var ccc = path.join('node_modules', 'google-closure-compiler', 'contrib');
+            var cu1 = ccc + '/some/parts/' + ccc + '/.';
+
+            beforeEach(function () {
+                vm = new VariableManager();
+                vm.set('CONTRIB_PATH', path.relative(process.cwd(), CC.compiler.CONTRIB_PATH));
+                vm.set('CWD', '.');
+                cn = new ConfigurationNormalizer(config, null, vm);
+                normalizedConfig = cn.normalize();
+            });
+
+            it('normalize variables in checkFs.check', function () {
+                expect(normalizedConfig.checkFs).toBeDefined();
+                expect(normalizedConfig.checkFs).not.toBeNull();
+                expect(normalizedConfig.checkFs.check).toBeDefined();
+                expect(normalizedConfig.checkFs.check).not.toBeNull();
+                expect(normalizedConfig.checkFs.check.length).toBe(2);
+                expect(normalizedConfig.checkFs.check).toEqual(jasmine.arrayContaining(['.', ccc]));
+            });
+
+            it('normalize variables in checkFs.ignore', function () {
+                expect(normalizedConfig.checkFs.ignore).toBeDefined();
+                expect(normalizedConfig.checkFs.ignore).not.toBeNull();
+                expect(normalizedConfig.checkFs.ignore.length).toBe(2);
+                expect(normalizedConfig.checkFs.ignore).toEqual(jasmine.arrayContaining(['.', ccc]));
+            });
+
+            it('normalize variables in checkFs.fileExtensions', function () {
+                expect(normalizedConfig.checkFs.fileExtensions).toBeDefined();
+                expect(normalizedConfig.checkFs.fileExtensions).not.toBeNull();
+                expect(normalizedConfig.checkFs.fileExtensions.length).toBe(1);
+                expect(normalizedConfig.checkFs.fileExtensions).toEqual([ccc]);
+            });
+
+            it('normalize variables in global sources', function () {
+                expect(normalizedConfig.sources).toBeDefined();
+                expect(normalizedConfig.sources).not.toBeNull();
+                expect(normalizedConfig.sources.length).toBe(3);
+                expect(normalizedConfig.sources).toEqual(jasmine.arrayContaining(
+                    ['someFile.js', path.join(ccc, 'some', 'file.js'), path.join('some', 'file.js')]));
+            });
+
+            it('normalize variables in global externs', function () {
+                expect(normalizedConfig.externs).toBeDefined();
+                expect(normalizedConfig.externs).not.toBeNull();
+                expect(normalizedConfig.externs.length).toBe(3);
+                expect(normalizedConfig.externs).toEqual(jasmine.arrayContaining(
+                    ['someFile.js', path.join(ccc, 'some', 'file.js'), path.join('some', 'file.js')]));
+            });
+
+            it('normalize variables in global buildOptions', function () {
+                expect(normalizedConfig.buildOptions).toBeDefined();
+                expect(normalizedConfig.buildOptions).not.toBeNull();
+                expect(normalizedConfig.buildOptions.length).toBe(3);
+                expect(normalizedConfig.buildOptions).toEqual(jasmine.arrayContaining(
+                    ['--version', '--flagfile', path.join(ccc, 'flagfile.closure_compiler')]));
+            });
+
+            it('normalize variables in compilationUnits\' keys', function () {
+                expect(normalizedConfig.compilationUnits).toBeDefined();
+                expect(normalizedConfig.compilationUnits).not.toBeNull();
+                expect(Object.keys(normalizedConfig.compilationUnits).length).toBe(2);
+                expect(Object.keys(normalizedConfig.compilationUnits)).toEqual(jasmine.arrayContaining(
+                    [ccc + '/some/parts/' + ccc + '/.', 'some/unit']));
+            });
+
+            it('normalize variables in compilationUnits\' sources', function () {
+                expect(normalizedConfig.compilationUnits[cu1].sources).toBeDefined();
+                expect(normalizedConfig.compilationUnits[cu1].sources).not.toBeNull();
+                expect(normalizedConfig.compilationUnits[cu1].sources.length).toBe(3);
+                expect(normalizedConfig.compilationUnits[cu1].sources).toEqual(jasmine.arrayContaining(
+                    ['someFile.js', path.join(ccc, 'some', 'file.js'), path.join('some', 'file.js')]));
+            });
+
+            it('normalize variables in compilationUnits\' externs', function () {
+                expect(normalizedConfig.compilationUnits[cu1].externs).toBeDefined();
+                expect(normalizedConfig.compilationUnits[cu1].externs).not.toBeNull();
+                expect(normalizedConfig.compilationUnits[cu1].externs.length).toBe(3);
+                expect(normalizedConfig.compilationUnits[cu1].externs).toEqual(jasmine.arrayContaining(
+                    ['someFile.js', path.join(ccc, 'some', 'file.js'), path.join('some', 'file.js')]));
+            });
+
+            it('normalize variables in compilationUnits\' buildOptions', function () {
+                expect(normalizedConfig.compilationUnits[cu1].buildOptions).toBeDefined();
+                expect(normalizedConfig.compilationUnits[cu1].buildOptions).not.toBeNull();
+                expect(normalizedConfig.compilationUnits[cu1].buildOptions.length).toBe(3);
+                expect(normalizedConfig.compilationUnits[cu1].buildOptions).toEqual(jasmine.arrayContaining(
+                    [ '--version', '--flagfile', '.' + path.sep + 'flagfile.closure_compiler']));
+            });
+
+            it('normalize variables in next\'s keys', function () {
+                expect(normalizedConfig.next).toBeDefined();
+                expect(normalizedConfig.next).not.toBe(null);
+                expect(Object.keys(normalizedConfig.next).length).toBe(2);
+                expect(Object.keys(normalizedConfig.next)).toEqual(jasmine.arrayContaining([
+                    path.join(ccc, 'some', 'other', ccc, 'folders'),
+                    path.join('some', 'path')
+                ]));
+            });
+
+            it('throws an exception in case of undefined variable', function () {
+                var config = {
+                    sources: ['${doesNotExist}/abc.def']
+                };
+                var cn = new ConfigurationNormalizer(config, null, vm);
+                expect(function () {
+                    cn.normalize();
+                }).toThrowError();
+            });
         });
 
-        it('normalize variables in checkFs.ignore', function () {
-            expect(normalizedConfig.checkFs.ignore).toBeDefined();
-            expect(normalizedConfig.checkFs.ignore).not.toBeNull();
-            expect(normalizedConfig.checkFs.ignore.length).toBe(2);
-            expect(normalizedConfig.checkFs.ignore).toEqual(jasmine.arrayContaining([process.cwd(),
-                                                                                     CC.compiler.CONTRIB_PATH]));
-        });
+        describe('with absolute paths', function () {
+            var cu1 = CC.compiler.CONTRIB_PATH + '/some/parts/' + CC.compiler.CONTRIB_PATH + '/' + process.cwd();
 
-        it('normalize variables in checkFs.fileExtensions', function () {
-            expect(normalizedConfig.checkFs.fileExtensions).toBeDefined();
-            expect(normalizedConfig.checkFs.fileExtensions).not.toBeNull();
-            expect(normalizedConfig.checkFs.fileExtensions.length).toBe(1);
-            expect(normalizedConfig.checkFs.fileExtensions).toEqual([CC.compiler.CONTRIB_PATH]);
-        });
+            beforeEach(function () {
+                vm = new VariableManager();
+                vm.set('CONTRIB_PATH', CC.compiler.CONTRIB_PATH);
+                vm.set('CWD', process.cwd());
+                cn = new ConfigurationNormalizer(config, null, vm, true);
+                normalizedConfig = cn.normalize();
+            });
 
-        it('normalize variables in global sources', function () {
-            expect(normalizedConfig.sources).toBeDefined();
-            expect(normalizedConfig.sources).not.toBeNull();
-            expect(normalizedConfig.sources.length).toBe(3);
-            expect(normalizedConfig.sources).toEqual(jasmine.arrayContaining([
-                path.resolve('someFile.js'),
-                path.join(CC.compiler.CONTRIB_PATH, process.cwd(), 'some', 'file.js'),
-                path.resolve('some', 'file.js')
-            ]));
-        });
+            it('normalize variables in checkFs.check', function () {
+                expect(normalizedConfig.checkFs).toBeDefined();
+                expect(normalizedConfig.checkFs).not.toBeNull();
+                expect(normalizedConfig.checkFs.check).toBeDefined();
+                expect(normalizedConfig.checkFs.check).not.toBeNull();
+                expect(normalizedConfig.checkFs.check.length).toBe(2);
+                expect(normalizedConfig.checkFs.check).toEqual(jasmine.arrayContaining([process.cwd(),
+                                                                                        CC.compiler.CONTRIB_PATH]));
+            });
 
-        it('normalize variables in global externs', function () {
-            expect(normalizedConfig.externs).toBeDefined();
-            expect(normalizedConfig.externs).not.toBeNull();
-            expect(normalizedConfig.externs.length).toBe(3);
-            expect(normalizedConfig.externs).toEqual(jasmine.arrayContaining([
-                path.resolve('someFile.js'),
-                path.join(CC.compiler.CONTRIB_PATH, process.cwd(), 'some', 'file.js'),
-                path.resolve('some', 'file.js')
-            ]));
-        });
+            it('normalize variables in checkFs.ignore', function () {
+                expect(normalizedConfig.checkFs.ignore).toBeDefined();
+                expect(normalizedConfig.checkFs.ignore).not.toBeNull();
+                expect(normalizedConfig.checkFs.ignore.length).toBe(2);
+                expect(normalizedConfig.checkFs.ignore).toEqual(jasmine.arrayContaining([process.cwd(),
+                                                                                         CC.compiler.CONTRIB_PATH]));
+            });
 
-        it('normalize variables in global buildOptions', function () {
-            expect(normalizedConfig.buildOptions).toBeDefined();
-            expect(normalizedConfig.buildOptions).not.toBeNull();
-            expect(normalizedConfig.buildOptions.length).toBe(3);
-            expect(normalizedConfig.buildOptions).toEqual(jasmine.arrayContaining([
-                '--version',
-                '--flagfile',
-                path.join(CC.compiler.CONTRIB_PATH, 'flagfile.closure_compiler')
-            ]));
-        });
+            it('normalize variables in checkFs.fileExtensions', function () {
+                expect(normalizedConfig.checkFs.fileExtensions).toBeDefined();
+                expect(normalizedConfig.checkFs.fileExtensions).not.toBeNull();
+                expect(normalizedConfig.checkFs.fileExtensions.length).toBe(1);
+                expect(normalizedConfig.checkFs.fileExtensions).toEqual([CC.compiler.CONTRIB_PATH]);
+            });
 
-        it('normalize variables in compilationUnits\' keys', function () {
-            expect(normalizedConfig.compilationUnits).toBeDefined();
-            expect(normalizedConfig.compilationUnits).not.toBeNull();
-            expect(Object.keys(normalizedConfig.compilationUnits).length).toBe(2);
-            expect(Object.keys(normalizedConfig.compilationUnits)).toEqual(jasmine.arrayContaining([
-                CC.compiler.CONTRIB_PATH + '/some/parts/' + CC.compiler.CONTRIB_PATH + '/' + process.cwd(),
-                'some/unit'
-            ]));
-        });
+            it('normalize variables in global sources', function () {
+                expect(normalizedConfig.sources).toBeDefined();
+                expect(normalizedConfig.sources).not.toBeNull();
+                expect(normalizedConfig.sources.length).toBe(3);
+                expect(normalizedConfig.sources).toEqual(jasmine.arrayContaining([
+                    path.resolve('someFile.js'),
+                    path.join(CC.compiler.CONTRIB_PATH, process.cwd(), 'some', 'file.js'),
+                    path.resolve('some', 'file.js')
+                ]));
+            });
 
-        it('normalize variables in compilationUnits\' sources', function () {
-            expect(normalizedConfig.compilationUnits[cu1].sources).toBeDefined();
-            expect(normalizedConfig.compilationUnits[cu1].sources).not.toBeNull();
-            expect(normalizedConfig.compilationUnits[cu1].sources.length).toBe(3);
-            expect(normalizedConfig.compilationUnits[cu1].sources).toEqual(jasmine.arrayContaining([
-                path.resolve('someFile.js'),
-                path.join(CC.compiler.CONTRIB_PATH, process.cwd(), 'some', 'file.js'),
-                path.resolve('some', 'file.js')
-            ]));
-        });
+            it('normalize variables in global externs', function () {
+                expect(normalizedConfig.externs).toBeDefined();
+                expect(normalizedConfig.externs).not.toBeNull();
+                expect(normalizedConfig.externs.length).toBe(3);
+                expect(normalizedConfig.externs).toEqual(jasmine.arrayContaining([
+                    path.resolve('someFile.js'),
+                    path.join(CC.compiler.CONTRIB_PATH, process.cwd(), 'some', 'file.js'),
+                    path.resolve('some', 'file.js')
+                ]));
+            });
 
-        it('normalize variables in compilationUnits\' externs', function () {
-            expect(normalizedConfig.compilationUnits[cu1].externs).toBeDefined();
-            expect(normalizedConfig.compilationUnits[cu1].externs).not.toBeNull();
-            expect(normalizedConfig.compilationUnits[cu1].externs.length).toBe(3);
-            expect(normalizedConfig.compilationUnits[cu1].externs).toEqual(jasmine.arrayContaining([
-                path.resolve('someFile.js'),
-                path.join(CC.compiler.CONTRIB_PATH, process.cwd(), 'some', 'file.js'),
-                path.resolve('some', 'file.js')
-            ]));
-        });
+            it('normalize variables in global buildOptions', function () {
+                expect(normalizedConfig.buildOptions).toBeDefined();
+                expect(normalizedConfig.buildOptions).not.toBeNull();
+                expect(normalizedConfig.buildOptions.length).toBe(3);
+                expect(normalizedConfig.buildOptions).toEqual(jasmine.arrayContaining([
+                    '--version',
+                    '--flagfile',
+                    path.join(CC.compiler.CONTRIB_PATH, 'flagfile.closure_compiler')
+                ]));
+            });
 
-        it('normalize variables in compilationUnits\' buildOptions', function () {
-            expect(normalizedConfig.compilationUnits[cu1].buildOptions).toBeDefined();
-            expect(normalizedConfig.compilationUnits[cu1].buildOptions).not.toBeNull();
-            expect(normalizedConfig.compilationUnits[cu1].buildOptions.length).toBe(3);
-            expect(normalizedConfig.compilationUnits[cu1].buildOptions).toEqual(jasmine.arrayContaining([
-                '--version',
-                '--flagfile',
-                path.resolve('flagfile.closure_compiler')
-            ]));
-        });
+            it('normalize variables in compilationUnits\' keys', function () {
+                expect(normalizedConfig.compilationUnits).toBeDefined();
+                expect(normalizedConfig.compilationUnits).not.toBeNull();
+                expect(Object.keys(normalizedConfig.compilationUnits).length).toBe(2);
+                expect(Object.keys(normalizedConfig.compilationUnits)).toEqual(jasmine.arrayContaining([
+                    CC.compiler.CONTRIB_PATH + '/some/parts/' + CC.compiler.CONTRIB_PATH + '/' + process.cwd(),
+                    'some/unit'
+                ]));
+            });
 
-        it('normalize variables in next\'s keys', function () {
-            expect(normalizedConfig.next).toBeDefined();
-            expect(normalizedConfig.next).not.toBe(null);
-            expect(Object.keys(normalizedConfig.next).length).toBe(2);
-            expect(Object.keys(normalizedConfig.next)).toEqual(jasmine.arrayContaining([
-                path.join(CC.compiler.CONTRIB_PATH, 'some', 'other', CC.compiler.CONTRIB_PATH, 'folders',
-                          process.cwd()),
-                path.resolve('some', 'path')
-            ]));
-        });
+            it('normalize variables in compilationUnits\' sources', function () {
+                expect(normalizedConfig.compilationUnits[cu1].sources).toBeDefined();
+                expect(normalizedConfig.compilationUnits[cu1].sources).not.toBeNull();
+                expect(normalizedConfig.compilationUnits[cu1].sources.length).toBe(3);
+                expect(normalizedConfig.compilationUnits[cu1].sources).toEqual(jasmine.arrayContaining([
+                    path.resolve('someFile.js'),
+                    path.join(CC.compiler.CONTRIB_PATH, process.cwd(), 'some', 'file.js'),
+                    path.resolve('some', 'file.js')
+                ]));
+            });
 
-        it('throws an exception in case of undefined variable', function () {
-            var config = {
-                sources: ['${doesNotExist}/abc.def']
-            };
-            var cn = new ConfigurationNormalizer(config, null, vm);
-            expect(function () {
-                cn.normalize();
-            }).toThrowError();
+            it('normalize variables in compilationUnits\' externs', function () {
+                expect(normalizedConfig.compilationUnits[cu1].externs).toBeDefined();
+                expect(normalizedConfig.compilationUnits[cu1].externs).not.toBeNull();
+                expect(normalizedConfig.compilationUnits[cu1].externs.length).toBe(3);
+                expect(normalizedConfig.compilationUnits[cu1].externs).toEqual(jasmine.arrayContaining([
+                    path.resolve('someFile.js'),
+                    path.join(CC.compiler.CONTRIB_PATH, process.cwd(), 'some', 'file.js'),
+                    path.resolve('some', 'file.js')
+                ]));
+            });
+
+            it('normalize variables in compilationUnits\' buildOptions', function () {
+                expect(normalizedConfig.compilationUnits[cu1].buildOptions).toBeDefined();
+                expect(normalizedConfig.compilationUnits[cu1].buildOptions).not.toBeNull();
+                expect(normalizedConfig.compilationUnits[cu1].buildOptions.length).toBe(3);
+                expect(normalizedConfig.compilationUnits[cu1].buildOptions).toEqual(jasmine.arrayContaining([
+                    '--version',
+                    '--flagfile',
+                    path.resolve('flagfile.closure_compiler')
+                ]));
+            });
+
+            it('normalize variables in next\'s keys', function () {
+                expect(normalizedConfig.next).toBeDefined();
+                expect(normalizedConfig.next).not.toBe(null);
+                expect(Object.keys(normalizedConfig.next).length).toBe(2);
+                expect(Object.keys(normalizedConfig.next)).toEqual(jasmine.arrayContaining([
+                    path.join(CC.compiler.CONTRIB_PATH, 'some', 'other', CC.compiler.CONTRIB_PATH, 'folders',
+                              process.cwd()),
+                    path.resolve('some', 'path')
+                ]));
+            });
+
+            it('throws an exception in case of undefined variable', function () {
+                var config = {
+                    sources: ['${doesNotExist}/abc.def']
+                };
+                var cn = new ConfigurationNormalizer(config, null, vm);
+                expect(function () {
+                    cn.normalize();
+                }).toThrowError();
+            });
         });
     });
 });

@@ -42,9 +42,11 @@ var VariableParser = /** @type {function(new:VariableParser, VariableManager)} *
  * @param {string=} basePath The path against each relative path of the configuration is resolved.
  * @param {VariableManager=} variableManager An optional object that contains all variables and their values that can
  *        be used in the configuration file.
+ * @param {boolean=} useAbsolutePaths If set to true, all paths are transformed to absolute paths in the configuration
+ *        file.
  * @throws {Error} Thrown if `config` is not `undefined`, `null` or an object.
  */
-function ConfigurationNormalizer (config, basePath, variableManager) {
+function ConfigurationNormalizer (config, basePath, variableManager, useAbsolutePaths) {
     if (config === undefined || config === null || util.isObject(config)) {
         this._config = config || {};
     } else {
@@ -57,6 +59,9 @@ function ConfigurationNormalizer (config, basePath, variableManager) {
 
     this._variableParser = new VariableParser(
         variableManager || new /** @type {function(new:VariableManager, VariableManager=)} */(VariableManager)());
+
+    this._useAbsolutePaths = useAbsolutePaths;
+    if (!util.isBoolean(this._useAbsolutePaths)) this._useAbsolutePaths = false;
 
     if (basePath == null) this._basePath = process.cwd();
     else this._basePath = basePath;
@@ -115,9 +120,14 @@ ConfigurationNormalizer._mapBooleanProperty = function (booleanValue, nextPath, 
  */
 ConfigurationNormalizer.prototype._resolvePaths = function (paths) {
     var self = this;
-    return paths.map(function (item) {
-        return path.resolve(self._basePath, item);
-    });
+    return paths
+        .map(function (item) {
+            if (!item) return '.';
+            else return item;
+        })
+        .map(function (item) {
+            return self._resolvePath(item);
+        });
 };
 
 /**
@@ -131,7 +141,9 @@ ConfigurationNormalizer.prototype._resolvePaths = function (paths) {
 ConfigurationNormalizer.prototype._resolvePath = function (filePath) {
     var self = this;
     if (!filePath) return undefined;
-    return path.resolve(self._basePath, filePath);
+    if (path.isAbsolute(filePath)) return path.normalize(filePath);
+    else if (this._useAbsolutePaths) return path.resolve(self._basePath, filePath);
+    else return path.relative(process.cwd(), path.resolve(self._basePath, filePath)) || '.';
 };
 
 /**
@@ -243,7 +255,6 @@ ConfigurationNormalizer.prototype.normalize = function () {
         this._resolveVariables(ConfigurationNormalizer._mapStringArray(this._config.externs, 'externs')));
     result.buildOptions =
         this._resolveVariables(ConfigurationNormalizer._normalizeBuildOptions(this._config.buildOptions));
-
     result.checkFs = {};
     if (util.isObject(this._config.checkFs)) {
         result.checkFs.check = self._resolvePaths(this._resolveVariables(
@@ -287,7 +298,7 @@ ConfigurationNormalizer.prototype.normalize = function () {
     if (util.isObject(this._config.next)) {
         result.next = Object.keys(this._config.next)
             .reduce(function (accumulator, key) {
-                var resolvedPath = path.resolve(self._basePath, self._variableParser.resolve(key));
+                var resolvedPath = self._resolvePath(self._variableParser.resolve(key));
                 accumulator[resolvedPath] = {};
                 accumulator[resolvedPath].inheritSources =
                     ConfigurationNormalizer._mapBooleanProperty(

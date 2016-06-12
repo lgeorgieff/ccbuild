@@ -4,13 +4,19 @@
  * @ignore
  * @suppress {duplicate}
  */
-var CC = require('google-closure-compiler');
+var util = require('util');
 
 /**
  * @ignore
  * @suppress {duplicate}
  */
-var util = require('util');
+var path = require('path');
+
+/**
+ * @ignore
+ * @suppress {duplicate}
+ */
+var CC = require('google-closure-compiler');
 
 /**
  * A class that manages variable names and values.
@@ -86,11 +92,20 @@ VariableManager.prototype.has = function (variableName) {
  * @static
  *
  * @returns {VariableManager} A new {@link VariableManager} instance.
+ *
+ * @param {boolean=} useAbsolutePaths An optional parameter that signals whether to use absolute or relative paths.
+ *        The default is to use relative paths.
  */
-VariableManager.create = function () {
+VariableManager.create = function (useAbsolutePaths) {
     let vm = new /**  @type {function(new:VariableManager, VariableManager=)} */(VariableManager)();
-    vm.set('CWD', process.cwd());
-    vm.set('CONTRIB_PATH', CC.compiler.CONTRIB_PATH);
+
+    if (useAbsolutePaths) {
+        vm.set('CWD', process.cwd());
+        vm.set('CONTRIB_PATH', CC.compiler.CONTRIB_PATH);
+    } else {
+        vm.set('CWD', '.');
+        vm.set('CONTRIB_PATH', path.relative(process.cwd(), CC.compiler.CONTRIB_PATH));
+    }
     return vm;
 };
 
