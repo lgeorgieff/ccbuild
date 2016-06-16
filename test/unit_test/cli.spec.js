@@ -343,7 +343,7 @@ describe('CLI class', function () {
         var cli = new CLI([process.argv[0], process.argv[1], '-n', 'next1']);
         cli.on('argsError', fail);
         cli.on('argsParsed', function (options) {
-            expect(options).toEqual({filteredNextEntries: [path.resolve('next1')]});
+            expect(options).toEqual({filteredNextEntries: ['next1']});
             done();
         });
     });
@@ -352,7 +352,7 @@ describe('CLI class', function () {
         var cli = new CLI([process.argv[0], process.argv[1], '--next', 'next1']);
         cli.on('argsError', fail);
         cli.on('argsParsed', function (options) {
-            expect(options).toEqual({filteredNextEntries: [path.resolve('next1')]});
+            expect(options).toEqual({filteredNextEntries: ['next1']});
             done();
         });
     });
@@ -363,8 +363,7 @@ describe('CLI class', function () {
         cli.on('argsError', fail);
         cli.on('argsParsed', function (options) {
             expect(options).toEqual(jasmine.objectContaining({filteredNextEntries: jasmine.arrayContaining(
-                [path.join('/', 'abc', 'def', 'next1'), path.resolve('next2'), path.resolve('ghi', 'next3'),
-                 path.resolve('next4')])}));
+                [path.join('/', 'abc', 'def', 'next1'), 'next2', path.join('ghi', 'next3'), 'next4'])}));
             expect(options.filteredNextEntries.length).toBe(4);
             done();
         });
@@ -377,8 +376,7 @@ describe('CLI class', function () {
         cli.on('argsError', fail);
         cli.on('argsParsed', function (options) {
             expect(options).toEqual(jasmine.objectContaining({filteredNextEntries: jasmine.arrayContaining(
-                [path.resolve('next1'), path.resolve('next2'), path.resolve('next3'), path.resolve('next4'),
-                 path.resolve('ghi', 'next3'), path.resolve('next4')])}));
+                ['next1', 'next2', 'next3', 'next4', path.join('ghi', 'next3'), 'next4'])}));
             expect(options.filteredNextEntries.length).toBe(6);
             done();
         });

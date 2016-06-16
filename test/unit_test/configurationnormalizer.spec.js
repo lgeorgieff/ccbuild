@@ -490,7 +490,7 @@ describe('Class ConfigurationNormalizer', function () {
                 expect(normalizedConfig.compilationUnits[cu1].buildOptions).not.toBeNull();
                 expect(normalizedConfig.compilationUnits[cu1].buildOptions.length).toBe(3);
                 expect(normalizedConfig.compilationUnits[cu1].buildOptions).toEqual(jasmine.arrayContaining(
-                    [ '--version', '--flagfile', '.' + path.sep + 'flagfile.closure_compiler']));
+                    ['--version', '--flagfile', '.' + path.sep + 'flagfile.closure_compiler']));
             });
 
             it('normalize variables in next\'s keys', function () {

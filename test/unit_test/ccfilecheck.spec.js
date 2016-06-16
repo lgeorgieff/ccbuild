@@ -446,8 +446,7 @@ describe('CCFileCheck class', function () {
 
         it('signals done in case all files have been checked', function (done) {
             var configPath = path.resolve(path.join('dir-1', 'config3.ccbuild'));
-            var filesToCheck = [path.resolve(path.join('dir-1', 'source1.js')),
-                                path.resolve(path.join('dir-1', 'source2.js'))];
+            var filesToCheck = [path.join('dir-1', 'source1.js'), path.join('dir-1', 'source2.js')];
 
             var ccfc = new CCFileCheck([process.argv[0], process.argv[1], '-c', configPath]);
             var verificationSuccessHandler = jasmine.createSpy('verificationSuccessHandler');
@@ -492,12 +491,11 @@ describe('CCFileCheck class', function () {
 
         it('signals verificationError in case multiple files are not in the compilation units', function (done) {
             var configPath = path.resolve(path.join('dir-2', 'config3.ccbuild'));
-            var filesNotInUnits = [path.resolve(path.join('dir-2', 'source3.js')),
-                                   path.resolve(path.join('dir-2', 'data1.json')),
-                                   path.resolve(path.join('dir-2', 'data2.json'))];
+            var filesNotInUnits = [path.join('dir-2', 'source3.js'),
+                                   path.join('dir-2', 'data1.json'),
+                                   path.join('dir-2', 'data2.json')];
 
-            var filesInUnits = [path.resolve(path.join('dir-2', 'source1.js')),
-                                path.resolve(path.join('dir-2', 'source2.js'))];
+            var filesInUnits = [path.join('dir-2', 'source1.js'), path.join('dir-2', 'source2.js')];
 
             var ccfc = new CCFileCheck([process.argv[0], process.argv[1], '-c', configPath]);
             var verificationSuccessHandler = jasmine.createSpy('verificationSuccessHandler');
@@ -556,9 +554,8 @@ describe('CCFileCheck class', function () {
         it('does not signal a verificationError in case a file extension is not listed in the file extensions list',
             function (done) {
                 var configPath = path.resolve(path.join('dir-2', 'config5.ccbuild'));
-                var filesNotInUnits = [path.resolve(path.join('dir-2', 'source3.js'))];
-                var filesInUnits = [path.resolve(path.join('dir-2', 'source1.js')),
-                                    path.resolve(path.join('dir-2', 'source2.js'))];
+                var filesNotInUnits = [path.join('dir-2', 'source3.js')];
+                var filesInUnits = [path.join('dir-2', 'source1.js'), path.join('dir-2', 'source2.js')];
 
                 var ccfc = new CCFileCheck([process.argv[0], process.argv[1], '-c', configPath]);
                 var verificationSuccessHandler = jasmine.createSpy('verificationSuccessHandler');
@@ -589,8 +586,7 @@ describe('CCFileCheck class', function () {
         it('does not signal a verificationError in case a file is included in a directory set as filesInUnits',
             function (done) {
                 var configPath = path.resolve(path.join('dir-1', 'config6.ccbuild'));
-                var filesToCheck = [path.resolve(path.join('dir-1', 'source1.js')),
-                                    path.resolve(path.join('dir-1', 'source2.js'))];
+                var filesToCheck = [path.join('dir-1', 'source1.js'), path.join('dir-1', 'source2.js')];
 
                 var ccfc = new CCFileCheck([process.argv[0], process.argv[1], '-c', configPath]);
                 var verificationSuccessHandler = jasmine.createSpy('verificationSuccessHandler');
@@ -615,9 +611,8 @@ describe('CCFileCheck class', function () {
         it('signals a verificationError in case a file extension is listed in the file extensions list',
             function (done) {
                 var configPath = path.resolve(path.join('dir-2', 'config7.ccbuild'));
-                var filesInUnit = [path.resolve(path.join('dir-2', 'source1.js'))];
-                var filesNotInUnit = [path.resolve(path.join('dir-2', 'source2.js')),
-                                      path.resolve(path.join('dir-2', 'source3.js'))];
+                var filesInUnit = [path.join('dir-2', 'source1.js')];
+                var filesNotInUnit = [path.join('dir-2', 'source2.js'), path.join('dir-2', 'source3.js')];
 
                 var ccfc = new CCFileCheck([process.argv[0], process.argv[1], '-c', configPath]);
 

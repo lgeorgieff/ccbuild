@@ -181,7 +181,6 @@ function mergeConfigurations (configuration, configurationPath, parentConfigurat
  */
 function readAndParseConfiguration (configPath, parentConfig, variableManager) {
     var deferred = Q.defer();
-    var absoluteConfigPath = path.resolve(configPath);
 
     fs.readFile(configPath, 'utf8', (err, data) => {
         if (err) {
@@ -190,9 +189,9 @@ function readAndParseConfiguration (configPath, parentConfig, variableManager) {
             try {
                 var configObject = /** @type {Object} */ (JSON.parse(/** @type {string} */ (data)));
                 var configNormalizer =
-                        new ConfigurationNormalizer(configObject, path.dirname(absoluteConfigPath), variableManager);
+                        new ConfigurationNormalizer(configObject, path.dirname(configPath), variableManager);
                 var normalizedConfig = configNormalizer.normalize();
-                deferred.resolve(mergeConfigurations(normalizedConfig, absoluteConfigPath, parentConfig));
+                deferred.resolve(mergeConfigurations(normalizedConfig, configPath, parentConfig));
             } catch (configError) {
                 deferred.reject(new Error('Could not read the configuration file "' + configPath + '"!\n' +
                                           configError));

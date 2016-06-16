@@ -323,21 +323,21 @@ describe('config_reader', function () {
             expect(mergedConfig.sources).toBeDefined();
             expect(mergedConfig.sources).toEqual(jasmine.any(Array));
             var expectedSources = [
-                path.resolve('file1.js'),
-                path.resolve('/tmp/file2.js'),
-                path.resolve('./some/other/path/file2.js'),
-                path.resolve('file3.js'),
-                path.resolve('./some/other/path/file4.js')
+                path.join('file1.js'),
+                path.join('/', 'tmp', 'file2.js'),
+                path.join('some', 'other', 'path', 'file2.js'),
+                path.join('file3.js'),
+                path.join('some', 'other', 'path', 'file4.js')
             ];
             expect(mergedConfig.sources.length).toBe(expectedSources.length);
             expect(mergedConfig.sources).toEqual(jasmine.arrayContaining(expectedSources));
             expect(mergedConfig.externs).toBeDefined();
             expect(mergedConfig.externs).toEqual(jasmine.any(Array));
             var expectedExterns = [
-                path.resolve('externs1.js'),
-                path.resolve('/tmp/externs2.js'),
-                path.resolve('./some/other/path/externs2.js'),
-                path.resolve('externs3.js')
+                path.join('externs1.js'),
+                path.join('/', 'tmp', 'externs2.js'),
+                path.join('some', 'other', 'path', 'externs2.js'),
+                path.join('externs3.js')
             ];
             expect(mergedConfig.externs.length).toBe(expectedExterns.length);
             expect(mergedConfig.externs).toEqual(jasmine.arrayContaining(expectedExterns));
@@ -360,9 +360,9 @@ describe('config_reader', function () {
             expect(mergedConfig.compilationUnits.compilationUnit1.sources).toBeDefined();
             expect(mergedConfig.compilationUnits.compilationUnit1.sources).toEqual(jasmine.any(Array));
             var expectedUnitSources = [
-                path.resolve('unit1_file_1.js'),
-                path.resolve('/tmp/unit1_file_2.js'),
-                path.resolve('/tmp/file2.js')
+                path.join('unit1_file_1.js'),
+                path.join('/', 'tmp', 'unit1_file_2.js'),
+                path.join('/', 'tmp', 'file2.js')
             ];
             expect(mergedConfig.compilationUnits.compilationUnit1.sources.length).toBe(expectedUnitSources.length);
             expect(mergedConfig.compilationUnits.compilationUnit1.sources)
@@ -371,8 +371,8 @@ describe('config_reader', function () {
             expect(mergedConfig.compilationUnits.compilationUnit1.externs).toBeDefined();
             expect(mergedConfig.compilationUnits.compilationUnit1.externs).toEqual(jasmine.any(Array));
             var expectedUnitExterns = [
-                path.resolve('./some/other/path/externs2.js'),
-                path.resolve('/tmp/unit1_externs_2.js')
+                path.join('some', 'other', 'path', 'externs2.js'),
+                path.join('/', 'tmp', 'unit1_externs_2.js')
             ];
             expect(mergedConfig.compilationUnits.compilationUnit1.externs.length).toBe(expectedUnitExterns.length);
             expect(mergedConfig.compilationUnits.compilationUnit1.externs)
@@ -392,8 +392,8 @@ describe('config_reader', function () {
             expect(mergedConfig.compilationUnits.compilationUnit2.externs).toBeDefined();
             expect(mergedConfig.compilationUnits.compilationUnit2.externs).toEqual(jasmine.any(Array));
             expectedUnitExterns = [
-                path.resolve('./some/path/unit2_externs_9.js'),
-                path.resolve('/tmp/unit2_externs_2.js')
+                path.join('some', 'path', 'unit2_externs_9.js'),
+                path.join('/', 'tmp', 'unit2_externs_2.js')
             ];
             expect(mergedConfig.compilationUnits.compilationUnit2.externs.length).toBe(expectedUnitExterns.length);
             expect(mergedConfig.compilationUnits.compilationUnit2.externs)
@@ -515,18 +515,18 @@ describe('config_reader', function () {
             expect(mergedConfig.sources).toBeDefined();
             expect(mergedConfig.sources).toEqual(jasmine.any(Array));
             var expectedSources = [
-                path.resolve('/tmp/file2.js'),
-                path.resolve('file3.js'),
-                path.resolve('./some/other/path/file4.js')
+                path.join('/', 'tmp', 'file2.js'),
+                path.join('file3.js'),
+                path.join('some', 'other', 'path', 'file4.js')
             ];
             expect(mergedConfig.sources.length).toBe(expectedSources.length);
             expect(mergedConfig.sources).toEqual(jasmine.arrayContaining(expectedSources));
             expect(mergedConfig.externs).toBeDefined();
             expect(mergedConfig.externs).toEqual(jasmine.any(Array));
             var expectedExterns = [
-                path.resolve('/tmp/externs2.js'),
-                path.resolve('./some/other/path/externs2.js'),
-                path.resolve('externs3.js')
+                path.join('/', 'tmp', 'externs2.js'),
+                path.join('some', 'other', 'path', 'externs2.js'),
+                path.join('externs3.js')
             ];
             expect(mergedConfig.externs.length).toBe(expectedExterns.length);
             expect(mergedConfig.externs).toEqual(jasmine.arrayContaining(expectedExterns));
@@ -549,9 +549,9 @@ describe('config_reader', function () {
             expect(mergedConfig.compilationUnits.compilationUnit1.sources).toBeDefined();
             expect(mergedConfig.compilationUnits.compilationUnit1.sources).toEqual(jasmine.any(Array));
             var expectedUnitSources = [
-                path.resolve('unit1_file_1.js'),
-                path.resolve('/tmp/unit1_file_2.js'),
-                path.resolve('/tmp/file2.js')
+                path.join('unit1_file_1.js'),
+                path.join('/', 'tmp', 'unit1_file_2.js'),
+                path.join('/', 'tmp', 'file2.js')
             ];
             expect(mergedConfig.compilationUnits.compilationUnit1.sources.length).toBe(expectedUnitSources.length);
             expect(mergedConfig.compilationUnits.compilationUnit1.sources)
@@ -560,8 +560,8 @@ describe('config_reader', function () {
             expect(mergedConfig.compilationUnits.compilationUnit1.externs).toBeDefined();
             expect(mergedConfig.compilationUnits.compilationUnit1.externs).toEqual(jasmine.any(Array));
             var expectedUnitExterns = [
-                path.resolve('./some/other/path/externs2.js'),
-                path.resolve('/tmp/unit1_externs_2.js')
+                path.join('some', 'other', 'path', 'externs2.js'),
+                path.join('/', 'tmp', 'unit1_externs_2.js')
             ];
             expect(mergedConfig.compilationUnits.compilationUnit1.externs.length).toBe(expectedUnitExterns.length);
             expect(mergedConfig.compilationUnits.compilationUnit1.externs)
@@ -581,8 +581,8 @@ describe('config_reader', function () {
             expect(mergedConfig.compilationUnits.compilationUnit2.externs).toBeDefined();
             expect(mergedConfig.compilationUnits.compilationUnit2.externs).toEqual(jasmine.any(Array));
             expectedUnitExterns = [
-                path.resolve('./some/path/unit2_externs_9.js'),
-                path.resolve('/tmp/unit2_externs_2.js')
+                path.join('some', 'path', 'unit2_externs_9.js'),
+                path.join('/', 'tmp', 'unit2_externs_2.js')
             ];
             expect(mergedConfig.compilationUnits.compilationUnit2.externs.length).toBe(expectedUnitExterns.length);
             expect(mergedConfig.compilationUnits.compilationUnit2.externs)
@@ -931,10 +931,26 @@ describe('config_reader', function () {
         var normalizer = new ConfigurationNormalizer(config, __dirname);
         var normalizedConfig = normalizer.normalize();
         var expectedConfig = Object.assign({}, this.EMPTY_CONFIG);
-        expectedConfig.checkFs = {check: [path.join(__dirname, 'file1.js'), '/tmp/files/file2.json',
-                                                        path.join(__dirname, 'src/file3.js')],
-                                                ignore: [],
-                                                fileExtensions: ['.js', '.json']};
+        expectedConfig.checkFs = {check: [path.join('test', 'unit_test', 'file1.js'),
+                                          path.join('/', 'tmp', 'files', 'file2.json'),
+                                          path.join('test', 'unit_test', 'src', 'file3.js')],
+                                  ignore: [],
+                                  fileExtensions: ['.js', '.json']};
+        expect(normalizedConfig).toEqual(expectedConfig);
+    });
+
+    it('normalizes set checkFs.check', function () {
+        var config = {
+            checkFs: {check: ['file1.js', '/tmp/files/file2.json', 'src/file3.js']}
+        };
+        var normalizer = new ConfigurationNormalizer(config, __dirname, null, true);
+        var normalizedConfig = normalizer.normalize();
+        var expectedConfig = Object.assign({}, this.EMPTY_CONFIG);
+        expectedConfig.checkFs = {check: [path.join(__dirname, 'file1.js'),
+                                          path.join('/', 'tmp', 'files', 'file2.json'),
+                                          path.join(__dirname, 'src/file3.js')],
+                                  ignore: [],
+                                  fileExtensions: ['.js', '.json']};
         expect(normalizedConfig).toEqual(expectedConfig);
     });
 
@@ -945,10 +961,26 @@ describe('config_reader', function () {
         var normalizer = new ConfigurationNormalizer(config, __dirname);
         var normalizedConfig = normalizer.normalize();
         var expectedConfig = Object.assign({}, this.EMPTY_CONFIG);
-        expectedConfig.checkFs = {ignore: [path.join(__dirname, 'file1.js'), '/tmp/files/file2.json',
-                                                         path.join(__dirname, 'src/file3.js')],
-                                                check: [],
-                                                fileExtensions: ['.js', '.json']};
+        expectedConfig.checkFs = {ignore: [path.join('test', 'unit_test', 'file1.js'),
+                                           path.join('/', 'tmp', 'files', 'file2.json'),
+                                           path.join('test', 'unit_test', 'src', 'file3.js')],
+                                  check: [],
+                                  fileExtensions: ['.js', '.json']};
+        expect(normalizedConfig).toEqual(expectedConfig);
+    });
+
+    it('normalizes set checkFs.ignore', function () {
+        var config = {
+            checkFs: {ignore: ['file1.js', '/tmp/files/file2.json', 'src/file3.js']}
+        };
+        var normalizer = new ConfigurationNormalizer(config, __dirname, null, true);
+        var normalizedConfig = normalizer.normalize();
+        var expectedConfig = Object.assign({}, this.EMPTY_CONFIG);
+        expectedConfig.checkFs = {ignore: [path.join(__dirname, 'file1.js'),
+                                           path.join('/', 'tmp', 'files', 'file2.json'),
+                                           path.join(__dirname, 'src/file3.js')],
+                                  check: [],
+                                  fileExtensions: ['.js', '.json']};
         expect(normalizedConfig).toEqual(expectedConfig);
     });
 });

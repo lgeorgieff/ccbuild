@@ -433,7 +433,10 @@ CLI.prototype._parseCliArgs = function (argv) {
     if (result.configs !== undefined) result.configs = utils.arrayToSet(result.configs);
     if (result.filteredUnits !== undefined) result.filteredUnits = utils.arrayToSet(result.filteredUnits);
     if (result.filteredNextEntries !== undefined) {
-        result.filteredNextEntries = utils.joinPaths(process.cwd(), result.filteredNextEntries);
+        result.filteredNextEntries = result.filteredNextEntries.map(function (p) {
+            if (path.isAbsolute(p)) return p;
+            else return path.relative(process.cwd(), p);
+        });
         result.filteredNextEntries = utils.arrayToSet(result.filteredNextEntries);
     }
     /**

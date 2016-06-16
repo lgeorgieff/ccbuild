@@ -249,7 +249,8 @@ CCBuild.prototype._processConfigs = function (cliArgs, rootVariableManager) {
         // We ignore duplicate configuration files. This can be for example the case if the same configuration file is
         // specified viw the CLI argument --config|-c and via the next property in a parent configuration file.
         if (processedConfigFiles.indexOf(configFilePath) === -1) {
-            configurationReader.readAndParseConfiguration(configFilePath, parentConfig, rootVariableManager)
+            configurationReader.readAndParseConfiguration(
+                path.relative(process.cwd(), configFilePath), parentConfig, rootVariableManager)
                 .then(function (configObject) {
                     globalContainsJsOutputFile = configObject.buildOptions.indexOf('--js_output_file') !== -1;
                     globalContainsJs = configObject.buildOptions.indexOf('--js') !== -1;
@@ -271,11 +272,9 @@ CCBuild.prototype._processConfigs = function (cliArgs, rootVariableManager) {
                             globalContainsJs || localContainsExterns || globalContainsExterns) {
                             break;
                         }
-
                         if (!cliArgs.filteredUnits || cliArgs.filteredUnits.length === 0 ||
                             cliArgs.filteredUnits.indexOf(objectKeys[i]) !== -1) {
                             var compilationUnit = {
-                                workingDirectory: path.dirname(configFilePath),
                                 unitName: objectKeys[i],
                                 globalSources: configObject.sources,
                                 unitSources: configObject.compilationUnits[objectKeys[i]].sources,
@@ -324,7 +323,9 @@ CCBuild.prototype._processConfigs = function (cliArgs, rootVariableManager) {
                                              utils.arrayContains(cliArgs.filteredNextEntries, nextConfigFilePath);
                                      })
                                      .map(function (nextConfigFilePath) {
-                                         return processConfig(nextConfigFilePath, configObject);
+                                         var p = nextConfigFilePath;
+                                         if (!path.isAbsolute(p)) path.join(configFilePath, nextConfigFilePath);
+                                         return processConfig(p, configObject);
                                      }))
                             .then(function (queuedCompilationUnitsPromises) {
                                 var queuedCompilationsUnits = queuedCompilationUnitsPromises.map(function (promise) {
@@ -411,7 +412,6 @@ CCBuild.prototype._compile = function (compilerConfiguration) {
         return deferred.promise;
     }
     var compiler = new CC.compiler(compilerArguments);
-    process.chdir(compilerConfiguration.workingDirectory);
     compiler.run(function (code, stdout, stderr) {
         if (code !== 0) {
             var err = new Error(code + (stderr ? ': ' + stderr : ''));

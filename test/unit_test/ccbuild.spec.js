@@ -437,7 +437,7 @@ describe('CCBuild class', function () {
                         '--warning_level', 'VERBOSE',
                         '--env', 'CUSTOM',
                         '--flagfile', './data/test_flagfile',
-                        '--js', path.join(__dirname, 'data', 'source4.js')]));
+                        '--js', path.join('test', 'unit_test', 'data', 'source4.js')]));
                     done();
                 });
             });
@@ -516,7 +516,7 @@ describe('CCBuild class', function () {
 
                    var ccbuild = new CCBuild([process.argv[0], process.argv[1], '--config', configPath1,
                                               '--next', 'does/not/exist',
-                                              '-n', path.join(__dirname, 'data/config5.ccbuild')]);
+                                              '-n', path.join('test', 'unit_test', 'data', 'config5.ccbuild')]);
                    var compiledHandler = jasmine.createSpy('compiledHandler');
                    ccbuild.on('compiled', compiledHandler);
                    ccbuild.on('done', function () {
@@ -525,6 +525,7 @@ describe('CCBuild class', function () {
                        expect(compiledHandler).toHaveBeenCalledWith('unit2', jasmine.any(String), jasmine.any(String));
                        done();
                    });
+                   ccbuild.on('argsError', (err) => console.log('>>>> ' + err));
                });
 
             it('emits done after finished with multiple configs -- 4 compilation units & 3x --next NEXT_ENTRY',
@@ -533,12 +534,12 @@ describe('CCBuild class', function () {
                        cb(0, '', '');
                    });
 
-                   var configPath1 = path.join(__dirname, 'config4.ccbuild');
+                   var configPath1 = path.join('test', 'unit_test', 'config4.ccbuild');
 
                    var ccbuild = new CCBuild([process.argv[0], process.argv[1], '--config', configPath1,
                                               '--next', 'does/not/exist',
-                                              '-n', path.join(__dirname, 'data/config5.ccbuild'),
-                                              '-n', path.join(__dirname, 'data/configs/config6')]);
+                                              '-n', path.join('test', 'unit_test', 'data', 'config5.ccbuild'),
+                                              '-n', path.join('test', 'unit_test', 'data', 'configs', 'config6')]);
                    var compiledHandler = jasmine.createSpy('compiledHandler');
                    ccbuild.on('compiled', compiledHandler);
                    ccbuild.on('done', function () {
