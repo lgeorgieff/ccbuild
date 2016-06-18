@@ -525,9 +525,8 @@ describe('CCBuild class', function () {
                        expect(compiledHandler).toHaveBeenCalledWith('unit2', jasmine.any(String), jasmine.any(String));
                        done();
                    });
-                   ccbuild.on('argsError', (err) => console.log('>>>> ' + err));
                });
-
+            
             it('emits done after finished with multiple configs -- 4 compilation units & 3x --next NEXT_ENTRY',
                function (done) {
                    runMock = jasmine.createSpy('compiler.run').and.callFake(function (cb) {

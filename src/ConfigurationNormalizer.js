@@ -298,7 +298,7 @@ ConfigurationNormalizer.prototype.normalize = function () {
     if (util.isObject(this._config.next)) {
         result.next = Object.keys(this._config.next)
             .reduce(function (accumulator, key) {
-                var resolvedPath = self._resolvePath(self._variableParser.resolve(key));
+                var resolvedPath = path.resolve(self._basePath, self._variableParser.resolve(key));
                 accumulator[resolvedPath] = {};
                 accumulator[resolvedPath].inheritSources =
                     ConfigurationNormalizer._mapBooleanProperty(

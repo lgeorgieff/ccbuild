@@ -134,7 +134,7 @@ describe('config_reader', function () {
         config2 = cn.normalize();
         fs.writeFileSync(testConfigPath, JSON.stringify(config2, null, 2), 'utf8');
 
-        configurationReader.readAndParseConfiguration(testConfigPath, config1).then(function (mergedConfig) {
+        configurationReader.readAndParseConfiguration(path.resolve(testConfigPath), config1).then(function (mergedConfig) {
             expect(mergedConfig).toBeDefined();
             expect(mergedConfig.sources).toEqual([]);
             expect(mergedConfig.externs).toEqual([]);
@@ -316,8 +316,7 @@ describe('config_reader', function () {
         config2 = cn.normalize();
 
         fs.writeFileSync(testConfigPath, JSON.stringify(config2, null, 2), 'utf8');
-
-        configurationReader.readAndParseConfiguration(testConfigPath, config1).then(function (mergedConfig) {
+        configurationReader.readAndParseConfiguration(path.resolve(testConfigPath), config1).then(function (mergedConfig) {
             expect(mergedConfig).toBeDefined();
             expect(mergedConfig).toEqual(jasmine.any(Object));
             expect(mergedConfig.sources).toBeDefined();

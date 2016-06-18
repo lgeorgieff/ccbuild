@@ -435,7 +435,7 @@ CLI.prototype._parseCliArgs = function (argv) {
     if (result.filteredNextEntries !== undefined) {
         result.filteredNextEntries = result.filteredNextEntries.map(function (p) {
             if (path.isAbsolute(p)) return p;
-            else return path.relative(process.cwd(), p);
+            else return path.resolve(process.cwd(), p);
         });
         result.filteredNextEntries = utils.arrayToSet(result.filteredNextEntries);
     }

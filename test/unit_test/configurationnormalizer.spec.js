@@ -498,8 +498,8 @@ describe('Class ConfigurationNormalizer', function () {
                 expect(normalizedConfig.next).not.toBe(null);
                 expect(Object.keys(normalizedConfig.next).length).toBe(2);
                 expect(Object.keys(normalizedConfig.next)).toEqual(jasmine.arrayContaining([
-                    path.join(ccc, 'some', 'other', ccc, 'folders'),
-                    path.join('some', 'path')
+                    path.resolve(process.cwd(), path.join(ccc, 'some', 'other', ccc, 'folders')),
+                    path.join(process.cwd(), 'some', 'path')
                 ]));
             });
 

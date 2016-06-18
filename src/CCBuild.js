@@ -275,6 +275,7 @@ CCBuild.prototype._processConfigs = function (cliArgs, rootVariableManager) {
                         if (!cliArgs.filteredUnits || cliArgs.filteredUnits.length === 0 ||
                             cliArgs.filteredUnits.indexOf(objectKeys[i]) !== -1) {
                             var compilationUnit = {
+                                workingDirectory: path.dirname(configFilePath),
                                 unitName: objectKeys[i],
                                 globalSources: configObject.sources,
                                 unitSources: configObject.compilationUnits[objectKeys[i]].sources,
@@ -411,6 +412,7 @@ CCBuild.prototype._compile = function (compilerConfiguration) {
         deferred.reject({compilationUnit: compilerConfiguration.unitName, error: err});
         return deferred.promise;
     }
+    process.chdir(compilerConfiguration.workingDirectory);
     var compiler = new CC.compiler(compilerArguments);
     compiler.run(function (code, stdout, stderr) {
         if (code !== 0) {
