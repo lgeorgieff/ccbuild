@@ -120,14 +120,9 @@ ConfigurationNormalizer._mapBooleanProperty = function (booleanValue, nextPath, 
  */
 ConfigurationNormalizer.prototype._resolvePaths = function (paths) {
     var self = this;
-    return paths
-        .map(function (item) {
-            if (!item) return '.';
-            else return item;
-        })
-        .map(function (item) {
-            return self._resolvePath(item);
-        });
+    return paths.map(function (item) {
+        return self._resolvePath(item);
+    });
 };
 
 /**
@@ -239,7 +234,8 @@ ConfigurationNormalizer.prototype._resolveVariables = function (strs, isPath) {
     if (!utils.isStringArray(strs)) throw new Error('"strs" must be a string array!');
     return strs.map(function (str) {
         var resolvedString = self._variableParser.resolve(str);
-        if (resolvedString === str && isPath === true) return self._resolvePath(str);
+        if (resolvedString === str && isPath === true) return self._resolvePath(str || '.');
+        else if (isPath) return path.normalize(resolvedString);
         else return resolvedString;
     });
 };
