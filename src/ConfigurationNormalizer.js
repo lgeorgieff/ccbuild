@@ -229,14 +229,18 @@ ConfigurationNormalizer._normalizeBuildOptions = function (buildOptions, compila
  *
  * @returns {Array<string>} The parsed strings.
  * @param {Array<string>} strs The strings read from the configuration file.
+ * @param {boolean=} isPath True if the passed strings are file pathes, i.e. they will be resolved against the CWD.
+ *        The default value nis false.
  * @throws {Error} Thrown if `strs` is not a string array.
  * @throws {Error} Thrown if an undefined variable identifier is used.
  */
-ConfigurationNormalizer.prototype._resolveVariables = function (strs) {
+ConfigurationNormalizer.prototype._resolveVariables = function (strs, isPath) {
     var self = this;
     if (!utils.isStringArray(strs)) throw new Error('"strs" must be a string array!');
     return strs.map(function (str) {
-        return self._variableParser.resolve(str);
+        var resolvedString = self._variableParser.resolve(str);
+        if (resolvedString === str && isPath === true) return self._resolvePath(str);
+        else return resolvedString;
     });
 };
 
@@ -249,23 +253,23 @@ ConfigurationNormalizer.prototype._resolveVariables = function (strs) {
 ConfigurationNormalizer.prototype.normalize = function () {
     var self = this;
     var result = {};
-    result.sources = this._resolvePaths(
-        this._resolveVariables(ConfigurationNormalizer._mapStringArray(this._config.sources, 'sources')));
-    result.externs = this._resolvePaths(
-        this._resolveVariables(ConfigurationNormalizer._mapStringArray(this._config.externs, 'externs')));
+    result.sources =
+        this._resolveVariables(ConfigurationNormalizer._mapStringArray(this._config.sources, 'sources'), true);
+    result.externs =
+        this._resolveVariables(ConfigurationNormalizer._mapStringArray(this._config.externs, 'externs'), true);
     result.buildOptions =
-        this._resolveVariables(ConfigurationNormalizer._normalizeBuildOptions(this._config.buildOptions));
+        this._resolveVariables(ConfigurationNormalizer._normalizeBuildOptions(this._config.buildOptions), false);
     result.checkFs = {};
     if (util.isObject(this._config.checkFs)) {
-        result.checkFs.check = self._resolvePaths(this._resolveVariables(
-            ConfigurationNormalizer._mapStringArray(this._config.checkFs.check, 'checkFs.check')));
-        result.checkFs.ignore = self._resolvePaths(this._resolveVariables(
-            ConfigurationNormalizer._mapStringArray(this._config.checkFs.ignore, 'checkFs.ignore')));
+        result.checkFs.check = this._resolveVariables(
+            ConfigurationNormalizer._mapStringArray(this._config.checkFs.check, 'checkFs.check'), true);
+        result.checkFs.ignore = this._resolveVariables(
+            ConfigurationNormalizer._mapStringArray(this._config.checkFs.ignore, 'checkFs.ignore'), true);
         if (this._config.checkFs.fileExtensions == null) {
             result.checkFs.fileExtensions = ['.js', '.json'];
         } else {
             result.checkFs.fileExtensions = this._resolveVariables(
-                ConfigurationNormalizer._mapStringArray(this._config.checkFs.fileExtensions, 'checkFs.fileExtensions'));
+                ConfigurationNormalizer._mapStringArray(this._config.checkFs.fileExtensions, 'checkFs.fileExtensions'), false);
         }
     }
 
@@ -275,16 +279,16 @@ ConfigurationNormalizer.prototype.normalize = function () {
                 var finalKey = self._variableParser.resolve(key);
                 accumulator[finalKey] = {};
                 accumulator[finalKey].sources =
-                    self._resolvePaths(self._resolveVariables(
+                    self._resolveVariables(
                         ConfigurationNormalizer._mapStringArray(
-                            self._config.compilationUnits[key].sources, 'sources')));
+                            self._config.compilationUnits[key].sources, 'sources'), true);
                 accumulator[finalKey].externs =
-                    self._resolvePaths(self._resolveVariables(
+                    self._resolveVariables(
                         ConfigurationNormalizer._mapStringArray(
-                            self._config.compilationUnits[key].externs, 'externs')));
+                            self._config.compilationUnits[key].externs, 'externs'), true);
                 accumulator[finalKey].buildOptions =
                     self._resolveVariables(ConfigurationNormalizer._normalizeBuildOptions(
-                        self._config.compilationUnits[key].buildOptions, key));
+                        self._config.compilationUnits[key].buildOptions, key), false);
                 if (self._config.compilationUnits[key].outputFile) {
                     accumulator[finalKey].outputFile =
                         self._resolvePath(self._variableParser.resolve(self._config.compilationUnits[key].outputFile));
