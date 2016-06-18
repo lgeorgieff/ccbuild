@@ -265,7 +265,8 @@ ConfigurationNormalizer.prototype.normalize = function () {
             result.checkFs.fileExtensions = ['.js', '.json'];
         } else {
             result.checkFs.fileExtensions = this._resolveVariables(
-                ConfigurationNormalizer._mapStringArray(this._config.checkFs.fileExtensions, 'checkFs.fileExtensions'), false);
+                ConfigurationNormalizer._mapStringArray(this._config.checkFs.fileExtensions, 'checkFs.fileExtensions'),
+                false);
         }
     }
 

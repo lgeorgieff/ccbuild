@@ -54,7 +54,7 @@ describe('bin', function () {
                 '--compilation_level', 'ADVANCED_OPTIMIZATIONS',
                 '--warning_level', 'VERBOSE',
                 '--env', 'CUSTOM',
-                '--flagfile', './data/test_flagfile'
+                '--flagfile', './test/system_test/data/test_flagfile'
             ],
             compilationUnits: {
                 unit1: {
@@ -101,7 +101,7 @@ describe('bin', function () {
                 '--compilation_level', 'ADVANCED_OPTIMIZATIONS',
                 '--warning_level', 'VERBOSE',
                 '--env', 'CUSTOM',
-                '--flagfile', './data/test_flagfile'
+                '--flagfile', './test/system_test/data/test_flagfile'
             ],
             compilationUnits: {
                 unit1: {
@@ -148,7 +148,7 @@ describe('bin', function () {
                 '--compilation_level', 'ADVANCED_OPTIMIZATIONS',
                 '--warning_level', 'VERBOSE',
                 '--env', 'CUSTOM',
-                '--flagfile', './data/test_flagfile'
+                '--flagfile', './test/system_test/data/test_flagfile'
             ],
             compilationUnits: {
                 unit1: {
@@ -184,7 +184,7 @@ describe('bin', function () {
                 '--compilation_level', 'ADVANCED_OPTIMIZATIONS',
                 '--warning_level', 'VERBOSE',
                 '--env', 'CUSTOM',
-                '--flagfile', './data/test_flagfile'
+                '--flagfile', './test/system_test/data/test_flagfile'
             ],
             compilationUnits: {
                 unit1: {
@@ -219,7 +219,7 @@ describe('bin', function () {
                 '--compilation_level', 'ADVANCED_OPTIMIZATIONS',
                 '--warning_level', 'VERBOSE',
                 '--env', 'CUSTOM',
-                '--flagfile', './data/test_flagfile'
+                '--flagfile', './test/system_test/data/test_flagfile'
             ],
             compilationUnits: {
                 unit1: {},
@@ -400,7 +400,7 @@ describe('bin', function () {
         };
         var config2 = {
             externs: ['./data/externs2.js'],
-            buildOptions: ['--flagfile', './data/test_flagfile'],
+            buildOptions: ['--flagfile', './test/system_test/data/test_flagfile'],
             next: {}
         };
         config2.next[configPath3] = {
@@ -461,7 +461,7 @@ describe('bin', function () {
         };
         var config2 = {
             externs: ['./data/externs2.js'],
-            buildOptions: ['--flagfile', './data/test_flagfile'],
+            buildOptions: ['--flagfile', './test/system_test/data/test_flagfile'],
             next: {}
         };
         config2.next[configPath3] = {
@@ -518,7 +518,7 @@ describe('bin', function () {
             ],
             compilationUnits: {
                 unit1: {
-                    buildOptions: ['--flagfile', './data/test_flagfile']
+                    buildOptions: ['--flagfile', './test/system_test/data/test_flagfile']
                 }
             },
             next: {}
@@ -534,7 +534,7 @@ describe('bin', function () {
                 unit2: {
                     sources: ['source2.js'],
                     externs: ['./externs2.js'],
-                    buildOptions: ['--flagfile', './test_flagfile']
+                    buildOptions: ['--flagfile', './test/system_test/data/test_flagfile']
                 }
             },
             next: {}
@@ -552,12 +552,12 @@ describe('bin', function () {
                 unit3: {
                     sources: ['../source3.js', '../source4.js'],
                     externs: ['../externs2.js', '../externs3.js'],
-                    buildOptions: ['--flagfile', '../test_flagfile']
+                    buildOptions: ['--flagfile', './test/system_test/data/test_flagfile']
                 },
                 unit4: {
                     sources: ['../source3.js', '../source4.js'],
                     externs: ['../externs2.js', '../externs3.js'],
-                    buildOptions: ['--flagfile', '../test_flagfile']
+                    buildOptions: ['--flagfile', './test/system_test/data/test_flagfile']
                 }
             }
         };
@@ -613,7 +613,7 @@ describe('bin', function () {
             ],
             compilationUnits: {
                 unit1: {
-                    buildOptions: ['--flagfile', './data/test_flagfile']
+                    buildOptions: ['--flagfile', './test/system_test/data/test_flagfile']
                 }
             },
             next: {}
@@ -631,7 +631,7 @@ describe('bin', function () {
                 unit2: {
                     sources: ['source2.js'],
                     externs: ['./externs2.js'],
-                    buildOptions: ['--flagfile', './test_flagfile']
+                    buildOptions: ['--flagfile', './test/system_test/data/test_flagfile']
                 }
             },
             next: {}
@@ -646,12 +646,12 @@ describe('bin', function () {
             compilationUnits: {
                 unit3: {
                     sources: ['../source3.js', '../source4.js'],
-                    buildOptions: ['--flagfile', '../test_flagfile']
+                    buildOptions: ['--flagfile', './test/system_test/data/test_flagfile']
                 },
                 unit4: {
                     sources: ['../source3.js', '../source4.js'],
                     externs: ['../externs2.js', '../externs3.js'],
-                    buildOptions: ['--flagfile', '../test_flagfile']
+                    buildOptions: ['--flagfile', './test/system_test/data/test_flagfile']
                 }
             }
         };
@@ -707,7 +707,7 @@ describe('bin', function () {
             ],
             compilationUnits: {
                 unit1: {
-                    buildOptions: ['--flagfile', './data/test_flagfile']
+                    buildOptions: ['--flagfile', './test/system_test/data/test_flagfile']
                 }
             },
             next: {}
@@ -725,7 +725,7 @@ describe('bin', function () {
                 unit2: {
                     sources: ['source2.js'],
                     externs: ['./externs2.js'],
-                    buildOptions: ['--flagfile', './test_flagfile']
+                    buildOptions: ['--flagfile', './test/system_test/data/test_flagfile']
                 }
             },
             next: {}
@@ -741,7 +741,7 @@ describe('bin', function () {
                 unit3: {
                     sources: ['../source3.js', '../source4.js'],
                     externs: ['../externs2.js', '../externs3.js'],
-                    buildOptions: ['--flagfile', '../test_flagfile']
+                    buildOptions: ['--flagfile', './test/system_test/data/test_flagfile']
                 }
             },
             next: {}
@@ -786,7 +786,7 @@ describe('bin', function () {
                 '--compilation_level', 'ADVANCED_OPTIMIZATIONS',
                 '--warning_level', 'VERBOSE',
                 '--env', 'CUSTOM',
-                '--flagfile', './data/test_flagfile'
+                '--flagfile', './test/system_test/data/test_flagfile'
             ],
             compilationUnits: {
                 unit1: {
@@ -823,7 +823,7 @@ describe('bin', function () {
                 '--compilation_level', 'ADVANCED_OPTIMIZATIONS',
                 '--warning_level', 'VERBOSE',
                 '--env', 'CUSTOM',
-                '--flagfile', './data/test_flagfile'
+                '--flagfile', './test/system_test/data/test_flagfile'
             ],
             compilationUnits: {
                 unit1: {
@@ -865,7 +865,7 @@ describe('bin', function () {
                 '--compilation_level', 'ADVANCED_OPTIMIZATIONS',
                 '--warning_level', 'VERBOSE',
                 '--env', 'CUSTOM',
-                '--flagfile', './data/test_flagfile'
+                '--flagfile', './test/system_test/data/test_flagfile'
             ],
             compilationUnits: {
                 unit1: {
@@ -907,7 +907,7 @@ describe('bin', function () {
                 '--compilation_level', 'ADVANCED_OPTIMIZATIONS',
                 '--warning_level', 'VERBOSE',
                 '--env', 'CUSTOM',
-                '--flagfile', './data/test_flagfile'
+                '--flagfile', './test/system_test/data/test_flagfile'
             ],
             compilationUnits: {
                 unit1: {
@@ -948,7 +948,7 @@ describe('bin', function () {
                 '--compilation_level', 'ADVANCED_OPTIMIZATIONS',
                 '--warning_level', 'VERBOSE',
                 '--env', 'CUSTOM',
-                '--flagfile', './data/test_flagfile'
+                '--flagfile', './test/system_test/data/test_flagfile'
             ],
             compilationUnits: {
                 unit1: {
@@ -987,7 +987,7 @@ describe('bin', function () {
                 '--compilation_level', 'ADVANCED_OPTIMIZATIONS',
                 '--warning_level', 'VERBOSE',
                 '--env', 'CUSTOM',
-                '--flagfile', './data/test_flagfile'
+                '--flagfile', './test/system_test/data/test_flagfile'
             ],
             compilationUnits: {
                 unit1: {
@@ -1036,7 +1036,7 @@ describe('bin', function () {
                 '--compilation_level', 'ADVANCED_OPTIMIZATIONS',
                 '--warning_level', 'VERBOSE',
                 '--env', 'CUSTOM',
-                '--flagfile', './data/test_flagfile'
+                '--flagfile', './test/system_test/data/test_flagfile'
             ],
             compilationUnits: {
                 unit1: {
@@ -1086,7 +1086,7 @@ describe('bin', function () {
                 '--compilation_level', 'ADVANCED_OPTIMIZATIONS',
                 '--warning_level', 'VERBOSE',
                 '--env', 'CUSTOM',
-                '--flagfile', './data/test_flagfile'
+                '--flagfile', './test/system_test/data/test_flagfile'
             ],
             compilationUnits: {
                 unit1: {
@@ -1150,7 +1150,7 @@ describe('bin', function () {
             ],
             compilationUnits: {
                 unit1: {
-                    buildOptions: ['--flagfile', './data/test_flagfile'],
+                    buildOptions: ['--flagfile', './test/system_test/data/test_flagfile'],
                     outputFile: path.basename(out1)
                 }
             },
@@ -1167,7 +1167,7 @@ describe('bin', function () {
                 unit2: {
                     sources: ['source2.js'],
                     externs: ['./externs2.js'],
-                    buildOptions: ['--flagfile', './test_flagfile'],
+                    buildOptions: ['--flagfile', './test/system_test/data/test_flagfile'],
                     outputFile: path.basename(out2)
                 }
             },
@@ -1186,13 +1186,13 @@ describe('bin', function () {
                 unit3: {
                     sources: ['../source3.js', '../source4.js'],
                     externs: ['../externs2.js', '../externs3.js'],
-                    buildOptions: ['--flagfile', '../test_flagfile'],
+                    buildOptions: ['--flagfile', './test/system_test/data/test_flagfile'],
                     outputFile: path.basename(out3)
                 },
                 unit4: {
                     sources: ['../source3.js', '../source4.js'],
                     externs: ['../externs2.js', '../externs3.js'],
-                    buildOptions: ['--flagfile', '../test_flagfile'],
+                    buildOptions: ['--flagfile', './test/system_test/data/test_flagfile'],
                     outputFile: path.basename(out4)
                 }
             }
@@ -1248,7 +1248,7 @@ describe('bin', function () {
                 '--compilation_level', 'ADVANCED_OPTIMIZATIONS',
                 '--warning_level', 'VERBOSE',
                 '--env', 'CUSTOM',
-                '--flagfile', './data/test_flagfile'
+                '--flagfile', './test/system_test/data/test_flagfile'
             ],
             compilationUnits: {
                 unit1: {
@@ -1306,7 +1306,7 @@ describe('bin', function () {
             ],
             compilationUnits: {
                 unit1: {
-                    buildOptions: ['--flagfile', './data/test_flagfile']
+                    buildOptions: ['--flagfile', './test/system_test/data/test_flagfile']
                 }
             },
             next: {}
@@ -1322,7 +1322,7 @@ describe('bin', function () {
                 unit2: {
                     sources: ['source2.js'],
                     externs: ['./externs2.js'],
-                    buildOptions: ['--flagfile', './test_flagfile']
+                    buildOptions: ['--flagfile', './test/system_test/data/test_flagfile']
                 }
             },
             next: {}
@@ -1340,12 +1340,12 @@ describe('bin', function () {
                 unit3: {
                     sources: ['../source3.js', '../source4.js'],
                     externs: ['../externs2.js', '../externs3.js'],
-                    buildOptions: ['--flagfile', '../test_flagfile']
+                    buildOptions: ['--flagfile', './test/system_test/data/test_flagfile']
                 },
                 unit4: {
                     sources: ['../source3.js', '../source4.js'],
                     externs: ['../externs2.js', '../externs3.js'],
-                    buildOptions: ['--flagfile', '../test_flagfile']
+                    buildOptions: ['--flagfile', './test/system_test/data/test_flagfile']
                 }
             }
         };
@@ -1390,7 +1390,7 @@ describe('bin', function () {
                 '--compilation_level', 'ADVANCED_OPTIMIZATIONS',
                 '--warning_level', 'VERBOSE',
                 '--env', 'CUSTOM',
-                '--flagfile', './data/test_flagfile'
+                '--flagfile', './test/system_test/data/test_flagfile'
             ],
             compilationUnits: {
                 unit1: {
@@ -1444,7 +1444,7 @@ describe('bin', function () {
             ],
             compilationUnits: {
                 unit1: {
-                    buildOptions: ['--flagfile', './data/test_flagfile']
+                    buildOptions: ['--flagfile', './test/system_test/data/test_flagfile']
                 }
             },
             next: {}
@@ -1464,7 +1464,7 @@ describe('bin', function () {
                 unit2: {
                     sources: ['source2.js'],
                     externs: ['./externs2.js'],
-                    buildOptions: ['--flagfile', './test_flagfile']
+                    buildOptions: ['--flagfile', './test/system_test/data/test_flagfile']
                 }
             },
             next: {}
@@ -1486,12 +1486,12 @@ describe('bin', function () {
                 unit3: {
                     sources: ['../source3.js', '../source4.js'],
                     externs: ['../externs2.js', '../externs3.js'],
-                    buildOptions: ['--flagfile', '../test_flagfile']
+                    buildOptions: ['--flagfile', './test/system_test/data/test_flagfile']
                 },
                 unit4: {
                     sources: ['../source3.js', '../source4.js'],
                     externs: ['../externs2.js', '../externs3.js'],
-                    buildOptions: ['--flagfile', '../test_flagfile']
+                    buildOptions: ['--flagfile', './test/system_test/data/test_flagfile']
                 }
             }
         };
@@ -1541,7 +1541,7 @@ describe('bin', function () {
             ],
             compilationUnits: {
                 unit1: {
-                    buildOptions: ['--flagfile', './data/test_flagfile']
+                    buildOptions: ['--flagfile', './test/system_test/data/test_flagfile']
                 }
             },
             next: {}
@@ -1561,7 +1561,7 @@ describe('bin', function () {
                 unit2: {
                     sources: ['source2.js'],
                     externs: ['./externs2.js'],
-                    buildOptions: ['--flagfile', './test_flagfile']
+                    buildOptions: ['--flagfile', './test/system_test/data/test_flagfile']
                 }
             },
             next: {}
@@ -1583,12 +1583,12 @@ describe('bin', function () {
                 unit3: {
                     sources: ['../source3.js', '../source4.js'],
                     externs: ['../externs2.js', '../externs3.js'],
-                    buildOptions: ['--flagfile', '../test_flagfile']
+                    buildOptions: ['--flagfile', './test/system_test/data/test_flagfile']
                 },
                 unit4: {
                     sources: ['../source3.js', '../source4.js'],
                     externs: ['../externs2.js', '../externs3.js'],
-                    buildOptions: ['--flagfile', '../test_flagfile']
+                    buildOptions: ['--flagfile', './test/system_test/data/test_flagfile']
                 }
             }
         };
@@ -1640,7 +1640,7 @@ describe('bin', function () {
             ],
             compilationUnits: {
                 unit1: {
-                    buildOptions: ['--flagfile', './data/test_flagfile']
+                    buildOptions: ['--flagfile', './test/system_test/data/test_flagfile']
                 }
             },
             next: {}
@@ -1660,7 +1660,7 @@ describe('bin', function () {
                 unit2: {
                     sources: ['source2.js'],
                     externs: ['./externs2.js'],
-                    buildOptions: ['--flagfile', './test_flagfile']
+                    buildOptions: ['--flagfile', './test/system_test/data/test_flagfile']
                 }
             },
             next: {}
@@ -1682,12 +1682,12 @@ describe('bin', function () {
                 unit3: {
                     sources: ['../source3.js', '../source4.js'],
                     externs: ['../externs2.js', '../externs3.js'],
-                    buildOptions: ['--flagfile', '../test_flagfile']
+                    buildOptions: ['--flagfile', './test/system_test/data/test_flagfile']
                 },
                 unit4: {
                     sources: ['../source3.js', '../source4.js'],
                     externs: ['../externs2.js', '../externs3.js'],
-                    buildOptions: ['--flagfile', '../test_flagfile']
+                    buildOptions: ['--flagfile', './test/system_test/data/test_flagfile']
                 }
             }
         };

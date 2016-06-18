@@ -38,7 +38,7 @@ var cliUtils = require('../utils/cliUtils.js');
 
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 60000;
 
-fdescribe('CCBuild class', function () {
+describe('CCBuild class', function () {
     beforeEach(function () {
         this.resourcesToDelete = [];
     });
