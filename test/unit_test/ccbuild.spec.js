@@ -526,7 +526,7 @@ describe('CCBuild class', function () {
                        done();
                    });
                });
-            
+
             it('emits done after finished with multiple configs -- 4 compilation units & 3x --next NEXT_ENTRY',
                function (done) {
                    runMock = jasmine.createSpy('compiler.run').and.callFake(function (cb) {

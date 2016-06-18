@@ -134,35 +134,36 @@ describe('config_reader', function () {
         config2 = cn.normalize();
         fs.writeFileSync(testConfigPath, JSON.stringify(config2, null, 2), 'utf8');
 
-        configurationReader.readAndParseConfiguration(path.resolve(testConfigPath), config1).then(function (mergedConfig) {
-            expect(mergedConfig).toBeDefined();
-            expect(mergedConfig.sources).toEqual([]);
-            expect(mergedConfig.externs).toEqual([]);
-            expect(mergedConfig.compilationUnits).toEqual({});
-            expect(mergedConfig.next).toBeDefined();
-            var nextPath = path.resolve(testConfigPath);
-            expect(mergedConfig.next[nextPath]).toBeUndefined();
-            var expectedBuildOptions = [
-                '--js', 'file1.js',
-                '--js', 'file2.js',
-                '--js', 'file3.js',
-                '--externs', 'externs1.js',
-                '--externs', 'externs1.js',
-                '--externs', 'externs2.js',
-                '--js', 'fil=e4.js=',
-                '--version',
-                '--js', 'file4.js',
-                '--js', 'file5.js',
-                '--debug',
-                '--externs', 'externs3.js',
-                '--externs', 'externs4.js'
-            ];
-            expect(mergedConfig.buildOptions.length).toBe(expectedBuildOptions.length);
-            expect(mergedConfig.buildOptions).toEqual(jasmine.arrayContaining(expectedBuildOptions));
-            done();
-        }).catch(function (err) {
-            done.fail(err);
-        });
+        configurationReader.readAndParseConfiguration(path.resolve(testConfigPath), config1)
+            .then(function (mergedConfig) {
+                expect(mergedConfig).toBeDefined();
+                expect(mergedConfig.sources).toEqual([]);
+                expect(mergedConfig.externs).toEqual([]);
+                expect(mergedConfig.compilationUnits).toEqual({});
+                expect(mergedConfig.next).toBeDefined();
+                var nextPath = path.resolve(testConfigPath);
+                expect(mergedConfig.next[nextPath]).toBeUndefined();
+                var expectedBuildOptions = [
+                    '--js', 'file1.js',
+                    '--js', 'file2.js',
+                    '--js', 'file3.js',
+                    '--externs', 'externs1.js',
+                    '--externs', 'externs1.js',
+                    '--externs', 'externs2.js',
+                    '--js', 'fil=e4.js=',
+                    '--version',
+                    '--js', 'file4.js',
+                    '--js', 'file5.js',
+                    '--debug',
+                    '--externs', 'externs3.js',
+                    '--externs', 'externs4.js'
+                ];
+                expect(mergedConfig.buildOptions.length).toBe(expectedBuildOptions.length);
+                expect(mergedConfig.buildOptions).toEqual(jasmine.arrayContaining(expectedBuildOptions));
+                done();
+            }).catch(function (err) {
+                done.fail(err);
+            });
         this.resourcesToDelete.push(testConfigPath);
     });
 
@@ -316,107 +317,108 @@ describe('config_reader', function () {
         config2 = cn.normalize();
 
         fs.writeFileSync(testConfigPath, JSON.stringify(config2, null, 2), 'utf8');
-        configurationReader.readAndParseConfiguration(path.resolve(testConfigPath), config1).then(function (mergedConfig) {
-            expect(mergedConfig).toBeDefined();
-            expect(mergedConfig).toEqual(jasmine.any(Object));
-            expect(mergedConfig.sources).toBeDefined();
-            expect(mergedConfig.sources).toEqual(jasmine.any(Array));
-            var expectedSources = [
-                path.join('file1.js'),
-                path.join('/', 'tmp', 'file2.js'),
-                path.join('some', 'other', 'path', 'file2.js'),
-                path.join('file3.js'),
-                path.join('some', 'other', 'path', 'file4.js')
-            ];
-            expect(mergedConfig.sources.length).toBe(expectedSources.length);
-            expect(mergedConfig.sources).toEqual(jasmine.arrayContaining(expectedSources));
-            expect(mergedConfig.externs).toBeDefined();
-            expect(mergedConfig.externs).toEqual(jasmine.any(Array));
-            var expectedExterns = [
-                path.join('externs1.js'),
-                path.join('/', 'tmp', 'externs2.js'),
-                path.join('some', 'other', 'path', 'externs2.js'),
-                path.join('externs3.js')
-            ];
-            expect(mergedConfig.externs.length).toBe(expectedExterns.length);
-            expect(mergedConfig.externs).toEqual(jasmine.arrayContaining(expectedExterns));
-            expect(mergedConfig.buildOptions).toBeDefined();
-            expect(mergedConfig.buildOptions).toEqual(jasmine.any(Array));
-            var expectedBuildOptions = [
-                '--debug',
-                '--language_in', 'ECMASCRIPT6_STRICT',
-                '--language_out', 'ECMASCRIPT6_STRICT',
-                '--version'
-            ];
-            expect(mergedConfig.buildOptions.length).toBe(expectedBuildOptions.length);
-            expect(mergedConfig.buildOptions).toEqual(jasmine.arrayContaining(expectedBuildOptions));
+        configurationReader.readAndParseConfiguration(path.resolve(testConfigPath), config1)
+            .then(function (mergedConfig) {
+                expect(mergedConfig).toBeDefined();
+                expect(mergedConfig).toEqual(jasmine.any(Object));
+                expect(mergedConfig.sources).toBeDefined();
+                expect(mergedConfig.sources).toEqual(jasmine.any(Array));
+                var expectedSources = [
+                    path.join('file1.js'),
+                    path.join('/', 'tmp', 'file2.js'),
+                    path.join('some', 'other', 'path', 'file2.js'),
+                    path.join('file3.js'),
+                    path.join('some', 'other', 'path', 'file4.js')
+                ];
+                expect(mergedConfig.sources.length).toBe(expectedSources.length);
+                expect(mergedConfig.sources).toEqual(jasmine.arrayContaining(expectedSources));
+                expect(mergedConfig.externs).toBeDefined();
+                expect(mergedConfig.externs).toEqual(jasmine.any(Array));
+                var expectedExterns = [
+                    path.join('externs1.js'),
+                    path.join('/', 'tmp', 'externs2.js'),
+                    path.join('some', 'other', 'path', 'externs2.js'),
+                    path.join('externs3.js')
+                ];
+                expect(mergedConfig.externs.length).toBe(expectedExterns.length);
+                expect(mergedConfig.externs).toEqual(jasmine.arrayContaining(expectedExterns));
+                expect(mergedConfig.buildOptions).toBeDefined();
+                expect(mergedConfig.buildOptions).toEqual(jasmine.any(Array));
+                var expectedBuildOptions = [
+                    '--debug',
+                    '--language_in', 'ECMASCRIPT6_STRICT',
+                    '--language_out', 'ECMASCRIPT6_STRICT',
+                    '--version'
+                ];
+                expect(mergedConfig.buildOptions.length).toBe(expectedBuildOptions.length);
+                expect(mergedConfig.buildOptions).toEqual(jasmine.arrayContaining(expectedBuildOptions));
 
-            expect(mergedConfig.compilationUnits).toBeDefined();
-            expect(mergedConfig.compilationUnits).toEqual(jasmine.any(Object));
-            expect(Object.keys(mergedConfig.compilationUnits).length).toBe(2);
+                expect(mergedConfig.compilationUnits).toBeDefined();
+                expect(mergedConfig.compilationUnits).toEqual(jasmine.any(Object));
+                expect(Object.keys(mergedConfig.compilationUnits).length).toBe(2);
 
-            expect(mergedConfig.compilationUnits.compilationUnit1).toBeDefined();
-            expect(mergedConfig.compilationUnits.compilationUnit1.sources).toBeDefined();
-            expect(mergedConfig.compilationUnits.compilationUnit1.sources).toEqual(jasmine.any(Array));
-            var expectedUnitSources = [
-                path.join('unit1_file_1.js'),
-                path.join('/', 'tmp', 'unit1_file_2.js'),
-                path.join('/', 'tmp', 'file2.js')
-            ];
-            expect(mergedConfig.compilationUnits.compilationUnit1.sources.length).toBe(expectedUnitSources.length);
-            expect(mergedConfig.compilationUnits.compilationUnit1.sources)
-                .toEqual(jasmine.arrayContaining(expectedUnitSources));
+                expect(mergedConfig.compilationUnits.compilationUnit1).toBeDefined();
+                expect(mergedConfig.compilationUnits.compilationUnit1.sources).toBeDefined();
+                expect(mergedConfig.compilationUnits.compilationUnit1.sources).toEqual(jasmine.any(Array));
+                var expectedUnitSources = [
+                    path.join('unit1_file_1.js'),
+                    path.join('/', 'tmp', 'unit1_file_2.js'),
+                    path.join('/', 'tmp', 'file2.js')
+                ];
+                expect(mergedConfig.compilationUnits.compilationUnit1.sources.length).toBe(expectedUnitSources.length);
+                expect(mergedConfig.compilationUnits.compilationUnit1.sources)
+                    .toEqual(jasmine.arrayContaining(expectedUnitSources));
 
-            expect(mergedConfig.compilationUnits.compilationUnit1.externs).toBeDefined();
-            expect(mergedConfig.compilationUnits.compilationUnit1.externs).toEqual(jasmine.any(Array));
-            var expectedUnitExterns = [
-                path.join('some', 'other', 'path', 'externs2.js'),
-                path.join('/', 'tmp', 'unit1_externs_2.js')
-            ];
-            expect(mergedConfig.compilationUnits.compilationUnit1.externs.length).toBe(expectedUnitExterns.length);
-            expect(mergedConfig.compilationUnits.compilationUnit1.externs)
-                .toEqual(jasmine.arrayContaining(expectedUnitExterns));
-            expect(mergedConfig.compilationUnits.compilationUnit1.buildOptions).toBeDefined();
-            expect(mergedConfig.compilationUnits.compilationUnit1.buildOptions).toEqual(jasmine.any(Array));
-            expect(mergedConfig.compilationUnits.compilationUnit1.buildOptions.length).toBe(0);
+                expect(mergedConfig.compilationUnits.compilationUnit1.externs).toBeDefined();
+                expect(mergedConfig.compilationUnits.compilationUnit1.externs).toEqual(jasmine.any(Array));
+                var expectedUnitExterns = [
+                    path.join('some', 'other', 'path', 'externs2.js'),
+                    path.join('/', 'tmp', 'unit1_externs_2.js')
+                ];
+                expect(mergedConfig.compilationUnits.compilationUnit1.externs.length).toBe(expectedUnitExterns.length);
+                expect(mergedConfig.compilationUnits.compilationUnit1.externs)
+                    .toEqual(jasmine.arrayContaining(expectedUnitExterns));
+                expect(mergedConfig.compilationUnits.compilationUnit1.buildOptions).toBeDefined();
+                expect(mergedConfig.compilationUnits.compilationUnit1.buildOptions).toEqual(jasmine.any(Array));
+                expect(mergedConfig.compilationUnits.compilationUnit1.buildOptions.length).toBe(0);
 
-            expect(mergedConfig.compilationUnits.compilationUnit2).toBeDefined();
-            expect(mergedConfig.compilationUnits.compilationUnit2.sources).toBeDefined();
-            expect(mergedConfig.compilationUnits.compilationUnit2.sources).toEqual(jasmine.any(Array));
-            expectedUnitSources = [];
-            expect(mergedConfig.compilationUnits.compilationUnit2.sources.length).toBe(expectedUnitSources.length);
-            expect(mergedConfig.compilationUnits.compilationUnit2.sources)
-                .toEqual(jasmine.arrayContaining(expectedUnitSources));
+                expect(mergedConfig.compilationUnits.compilationUnit2).toBeDefined();
+                expect(mergedConfig.compilationUnits.compilationUnit2.sources).toBeDefined();
+                expect(mergedConfig.compilationUnits.compilationUnit2.sources).toEqual(jasmine.any(Array));
+                expectedUnitSources = [];
+                expect(mergedConfig.compilationUnits.compilationUnit2.sources.length).toBe(expectedUnitSources.length);
+                expect(mergedConfig.compilationUnits.compilationUnit2.sources)
+                    .toEqual(jasmine.arrayContaining(expectedUnitSources));
 
-            expect(mergedConfig.compilationUnits.compilationUnit2.externs).toBeDefined();
-            expect(mergedConfig.compilationUnits.compilationUnit2.externs).toEqual(jasmine.any(Array));
-            expectedUnitExterns = [
-                path.join('some', 'path', 'unit2_externs_9.js'),
-                path.join('/', 'tmp', 'unit2_externs_2.js')
-            ];
-            expect(mergedConfig.compilationUnits.compilationUnit2.externs.length).toBe(expectedUnitExterns.length);
-            expect(mergedConfig.compilationUnits.compilationUnit2.externs)
-                .toEqual(jasmine.arrayContaining(expectedUnitExterns));
-            expect(mergedConfig.compilationUnits.compilationUnit2.buildOptions).toBeDefined();
-            expect(mergedConfig.compilationUnits.compilationUnit2.buildOptions).toEqual(jasmine.any(Array));
-            var expectedUnitBuildOptions = [
-                '--debug',
-                '--language_out', 'ECMASCRIPT6_STRICT',
-                '--version',
-                '--transpile_only'
-            ];
-            expect(mergedConfig.compilationUnits.compilationUnit2.buildOptions.length)
-                .toBe(expectedUnitBuildOptions.length);
-            expect(mergedConfig.compilationUnits.compilationUnit2.buildOptions)
-                .toEqual(jasmine.arrayContaining(expectedUnitBuildOptions));
+                expect(mergedConfig.compilationUnits.compilationUnit2.externs).toBeDefined();
+                expect(mergedConfig.compilationUnits.compilationUnit2.externs).toEqual(jasmine.any(Array));
+                expectedUnitExterns = [
+                    path.join('some', 'path', 'unit2_externs_9.js'),
+                    path.join('/', 'tmp', 'unit2_externs_2.js')
+                ];
+                expect(mergedConfig.compilationUnits.compilationUnit2.externs.length).toBe(expectedUnitExterns.length);
+                expect(mergedConfig.compilationUnits.compilationUnit2.externs)
+                    .toEqual(jasmine.arrayContaining(expectedUnitExterns));
+                expect(mergedConfig.compilationUnits.compilationUnit2.buildOptions).toBeDefined();
+                expect(mergedConfig.compilationUnits.compilationUnit2.buildOptions).toEqual(jasmine.any(Array));
+                var expectedUnitBuildOptions = [
+                    '--debug',
+                    '--language_out', 'ECMASCRIPT6_STRICT',
+                    '--version',
+                    '--transpile_only'
+                ];
+                expect(mergedConfig.compilationUnits.compilationUnit2.buildOptions.length)
+                    .toBe(expectedUnitBuildOptions.length);
+                expect(mergedConfig.compilationUnits.compilationUnit2.buildOptions)
+                    .toEqual(jasmine.arrayContaining(expectedUnitBuildOptions));
 
-            expect(mergedConfig.next).toBeDefined();
-            expect(mergedConfig.next).toEqual(jasmine.any(Object));
-            expect(mergedConfig.next).toEqual({});
-            done();
-        }).catch(function (err) {
-            done.fail(err);
-        });
+                expect(mergedConfig.next).toBeDefined();
+                expect(mergedConfig.next).toEqual(jasmine.any(Object));
+                expect(mergedConfig.next).toEqual({});
+                done();
+            }).catch(function (err) {
+                done.fail(err);
+            });
         this.resourcesToDelete.push(testConfigPath);
     });
 
