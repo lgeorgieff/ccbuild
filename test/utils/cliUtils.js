@@ -88,6 +88,7 @@ var expectedConfigHelp = 'The configuration files for ' + scriptName + ' use the
         '  "buildOptions": [\n' +
         '    "<options to be used for all compilation units defined in this config>"\n' +
         '  ],\n' +
+        '  "warningsFilterFile": "<file path to a warnings filter file>",\n' +
         '  "compilationUnits": {\n' +
         '    "unit 1": {\n' +
         '      "externs": [\n' +
@@ -98,7 +99,8 @@ var expectedConfigHelp = 'The configuration files for ' + scriptName + ' use the
         '      ],\n' +
         '      "buildOptions": [\n' +
         '        "<options to be used only for this compilation unit>"\n' +
-        '      ]\n' +
+        '      ],\n' +
+        '      "warningsFilterFile": "<file path to a local warnings filter file>"\n' +
         '    },\n' +
         '    "unit 2": {\n' +
         '      "externs": [\n' +
@@ -117,12 +119,11 @@ var expectedConfigHelp = 'The configuration files for ' + scriptName + ' use the
         '    "<file path to the next config relative to this config>": {\n' +
         '      "inheritSources": "<boolean>",\n' +
         '      "inheritExterns": "<boolean>",\n' +
-        '      "inheritBuildOptions": "<boolean>"\n' +
+        '      "inheritBuildOptions": "<boolean>",\n' +
+        '      "inheritWarningsFilterFile": "<boolean>"\n' +
         '    },\n' +
         '    "<file path to another config relative to this config>": {\n' +
-        '      "inheritSources": "<boolean>",\n' +
-        '      "inheritExterns": "<boolean>",\n' +
-        '      "inheritBuildOptions": "<boolean>"\n' +
+        '      "inheritSources": "<boolean>"\n' +
         '    }\n' +
         '  }\n' +
         '}\n\n' +

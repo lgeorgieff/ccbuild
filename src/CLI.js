@@ -160,11 +160,13 @@ CLI.getConfigFileHelp = function () {
         externs: ['<extern file paths to be included in all compilation units defined in this config>',
                   '${CONTRIB_PATH}/nodejs/os.js'],
         buildOptions: ['<options to be used for all compilation units defined in this config>'],
+        warningsFilterFile: '<file path to a warnings filter file>',
         compilationUnits: {
             'unit 1': {
                 externs: ['<source file paths to be used only for this compilation unit>'],
                 sources: ['<extern file paths to be used only for this compilation unit>'],
-                buildOptions: ['<options to be used only for this compilation unit>']
+                buildOptions: ['<options to be used only for this compilation unit>'],
+                warningsFilterFile: '<file path to a local warnings filter file>'
             },
             'unit 2': {
                 externs: ['<source file paths to be used only for this compilation unit>'],
@@ -177,12 +179,11 @@ CLI.getConfigFileHelp = function () {
             '<file path to the next config relative to this config>': {
                 inheritSources: '<boolean>',
                 inheritExterns: '<boolean>',
-                inheritBuildOptions: '<boolean>'
+                inheritBuildOptions: '<boolean>',
+                inheritWarningsFilterFile: '<boolean>'
             },
             '<file path to another config relative to this config>': {
-                inheritSources: '<boolean>',
-                inheritExterns: '<boolean>',
-                inheritBuildOptions: '<boolean>'
+                inheritSources: '<boolean>'
             }
         }
     };
