@@ -269,6 +269,9 @@ ConfigurationNormalizer.prototype.normalize = function () {
                 false);
         }
     }
+    if (this._config.warningsFilterFile) {
+        result.warningsFilterFile = self._resolvePath(self._variableParser.resolve(this._config.warningsFilterFile));
+    }
 
     if (util.isObject(this._config.compilationUnits)) {
         result.compilationUnits = Object.keys(this._config.compilationUnits)
@@ -290,6 +293,10 @@ ConfigurationNormalizer.prototype.normalize = function () {
                     accumulator[finalKey].outputFile =
                         self._resolvePath(self._variableParser.resolve(self._config.compilationUnits[key].outputFile));
                 }
+                if (self._config.compilationUnits[key].warningsFilterFile) {
+                    accumulator[finalKey].warningsFilterFile = self._resolvePath(
+                        self._variableParser.resolve(self._config.compilationUnits[key].warningsFilterFile));
+                }
                 return accumulator;
             }, {}) || {};
     } else {
@@ -310,6 +317,9 @@ ConfigurationNormalizer.prototype.normalize = function () {
                 accumulator[resolvedPath].inheritBuildOptions =
                     ConfigurationNormalizer._mapBooleanProperty(
                         self._config.next[key].inheritBuildOptions, key, 'inheritBuildOptions');
+                accumulator[resolvedPath].inheritWarningsFilterFile =
+                    ConfigurationNormalizer._mapBooleanProperty(
+                        self._config.next[key].inheritWarningsFilterFile, key, 'inheritWarningsFilterFile');
                 return accumulator;
             }, {}) || {};
     } else {

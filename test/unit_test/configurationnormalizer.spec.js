@@ -89,9 +89,68 @@ describe('Class ConfigurationNormalizer', function () {
         expect(normalizedConfig.compilationUnits.unit1.outputFile).toEqual(jasmine.any(String));
         expect(normalizedConfig.compilationUnits.unit2.outputFile).toBeDefined();
         expect(normalizedConfig.compilationUnits.unit2.outputFile).toEqual(jasmine.any(String));
-        expect(normalizedConfig.compilationUnits.unit1.outputFile).toBe(path.join('test', 'unit_test', 'abc', 'def.ghi'));
+        expect(normalizedConfig.compilationUnits.unit1.outputFile)
+            .toBe(path.join('test', 'unit_test', 'abc', 'def.ghi'));
         expect(normalizedConfig.compilationUnits.unit2.outputFile).toBe('/tmp/abc.def');
     });
+
+    it('normalize global warningsFilterFile - relative path', function () {
+        var config = {
+            warningsFilterFile: path.join('abc', 'def.ghi')
+        };
+        var configNormalizer = new ConfigurationNormalizer(config, __dirname);
+        var normalizedConfig = configNormalizer.normalize();
+        expect(normalizedConfig).toBeDefined();
+        expect(normalizedConfig.warningsFilterFile).toBeDefined();
+        expect(normalizedConfig.warningsFilterFile).toEqual(jasmine.any(String));
+        expect(normalizedConfig.warningsFilterFile).toBe(path.join('test', 'unit_test', 'abc', 'def.ghi'));
+    });
+
+    it('normalize global warningsFilterFile - absolute path', function () {
+        var config = {
+            warningsFilterFile: '/tmp/abc.def'
+        };
+        var configNormalizer = new ConfigurationNormalizer(config, __dirname);
+        var normalizedConfig = configNormalizer.normalize();
+        expect(normalizedConfig).toBeDefined();
+        expect(normalizedConfig.warningsFilterFile).toBeDefined();
+        expect(normalizedConfig.warningsFilterFile).toEqual(jasmine.any(String));
+        expect(normalizedConfig.warningsFilterFile).toBe(path.join('/', 'tmp', 'abc.def'));
+    });
+
+    it('normalize local warningsFilterFile', function () {
+        var config = {
+            compilationUnits: {
+                unit1: {
+                    warningsFilterFile: path.join('abc', 'def.ghi')
+                }
+            }
+        };
+        var configNormalizer = new ConfigurationNormalizer(config, __dirname);
+        var normalizedConfig = configNormalizer.normalize();
+        expect(normalizedConfig).toBeDefined();
+        expect(normalizedConfig.compilationUnits.unit1.warningsFilterFile).toBeDefined();
+        expect(normalizedConfig.compilationUnits.unit1.warningsFilterFile).toEqual(jasmine.any(String));
+        expect(normalizedConfig.compilationUnits.unit1.warningsFilterFile)
+            .toBe(path.join('test', 'unit_test', 'abc', 'def.ghi'));
+    });
+
+    it('normalize inheritWarnignsFilterFile', function () {
+        var config = {
+            compilationUnits: {
+                unit1: {
+                    warningsFilterFile: '/tmp/abc.def'
+                }
+            }
+        };
+        var configNormalizer = new ConfigurationNormalizer(config, __dirname);
+        var normalizedConfig = configNormalizer.normalize();
+        expect(normalizedConfig).toBeDefined();
+        expect(normalizedConfig.compilationUnits.unit1.warningsFilterFile).toBeDefined();
+        expect(normalizedConfig.compilationUnits.unit1.warningsFilterFile).toEqual(jasmine.any(String));
+        expect(normalizedConfig.compilationUnits.unit1.warningsFilterFile).toBe(path.join('/', 'tmp', 'abc.def'));
+    });
+
     it('normalize sources - useAbsolutePaths', function () {
         var config = {sources: ['abc', 'def', '', '/ghi']};
         var configNormalizer = new ConfigurationNormalizer(config, __dirname, null, true);
@@ -396,6 +455,7 @@ describe('Class ConfigurationNormalizer', function () {
                     flagfile: '${CONTRIB_PATH}/flagfile.closure_compiler',
                     version: true
                 },
+                warningsFilterFile: path.join('${CWD}', 'abc', 'def.ghi'),
                 compilationUnits: {
                     '${CONTRIB_PATH}/some/parts/${CONTRIB_PATH}/${CWD}': {
                         sources: ['someFile.js', '${CONTRIB_PATH}/${CWD}/some/file.js', '${CWD}/some/file.js'],
@@ -406,7 +466,8 @@ describe('Class ConfigurationNormalizer', function () {
                         sources: ['someFile.js'],
                         externs: ['someFile.js'],
                         buildOptions: ['--flagfile', '${flagfile.closure_compiler', '--version'],
-                        outputFile: path.join('${CWD}', 'abc', 'def.ghi')
+                        outputFile: path.join('${CWD}', 'abc', 'def.ghi'),
+                        warningsFilterFile: path.join('${CONTRIB_PATH}', 'abc', 'def.ghi')
                     }
                 },
                 next: {
@@ -540,6 +601,21 @@ describe('Class ConfigurationNormalizer', function () {
                 expect(normalizedConfig.compilationUnits['some/unit'].outputFile).toBeDefined();
                 expect(normalizedConfig.compilationUnits['some/unit'].outputFile).toEqual(jasmine.any(String));
                 expect(normalizedConfig.compilationUnits['some/unit'].outputFile).toBe(path.join('abc', 'def.ghi'));
+            });
+
+            it('normalize variables in global warningsFilterFile', function () {
+                expect(normalizedConfig).toBeDefined();
+                expect(normalizedConfig.warningsFilterFile).toBeDefined();
+                expect(normalizedConfig.warningsFilterFile).toEqual(jasmine.any(String));
+                expect(normalizedConfig.warningsFilterFile).toBe(path.join('abc', 'def.ghi'));
+            });
+
+            it('normalize variables in local warningsFilterFile', function () {
+                expect(normalizedConfig).toBeDefined();
+                expect(normalizedConfig.compilationUnits['some/unit'].warningsFilterFile).toBeDefined();
+                expect(normalizedConfig.compilationUnits['some/unit'].warningsFilterFile).toEqual(jasmine.any(String));
+                expect(normalizedConfig.compilationUnits['some/unit'].warningsFilterFile)
+                    .toBe(path.join(ccc, 'abc', 'def.ghi'));
             });
         });
 
@@ -680,7 +756,23 @@ describe('Class ConfigurationNormalizer', function () {
                 expect(normalizedConfig).toBeDefined();
                 expect(normalizedConfig.compilationUnits['some/unit'].outputFile).toBeDefined();
                 expect(normalizedConfig.compilationUnits['some/unit'].outputFile).toEqual(jasmine.any(String));
-                expect(normalizedConfig.compilationUnits['some/unit'].outputFile).toBe(path.resolve(path.join('abc', 'def.ghi')));
+                expect(normalizedConfig.compilationUnits['some/unit'].outputFile)
+                    .toBe(path.resolve(path.join('abc', 'def.ghi')));
+            });
+
+            it('normalize variables in global warningsFilterFile', function () {
+                expect(normalizedConfig).toBeDefined();
+                expect(normalizedConfig.warningsFilterFile).toBeDefined();
+                expect(normalizedConfig.warningsFilterFile).toEqual(jasmine.any(String));
+                expect(normalizedConfig.warningsFilterFile).toBe(path.resolve(path.join('abc', 'def.ghi')));
+            });
+
+            it('normalize variables in local warningsFilterFile', function () {
+                expect(normalizedConfig).toBeDefined();
+                expect(normalizedConfig.compilationUnits['some/unit'].warningsFilterFile).toBeDefined();
+                expect(normalizedConfig.compilationUnits['some/unit'].warningsFilterFile).toEqual(jasmine.any(String));
+                expect(normalizedConfig.compilationUnits['some/unit'].warningsFilterFile)
+                    .toBe(path.join(CC.compiler.CONTRIB_PATH, 'abc', 'def.ghi'));
             });
         });
     });
