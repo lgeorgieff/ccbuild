@@ -71,6 +71,27 @@ describe('Class ConfigurationNormalizer', function () {
         expect(normalizedConfig.next).toEqual({});
     });
 
+    it('normalize outputFile', function () {
+        var config = {
+            compilationUnits: {
+                unit1: {
+                    outputFile: path.join('abc', 'def.ghi')
+                },
+                unit2: {
+                    outputFile: '/tmp/abc.def'
+                }
+            }
+        };
+        var configNormalizer = new ConfigurationNormalizer(config, __dirname);
+        var normalizedConfig = configNormalizer.normalize();
+        expect(normalizedConfig).toBeDefined();
+        expect(normalizedConfig.compilationUnits.unit1.outputFile).toBeDefined();
+        expect(normalizedConfig.compilationUnits.unit1.outputFile).toEqual(jasmine.any(String));
+        expect(normalizedConfig.compilationUnits.unit2.outputFile).toBeDefined();
+        expect(normalizedConfig.compilationUnits.unit2.outputFile).toEqual(jasmine.any(String));
+        expect(normalizedConfig.compilationUnits.unit1.outputFile).toBe(path.join('test', 'unit_test', 'abc', 'def.ghi'));
+        expect(normalizedConfig.compilationUnits.unit2.outputFile).toBe('/tmp/abc.def');
+    });
     it('normalize sources - useAbsolutePaths', function () {
         var config = {sources: ['abc', 'def', '', '/ghi']};
         var configNormalizer = new ConfigurationNormalizer(config, __dirname, null, true);
@@ -384,7 +405,8 @@ describe('Class ConfigurationNormalizer', function () {
                     'some/unit': {
                         sources: ['someFile.js'],
                         externs: ['someFile.js'],
-                        buildOptions: ['--flagfile', '${flagfile.closure_compiler', '--version']
+                        buildOptions: ['--flagfile', '${flagfile.closure_compiler', '--version'],
+                        outputFile: path.join('${CWD}', 'abc', 'def.ghi')
                     }
                 },
                 next: {
@@ -511,6 +533,13 @@ describe('Class ConfigurationNormalizer', function () {
                 expect(function () {
                     cn.normalize();
                 }).toThrowError();
+            });
+
+            it('normalize variables in outputFile', function () {
+                expect(normalizedConfig).toBeDefined();
+                expect(normalizedConfig.compilationUnits['some/unit'].outputFile).toBeDefined();
+                expect(normalizedConfig.compilationUnits['some/unit'].outputFile).toEqual(jasmine.any(String));
+                expect(normalizedConfig.compilationUnits['some/unit'].outputFile).toBe(path.join('abc', 'def.ghi'));
             });
         });
 
@@ -645,6 +674,13 @@ describe('Class ConfigurationNormalizer', function () {
                 expect(function () {
                     cn.normalize();
                 }).toThrowError();
+            });
+
+            it('normalize variables in outputFile', function () {
+                expect(normalizedConfig).toBeDefined();
+                expect(normalizedConfig.compilationUnits['some/unit'].outputFile).toBeDefined();
+                expect(normalizedConfig.compilationUnits['some/unit'].outputFile).toEqual(jasmine.any(String));
+                expect(normalizedConfig.compilationUnits['some/unit'].outputFile).toBe(path.resolve(path.join('abc', 'def.ghi')));
             });
         });
     });
