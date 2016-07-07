@@ -241,6 +241,28 @@ ConfigurationNormalizer.prototype._resolveVariables = function (strs, isPath) {
 };
 
 /**
+ * Returns a normalized warningsFilterFile value.
+ *
+ * @private
+ *
+ * @returns {Array<string>} An array of paths which is empty in case no value is specified.
+ * @param {string|Array<string>} configProperty The configuration property that is being checked.
+ */
+ConfigurationNormalizer.prototype._normalizeWarningsFilterFile = function (configProperty) {
+    if (!configProperty) return [];
+    var self = this;
+    var result;
+    if (configProperty && util.isString(configProperty)) {
+        result = [this._resolvePath(this._variableParser.resolve(configProperty))];
+    } else if (configProperty && util.isArray(configProperty)) {
+        result = configProperty.map(function (item) {
+            return self._resolvePath(self._variableParser.resolve(item));
+        });
+    }
+    return result || [];
+};
+
+/**
  * Starts the normalization process of the `buildOptions` data that was passed to the constructor function.
  *
  * @returns {Object} An array representing the normalized buildOptions.
@@ -269,9 +291,7 @@ ConfigurationNormalizer.prototype.normalize = function () {
                 false);
         }
     }
-    if (this._config.warningsFilterFile) {
-        result.warningsFilterFile = self._resolvePath(self._variableParser.resolve(this._config.warningsFilterFile));
-    }
+    result.warningsFilterFile = this._normalizeWarningsFilterFile(this._config.warningsFilterFile);
 
     if (util.isObject(this._config.compilationUnits)) {
         result.compilationUnits = Object.keys(this._config.compilationUnits)
@@ -293,10 +313,8 @@ ConfigurationNormalizer.prototype.normalize = function () {
                     accumulator[finalKey].outputFile =
                         self._resolvePath(self._variableParser.resolve(self._config.compilationUnits[key].outputFile));
                 }
-                if (self._config.compilationUnits[key].warningsFilterFile) {
-                    accumulator[finalKey].warningsFilterFile = self._resolvePath(
-                        self._variableParser.resolve(self._config.compilationUnits[key].warningsFilterFile));
-                }
+                accumulator[finalKey].warningsFilterFile =
+                    self._normalizeWarningsFilterFile(self._config.compilationUnits[key].warningsFilterFile);
                 return accumulator;
             }, {}) || {};
     } else {
