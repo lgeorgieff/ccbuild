@@ -158,12 +158,20 @@ function mergeConfigurations (configuration, configurationPath, parentConfigurat
     } else {
         resultBuildOptions = configuration.buildOptions;
     }
+    var resultWarningsFilterFile = [];
+    Array.prototype.push.apply(resultWarningsFilterFile, configuration.warningsFilterFile);
+    if (parentConfiguration.next[configurationPath] &&
+        parentConfiguration.next[configurationPath].inheritWarningsFilterFile) {
+        Array.prototype.push.apply(resultWarningsFilterFile, parentConfiguration.warningsFilterFile);
+    }
+    resultWarningsFilterFile = utils.arrayToSet(resultWarningsFilterFile);
 
     return {
         checkFs: configuration.checkFs,
         sources: resultSources,
         externs: resultExterns,
         outputFile: configuration.outputFile,
+        warningsFilterFile: resultWarningsFilterFile,
         buildOptions: resultBuildOptions,
         compilationUnits: configuration.compilationUnits,
         next: configuration.next

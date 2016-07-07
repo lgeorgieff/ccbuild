@@ -37,7 +37,7 @@ describe('config_reader', function () {
          * @const
          */
         this.EMPTY_CONFIG = {checkFs: {}, sources: [], externs: [], buildOptions: [],
-                             compilationUnits: {}, next: {}};
+                             warningsFilterFile: [], compilationUnits: {}, next: {}};
         this.resourcesToDelete = [];
     });
 
@@ -93,6 +93,117 @@ describe('config_reader', function () {
             return path.join(testDirectory, filePath);
         }));
         this.resourcesToDelete.push(testDirectory);
+    });
+
+    it('merge warningsFilterFile inherit', function (done) {
+        var testConfigPath = 'merge_waringsFilterFile.ccbuild';
+        var config1 = {
+            warningsFilterFile: path.join('test', 'filter.txt'),
+            next: {
+            }
+        };
+        config1.next[testConfigPath] = {
+            inheritWarningsFilterFile: true
+        };
+
+        var cn = new ConfigurationNormalizer(config1);
+        config1 = cn.normalize();
+
+        var config2 = {
+            warningsFilterFile: path.join('test', 'filter2.txt')
+        };
+
+        cn = new ConfigurationNormalizer(config2);
+        config2 = cn.normalize();
+        fs.writeFileSync(testConfigPath, JSON.stringify(config2, null, 2), 'utf8');
+
+        configurationReader.readAndParseConfiguration(path.resolve(testConfigPath), config1)
+            .then(function (mergedConfig) {
+                expect(mergedConfig).toBeDefined();
+                expect(mergedConfig.sources).toEqual([]);
+                expect(mergedConfig.externs).toEqual([]);
+                expect(mergedConfig.compilationUnits).toEqual({});
+                expect(mergedConfig.next).toBeDefined();
+                var nextPath = path.resolve(testConfigPath);
+                expect(mergedConfig.next[nextPath]).toBeUndefined();
+                expect(mergedConfig.buildOptions.length).toBe(0);
+                expect(mergedConfig.warningsFilterFile).toBeDefined();
+                expect(mergedConfig.warningsFilterFile.length).toBe(2);
+                expect(mergedConfig.warningsFilterFile).toEqual(jasmine.arrayContaining([
+                    path.join('test', 'filter.txt'), path.join('test', 'filter2.txt')]));
+                done();
+            }).catch(function (err) {
+                done.fail(err);
+            });
+        this.resourcesToDelete.push(testConfigPath);
+    });
+
+    it('merge equal warningsFilterFile inherit', function (done) {
+        var testConfigPath = 'merge_waringsFilterFile.ccbuild';
+        var config1 = {
+            warningsFilterFile: path.join('test', 'filter.txt'),
+            next: {
+            }
+        };
+        config1.next[testConfigPath] = {
+            inheritWarningsFilterFile: true
+        };
+
+        var cn = new ConfigurationNormalizer(config1);
+        config1 = cn.normalize();
+
+        var config2 = {
+            warningsFilterFile: path.join('test', 'filter.txt')
+        };
+
+        cn = new ConfigurationNormalizer(config2);
+        config2 = cn.normalize();
+        fs.writeFileSync(testConfigPath, JSON.stringify(config2, null, 2), 'utf8');
+
+        configurationReader.readAndParseConfiguration(path.resolve(testConfigPath), config1)
+            .then(function (mergedConfig) {
+                expect(mergedConfig.warningsFilterFile.length).toBe(1);
+                expect(mergedConfig.warningsFilterFile).toEqual(jasmine.arrayContaining([
+                    path.join('test', 'filter.txt')]));
+                done();
+            }).catch(function (err) {
+                done.fail(err);
+            });
+        this.resourcesToDelete.push(testConfigPath);
+    });
+
+    it('merge warningsFilterFile no-inherit', function (done) {
+        var testConfigPath = 'merge_waringsFilterFile.ccbuild';
+        var config1 = {
+            warningsFilterFile: path.join('test', 'filter.txt'),
+            next: {
+            }
+        };
+        config1.next[testConfigPath] = {
+            inheritWarningsFilterFile: false
+        };
+
+        var cn = new ConfigurationNormalizer(config1);
+        config1 = cn.normalize();
+
+        var config2 = {
+            warningsFilterFile: path.join('test', 'filter2.txt')
+        };
+
+        cn = new ConfigurationNormalizer(config2);
+        config2 = cn.normalize();
+        fs.writeFileSync(testConfigPath, JSON.stringify(config2, null, 2), 'utf8');
+
+        configurationReader.readAndParseConfiguration(path.resolve(testConfigPath), config1)
+            .then(function (mergedConfig) {
+                expect(mergedConfig.warningsFilterFile.length).toBe(1);
+                expect(mergedConfig.warningsFilterFile).toEqual(jasmine.arrayContaining([
+                    path.join('test', 'filter2.txt')]));
+                done();
+            }).catch(function (err) {
+                done.fail(err);
+            });
+        this.resourcesToDelete.push(testConfigPath);
     });
 
     it('merge buildOptions inherit', function (done) {
