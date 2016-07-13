@@ -253,11 +253,9 @@ ConfigurationNormalizer.prototype._normalizeWarningsFilterFile = function (confi
     var self = this;
     var result;
     if (configProperty && util.isString(configProperty)) {
-        result = [this._resolvePath(this._variableParser.resolve(configProperty))];
+        result = this._resolveVariables([configProperty], true);
     } else if (configProperty && util.isArray(configProperty)) {
-        result = configProperty.map(function (item) {
-            return self._resolvePath(self._variableParser.resolve(item));
-        });
+        result = this._resolveVariables(/** @type {Array<string>} */ (configProperty), true);
     }
     return result || [];
 };
