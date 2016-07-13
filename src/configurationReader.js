@@ -90,7 +90,9 @@ function getLocalConfigFiles () {
  *            unitExterns: !Array<string>,
  *            globalBuildOptions: !Array<string>,
  *            unitBuildOptions: !Array<string>,
- *            outputFile: (?string|undefined)}}
+ *            outputFile: (?string|undefined),
+ *            globalWarningsFilterFile: Array<string>,
+ *            unitWarningsFilterFile: Array<string>}}
  */
 var CompilerConfiguration;
 

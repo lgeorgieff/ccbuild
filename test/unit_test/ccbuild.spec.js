@@ -359,11 +359,11 @@ describe('CCBuild class', function () {
                         'data/config5.ccbuild': {
                             inheritSources: true,
                             inheritExterns: true,
-                            inheritBuildOptions: true
+                            inheritBuildOptions: true,
+                            inheritWarningsFilterFile: true
                         }
                     }
                 };
-
                 var config5 = {
                     buildOptions: config4.buildOptions,
                     compilationUnits: {
