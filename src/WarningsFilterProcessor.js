@@ -86,7 +86,7 @@ WarningsFilterProcessor.prototype.getFilters = function (pathsToFiles) {
                         if (!Object.prototype.hasOwnProperty.call(self._registry, currentPath)) {
                             throw new Error('The warnings filter file "' + currentPath + '" is not known!');
                         }
-                        Array.prototype.push.apply(accumulator, this._registry[currentPath]);
+                        Array.prototype.push.apply(accumulator, self._registry[currentPath]);
                         return accumulator;
                     }, []));
 };
