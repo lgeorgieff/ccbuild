@@ -94,6 +94,7 @@ A configuration file is of the following form:
   "buildOptions": [
     "<options to be used for all compilation units defined in this config>"
   ],
+  "warningsFilterFile": "<file path to a warnings filter file>",
   "compilationUnits": {
     "unit 1": {
       "externs": [
@@ -104,7 +105,8 @@ A configuration file is of the following form:
       ],
       "buildOptions": [
         "<options to be used only for this compilation unit>"
-      ]
+      ],
+      "warningsFilterFile": "<file path to a local warnings filter file>"
     },
     "unit 2": {
       "externs": [
@@ -123,12 +125,11 @@ A configuration file is of the following form:
     "<file path to the next config relative to this config>": {
       "inheritSources": "<boolean>",
       "inheritExterns": "<boolean>",
-      "inheritBuildOptions": "<boolean>"
+      "inheritBuildOptions": "<boolean>",
+      "inheritWarningsFilterFile": "<boolean>"
     },
     "<file path to another config relative to this config>": {
-      "inheritSources": "<boolean>",
-      "inheritExterns": "<boolean>",
-      "inheritBuildOptions": "<boolean>"
+      "inheritSources": "<boolean>"
     }
   }
 }
