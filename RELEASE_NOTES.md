@@ -1,3 +1,8 @@
+# Version 2.1.0
+* Add WarningsFilterFile functionality
+* Fix format of RELEASE_NOTES.md
+* Fix license text
+
 # Version 2.0.1
 * Fix license text
 
