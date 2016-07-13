@@ -78,7 +78,7 @@ var GCCMessage = /** @type {function(new:GCCMessage, string)}*/ (require('./GCCM
  * @suppress {duplicate}
  */
 var WarningsFilterProcessor =
-        /** @type {function(): WarningsFilterProcessor} */ (require('./WarningsFilterProcessor.js'));
+        /** @type {function(number): WarningsFilterProcessor} */ (require('./WarningsFilterProcessor.js'));
 
 /**
  * Instantiates a CCBuild object.
@@ -431,7 +431,7 @@ CCBuild.prototype._compile = function (compilerConfiguration) {
     }
     var compiler = new CC.compiler(compilerArguments);
     compiler.run(function (code, stdout, stderr) {
-        var warningsFilterProcessor = WarningsFilterProcessor();
+        var warningsFilterProcessor = WarningsFilterProcessor(code);
         var currentWarningsFilterFiles = compilerConfiguration.globalWarningsFilterFile
                 .concat(compilerConfiguration.unitWarningsFilterFile);
         Q.all(currentWarningsFilterFiles.map(function (filePath) {

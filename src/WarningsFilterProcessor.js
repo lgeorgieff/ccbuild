@@ -36,9 +36,12 @@ var instance;
  * messages that are catched by any registered filter.
  *
  * @constructor
+ *
+ * @param {number} code The return code of the GCC process.
  */
-function WarningsFilterProcessor () {
+function WarningsFilterProcessor (code) {
     this._registry = {};
+    this._code = code;
 }
 
 /**
@@ -105,11 +108,11 @@ WarningsFilterProcessor.prototype.processMessages = function (messages, pathsToF
         .filter(function (message) {
             return !message.isWarning() || filters.indexOf(message.getHeading()) === -1;
         });
-
     if (results.length !== 0 && results[results.length - 1].isStatus()) {
         results[results.length - 1].setWarningsCount(results.length - 1);
         results[results.length - 1].setFilteredWarningsCount(messages.length - results.length);
     }
+    if (results.length === 1 && results[0].isStatus()) results = [];
     return results;
 };
 
@@ -118,12 +121,14 @@ WarningsFilterProcessor.prototype.processMessages = function (messages, pathsToF
  * instance of {@link WarningsFilterProcessor}, so it is realized as a singleton.
  *
  * @returns {WarningsFilterProcessor} The created {@link WarningsFilterProcessor} instance.
+ * @param {number} code The return code of the GCC process.
  */
-function getWarningsFilterProcessor () {
+function getWarningsFilterProcessor (code) {
     if (instance) {
+        instance._code = code;
         return instance;
     } else {
-        instance = new /** @type {function(new:WarningsFilterProcessor)} */ (WarningsFilterProcessor)();
+        instance = new /** @type {function(new:WarningsFilterProcessor, number)} */ (WarningsFilterProcessor)(code);
         return instance;
     }
 }
