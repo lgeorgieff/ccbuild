@@ -1,3 +1,6 @@
+# Version 2.1.1
+* Update example of configuration file in README.md
+
 # Version 2.1.0
 * Add WarningsFilterFile functionality
 * Fix format of RELEASE_NOTES.md
