@@ -3,7 +3,7 @@
 /**
  * @const
  */
-var STATUS_REGEX = /([0-9]+) error\(s\), ([0-9]+) warning\(s\)(, ([0-9]+) filtered warning\(s\))?, ([0-9]+\.[0-9]+)% typedg/;
+var STATUS_REGEX = /([0-9]+) error\(s\), ([0-9]+) warning\(s\)(, ([0-9]+) filtered warning\(s\))?, ([0-9]+\.[0-9]+)% typed/;
 
 /**
  * @const
