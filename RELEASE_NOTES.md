@@ -1,3 +1,7 @@
+# Version 2.1.2
+* Add unit tests for GCCMessage
+* Fix bugs in GCCMessage
+
 # Version 2.1.1
 * Update example of configuration file in README.md
 
