@@ -1,9 +1,16 @@
 'use strict';
 
 /**
+ * @ignore
+ * @suppress {duplicate}
+ */
+var util = require('util');
+
+/**
  * @const
  */
-var STATUS_REGEX = /([0-9]+) error\(s\), ([0-9]+) warning\(s\)(, ([0-9]+) filtered warning\(s\))?, ([0-9]+\.[0-9]+)% typed/;
+var STATUS_REGEX =
+        /([0-9]+) error\(s\), ([0-9]+) warning\(s\)(, ([0-9]+) filtered warning\(s\))?(, ([0-9]+\.[0-9]+)% typed)?/;
 
 /**
  * @const
@@ -26,7 +33,8 @@ var WARNING_REGEX = /.+:[0-9]+: WARNING - .+/;
  * @param {string} message One single message of the GCC (may be a multi line message).
  */
 function GCCMessage (message) {
-    this._data = (message || '').split('\n').filter(function (line) {
+    if (!util.isString(message)) throw new Error('"message" must be a string!');
+    this._data = message.split('\n').filter(function (line) {
         return line.length !== 0;
     });
 }
@@ -65,7 +73,7 @@ GCCMessage.prototype.hasMessage = function () {
  * @returns {string|null} A string in case a message body exists. `null` otherwise.
  */
 GCCMessage.prototype.getMessage = function () {
-    if (this.hasMessage()) return this._data.splice(1).join('\n');
+    if (this.hasMessage()) return this._data.slice(1).join('\n');
     else return null;
 };
 
@@ -166,7 +174,7 @@ GCCMessage.prototype.getTypedRatio = function () {
         throw new Error('Cannot get typed ratio. ' + this + ' is not a status message!');
     }
     let result = this._data[0].match(STATUS_REGEX);
-    if (result && result[5] !== undefined) return result[5];
+    if (result && result[6] !== undefined) return result[6];
     return null;
 };
 
@@ -176,16 +184,17 @@ GCCMessage.prototype.getTypedRatio = function () {
  *
  * @param {number} value The new errors count of the status line.
  * @throws {Error} Thrown in case this message object is not a status message or has a bad format.
+ * @throws {Error} Thrown in case value ios not a number.
  */
 GCCMessage.prototype.setErrorsCount = function (value) {
+    if (!util.isNumber(value)) throw new Error('"value" must be a number!');
     if (!this.isStatus()) throw new Error('Cannot set an error count. ' + this + ' is not a status message!');
     var warningsCount = this.getWarningsCount();
     var filteredWarningsCount = this.getFilteredWarningsCount();
     var typedRatio = this.getTypedRatio();
-    if (warningsCount === -1 || typedRatio === null) {
-        throw new Error('Cannot set an error count. ' + this + ' has a bad format!');
-    }
+    if (warningsCount === -1) warningsCount = 0;
     if (filteredWarningsCount === -1) filteredWarningsCount = 0;
+    if (!typedRatio) typedRatio = '0.0';
     this._setStatusLine(value, warningsCount, filteredWarningsCount, typedRatio);
 };
 
@@ -195,15 +204,16 @@ GCCMessage.prototype.setErrorsCount = function (value) {
  *
  * @param {number} value The new warnings count of the status line.
  * @throws {Error} Thrown in case this message object is not a status message or has a bad format.
+ * @throws {Error} Thrown in case value ios not a number.
  */
 GCCMessage.prototype.setWarningsCount = function (value) {
+    if (!util.isNumber(value)) throw new Error('"value" must be a number!');
     if (!this.isStatus()) throw new Error('Cannot set an error count. ' + this + ' is not a status message!');
     var errorsCount = this.getErrorsCount();
     var filteredWarningsCount = this.getFilteredWarningsCount();
     var typedRatio = this.getTypedRatio();
-    if (errorsCount === -1 || typedRatio === null) {
-        throw new Error('Cannot set a warnings count. ' + this + ' has a bad format!');
-    }
+    if (errorsCount === -1) errorsCount = 0;
+    if (!typedRatio) typedRatio = '0.0';
     if (filteredWarningsCount === -1) filteredWarningsCount = 0;
     this._setStatusLine(errorsCount, value, filteredWarningsCount, typedRatio);
 };
@@ -214,8 +224,10 @@ GCCMessage.prototype.setWarningsCount = function (value) {
  *
  * @param {number} value The new filtered warnings count of the status line.
  * @throws {Error} Thrown in case this message object is not a status message or has a bad format.
+ * @throws {Error} Thrown in case value ios not a number.
  */
 GCCMessage.prototype.setFilteredWarningsCount = function (value) {
+    if (!util.isNumber(value)) throw new Error('"value" must be a number!');
     if (!this.isStatus()) throw new Error('Cannot set an error count. ' + this + ' is not a status message!');
     var errorsCount = this.getErrorsCount();
     var warningsCount = this.getWarningsCount();
@@ -263,10 +275,14 @@ GCCMessage.prototype.toString = function () {
  *
  * @returns {string} The string representation of the message collection.
  * @param {Array<GCCMessage>} messages The messages that will be serialized into a string.
+ * @throws {Error} Thrown in case `messages` is not an array of {@link GCCMessage} objects.
  */
 GCCMessage.messagesToString = function (messages) {
+    if (!util.isArray(messages) && messages !== null && messages !== undefined) {
+        throw new Error('"messages" must be of the type Array<GCCMessage>!');
+    }
     if (!messages || !messages.length) return '';
-    else return messages.join('\n') + '\n';
+    return messages.join('\n') + '\n';
 };
 
 module.exports = GCCMessage;
