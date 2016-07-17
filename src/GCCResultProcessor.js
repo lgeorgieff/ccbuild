@@ -4,6 +4,12 @@
  * @ignore
  * @suppress {duplicate}
  */
+var util = require('util');
+
+/**
+ * @ignore
+ * @suppress {duplicate}
+ */
 var GCCMessage = /** @type {function (new:GCCMessage, string)} */ (require('./GCCMessage.js'));
 
 /**
@@ -15,13 +21,23 @@ var GCCMessage = /** @type {function (new:GCCMessage, string)} */ (require('./GC
  * @constructor
  *
  * @param {number} code The return code of the GCC.
- * @param {string} stdout The results from GCC on stdout.
- * @param {string} stderr The results from GCC on stderr
+ * @param {?string=} stdout The results from GCC on stdout (optional).
+ * @param {?string=} stderr The results from GCC on stderr (optional).
+ * @throws {Error} Thrown in case any of the arguments is invalid.
  */
 function GCCResultProcessor (code, stdout, stderr) {
+    if (!util.isNumber(code)) {
+        throw new Error('"code" must be a number!');
+    }
+    if (stdout !== null && stdout !== undefined && !util.isString(stdout)) {
+        throw new Error('"stdout" must be a string!');
+    }
+    if (stderr !== null && stderr !== undefined && !util.isString(stderr)) {
+        throw new Error('"stderr" must be a string!');
+    }
     this._code = code;
-    this._stdout = stdout;
-    this._stderr = stderr;
+    this._stdout = stdout || '';
+    this._stderr = stderr || '';
     this._results = /** @type {Array<GCCMessage>} */ (/** @type {?} */(undefined));
     this._processStderr();
 }
