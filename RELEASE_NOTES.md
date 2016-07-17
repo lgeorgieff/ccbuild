@@ -1,3 +1,7 @@
+# Version 2.1.3
+* Add unit tests for GCCResultProcessor
+* Add parameter checks to GCCResultProcessor
+
 # Version 2.1.2
 * Add unit tests for GCCMessage
 * Fix bugs in GCCMessage
