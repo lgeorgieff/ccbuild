@@ -65,7 +65,8 @@ var VariableManager = /** @type {function(new:VariableManager, VariableManager=)
  * @suppress {duplicate}
  */
 var GCCResultProcessor =
-        /** @type {function(new:GCCResultProcessor, number, string, string)}*/ (require('./GCCResultProcessor.js'));
+        /** @type {function (new:GCCResultProcessor, number, (null|string)=, (null|string)=): undefined}*/
+    (require('./GCCResultProcessor.js'));
 
 /**
  * @ignore
