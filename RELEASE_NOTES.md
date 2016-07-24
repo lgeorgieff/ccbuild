@@ -1,3 +1,7 @@
+# Version 2.1.4
+* Add unit tests for WarningsFilterProcessor
+* Add parameter checks to WarningsFilterProcessor
+
 # Version 2.1.3
 * Add unit tests for GCCResultProcessor
 * Add parameter checks to GCCResultProcessor
