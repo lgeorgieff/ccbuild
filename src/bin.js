@@ -110,7 +110,10 @@ function compile (cliArguments) {
         if (!parsedCliArgs.args.ignoreWarnings && stderr) {
             console.error(stderr);
         }
-        if (parsedCliArgs.args.stopOnWarning) process.exit(1);
+        if (parsedCliArgs.args.stopOnWarning && stderr) {
+            errorDetected = true;
+            process.exit(1);
+        }
     });
 
     var printAndExit = function (message) {

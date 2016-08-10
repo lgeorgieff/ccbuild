@@ -1766,4 +1766,76 @@ describe('bin', function () {
         // jscs:enable requireCamelCaseOrUpperCaseIdentifiers
         this.resourcesToDelete.push(configPath);
     });
+
+    it('compile with --stop-on-warning - with warning', function (done) {
+        var config = {
+            sources: ['./data/source1.js'],
+            externs: ['data/externs1.js'],
+            buildOptions: [
+                '--compilation_level', 'ADVANCED_OPTIMIZATIONS',
+                '--warning_level', 'VERBOSE',
+                '--env', 'CUSTOM',
+                '--flagfile', './test/system_test/data/test_flagfile'
+            ],
+            compilationUnits: {
+                unit1: {
+                },
+                unit2: {
+                    sources: ['data/source2.js'],
+                    externs: ['./data/externs2.js']
+                },
+                unit3: {
+                    sources: ['./data/source3.js', './data/source4.js'],
+                    externs: ['./data/externs2.js', 'data/externs3.js']
+                }
+            }
+        };
+
+        var configPath = path.join(__dirname, 'config1.ccbuild');
+        fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
+        // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
+        child_process.exec('node ./src/bin.js --config ./test/system_test/config1.ccbuild --stop-on-warning',
+                           function (err, stdout, stderr) {
+                               if (err) {
+                                   done();
+                               } else {
+                                   done.fail('Expected ccbuild to exit with error code 1');
+                               }
+                           });
+        // jscs:enable requireCamelCaseOrUpperCaseIdentifiers
+        this.resourcesToDelete.push(configPath);
+    });
+
+    it('compile with --stop-on-warning - without warning', function (done) {
+        var config = {
+            sources: ['./data/source1.js'],
+            externs: ['data/externs1.js'],
+            buildOptions: [
+                '--compilation_level', 'ADVANCED_OPTIMIZATIONS',
+                '--warning_level', 'VERBOSE',
+                '--env', 'CUSTOM',
+                '--flagfile', './test/system_test/data/test_flagfile'
+            ],
+            compilationUnits: {
+                unit1: {
+                    sources: ['./data/source3.js', './data/source4.js'],
+                    externs: ['./data/externs2.js', 'data/externs3.js']
+                }
+            }
+        };
+
+        var configPath = path.join(__dirname, 'config1.ccbuild');
+        fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
+        // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
+        child_process.exec('node ./src/bin.js --config ./test/system_test/config1.ccbuild --stop-on-warning',
+                           function (err, stdout, stderr) {
+                               if (err) {
+                                   done.fail(err);
+                               } else {
+                                   done();
+                               }
+                           });
+        // jscs:enable requireCamelCaseOrUpperCaseIdentifiers
+        this.resourcesToDelete.push(configPath);
+    });
 });
