@@ -1,3 +1,6 @@
+# Version 2.1.5
+* Fix a bug with --stop-on-warning
+
 # Version 2.1.4
 * Add unit tests for WarningsFilterProcessor
 * Add parameter checks to WarningsFilterProcessor
