@@ -1,3 +1,6 @@
+# Version 2.1.7
+* Fix a bug the checkFs implementation
+
 # Version 2.1.6
 * Fix a bug the checkFs implementation
 * Add more information to checkFs into README.md
