@@ -222,6 +222,9 @@ FileChecker.prototype._getFilesToCheck = function () {
                     return filteredFilesToCheck.map(function (f) {
                         return path.resolve(f);
                     });
+                })
+                .then(function (filteredFilesToCheck) {
+                    return utils.arrayToSet(filteredFilesToCheck);
                 });
         });
 };
