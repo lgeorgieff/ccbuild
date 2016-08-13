@@ -1,3 +1,7 @@
+# Version 2.1.6
+* Fix a bug the checkFs implementation
+* Add more information to checkFs into README.md
+
 # Version 2.1.5
 * Fix a bug with --stop-on-warning
 
