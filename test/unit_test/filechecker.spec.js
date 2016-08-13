@@ -255,6 +255,8 @@ describe('Class FileChecker', function () {
             var dir2Files = allFiles.filter(function (file) {
                 var splits = file.split(path.sep);
                 return splits.length > 0 && splits[0] === 'dir-2';
+            }).map(function (f) {
+                return path.resolve(f);
             });
 
             fc.on('verificationSuccess', verificationSuccessHandler);
@@ -279,8 +281,14 @@ describe('Class FileChecker', function () {
                 var splits = file.split(path.sep);
                 return splits.length > 0 && splits[0] === 'dir-2';
             });
-            var filesInUnits = allDir2Files.slice(0, allDir2Files.length - 1);
-            var filesNotInUnits = allDir2Files.slice(allDir2Files.length - 1);
+            var filesInUnits = allDir2Files.slice(0, allDir2Files.length - 1)
+                    .map(function (f) {
+                        return path.resolve(f);
+                    });
+            var filesNotInUnits = allDir2Files.slice(allDir2Files.length - 1)
+                    .map(function (f) {
+                        return path.resolve(f);
+                    });
 
             var fc = new FileChecker(
                 {filesToCheck: ['dir-2'], filesToIgnore: [], filesInUnits: filesInUnits, fileExtensions: []});
@@ -314,8 +322,14 @@ describe('Class FileChecker', function () {
                 var splits = file.split(path.sep);
                 return splits.length > 0 && splits[0] === 'dir-2';
             });
-            var filesInUnits = allDir2Files.slice(0, allDir2Files.length - (allDir2Files.length / 2));
-            var filesNotInUnits = allDir2Files.slice(allDir2Files.length - (allDir2Files.length / 2));
+            var filesInUnits = allDir2Files.slice(0, allDir2Files.length - (allDir2Files.length / 2))
+                    .map(function (f) {
+                        return path.resolve(f);
+                    });
+            var filesNotInUnits = allDir2Files.slice(allDir2Files.length - (allDir2Files.length / 2))
+                    .map(function (f) {
+                        return path.resolve(f);
+                    });
 
             var fc = new FileChecker(
                 {filesToCheck: ['dir-2'], filesToIgnore: [], filesInUnits: filesInUnits, fileExtensions: []});
@@ -349,7 +363,10 @@ describe('Class FileChecker', function () {
                 var splits = file.split(path.sep);
                 return splits.length > 0 && splits[0] === 'dir-2';
             });
-            var filesInUnits = allDir2Files.slice(0, allDir2Files.length - (allDir2Files.length / 2));
+            var filesInUnits = allDir2Files.slice(0, allDir2Files.length - (allDir2Files.length / 2))
+                    .map(function (f) {
+                        return path.resolve(f);
+                    });
             var ignoredFiles = allDir2Files.slice(allDir2Files.length - (allDir2Files.length / 2));
 
             var fc = new FileChecker(
@@ -398,6 +415,8 @@ describe('Class FileChecker', function () {
            function (done) {
                var filesInUnits = allFiles.filter(function (f) {
                    return path.extname(f) === '.js' || path.extname(f) === '.json';
+               }).map(function (f) {
+                   return path.resolve(f);
                });
 
                var fc = new FileChecker({filesToCheck: ['.'],
@@ -426,6 +445,8 @@ describe('Class FileChecker', function () {
            function (done) {
                var filesInUnits = allFiles.filter(function (f) {
                    return path.extname(f) === '.js' || path.extname(f) === '.json';
+               }).map(function (f) {
+                   return path.resolve(f);
                });
 
                var fc = new FileChecker({filesToCheck: ['.'],
@@ -455,8 +476,14 @@ describe('Class FileChecker', function () {
                var filteredFiles = allFiles.filter(function (f) {
                    return path.extname(f) === '.js' || path.extname(f) === '.json';
                });
-               var filesInUnits = filteredFiles.slice(0, filteredFiles.length / 2);
-               var filesNotInUnits = filteredFiles.slice(filteredFiles.length / 2);
+               var filesInUnits = filteredFiles.slice(0, filteredFiles.length / 2)
+                       .map(function (f) {
+                           return path.resolve(f);
+                       });
+               var filesNotInUnits = filteredFiles.slice(filteredFiles.length / 2)
+                       .map(function (f) {
+                           return path.resolve(f);
+                       });
                expect(filteredFiles.length).toBe(filesInUnits.length + filesNotInUnits.length);
 
                var fc = new FileChecker({filesToCheck: ['.'],
@@ -491,6 +518,8 @@ describe('Class FileChecker', function () {
                 });
                 var filesInUnits = filesToCheck.filter(function (f) {
                     return path.extname(f) === '.js' || path.extname(f) === '.json';
+                }).map(function (f) {
+                    return path.resolve(f);
                 });
                 expect(filesToCheck.length).toBeGreaterThan(filesInUnits.length);
 
@@ -523,10 +552,15 @@ describe('Class FileChecker', function () {
                 });
                 var filesInUnits = filesToCheck.filter(function (f) {
                     return path.extname(f) === '.js' || path.extname(f) === '.json';
+                }).map(function (f) {
+                    return path.resolve(f);
                 });
                 var filesNotInUnits = filesToCheck.filter(function (f) {
                     return path.extname(f) === '';
+                }).map(function (f) {
+                    return path.resolve(f);
                 });
+
                 expect(filesToCheck.length).toBeGreaterThan(filesInUnits.length);
 
                 var fc = new FileChecker({filesToCheck: filesToCheck,

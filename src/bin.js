@@ -128,7 +128,7 @@ function compile (cliArguments) {
 }
 
 /**
- * Checks whether the specifed files in the configuration files are included in any compilation unit or not.
+ * Checks whether the specified files in the configuration files are included in any compilation unit or not.
  *
  * @private
  *

@@ -74,7 +74,7 @@ A configuration file is of the following form:
 {
   "checkFs": {
     "check": [
-      "<GLOB paths to files to be checked whether they are included in any compilation unit>"
+      "<GLOB paths to files to be checked whether they are included in any compilation unit defined in the same config file as this rule>"
     ],
     "fileExtensions": [
       "<file extensions of files to be checked. This filter is applied on files resulting from \"check\". If nothing is specified, the default is set to \".js\" and \".json\">"

@@ -90,7 +90,10 @@ function FileChecker (options) {
     this._filesToCheck = options.filesToCheck;
     this._filesToIgnore = options.filesToIgnore;
     this._fileExtensions = options.fileExtensions;
-    this._filesInUnits = utils.arrayToSet(options.filesInUnits);
+    var absoluteFilesInUnits = options.filesInUnits.map(function (f) {
+        return path.resolve(f);
+    });
+    this._filesInUnits = utils.arrayToSet(absoluteFilesInUnits);
     this._filteredFilesInUnits = [];
     this._filteredFilesToCheck = [];
 
@@ -205,13 +208,19 @@ FileChecker.prototype._getFilesToCheck = function () {
                     }).map(function (result) {
                         return result.path;
                     });
-                }).then(function () {
+                })
+                .then(function () {
                     return filesToCheck.filter(function (fileToCheck) {
                         return ignoredFiles.indexOf(fileToCheck) === -1 &&
                             ignoredDirectories.filter(function (ignoredDirectory) {
                                 return path.join(ignoredDirectory, path.relative(ignoredDirectory, fileToCheck)) ===
                                     fileToCheck;
                             }).length === 0;
+                    });
+                })
+                .then(function (filteredFilesToCheck) {
+                    return filteredFilesToCheck.map(function (f) {
+                        return path.resolve(f);
                     });
                 });
         });
