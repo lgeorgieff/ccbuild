@@ -1,3 +1,6 @@
+# Version 2.1.8
+* Fix a bug with the checkFs implementation when using ignore
+
 # Version 2.1.7
 * Fix a bug the checkFs implementation
 
