@@ -255,9 +255,14 @@ CCFileCheck.prototype._processConfigs = function (cliArgs) {
                     processedConfigFiles.push(configFilePath);
                     return self._checkFiles(cliArgs, configObject.checkFs, sourcesFound, configFilePath)
                         .then(function () {
-                            return Q.all(Object.keys(configObject.next).map(function (nextConfigFilePath) {
-                                return processConfig(nextConfigFilePath, configObject);
-                            }));
+                            return Q.all(Object.keys(configObject.next)
+                                         .filter(function (nextConfigFilePath) {
+                                             return !cliArgs.filteredNextEntries ||
+                                                 utils.arrayContains(cliArgs.filteredNextEntries, nextConfigFilePath);
+                                         })
+                                         .map(function (nextConfigFilePath) {
+                                             return processConfig(nextConfigFilePath, configObject);
+                                         }));
                         });
                 })
                 .catch(function (err) {
@@ -321,7 +326,6 @@ CCFileCheck.prototype._processConfigs = function (cliArgs) {
 CCFileCheck.prototype._checkFiles = function (cliArgs, settingsFromConfig, sourcesFound, configFilePath) {
     if (Object.keys(settingsFromConfig).length === 0) return Q.resolve();
     var self = this;
-
     var options = {
         filesInUnits: utils.arrayToSet(sourcesFound || []),
         fileExtensions: settingsFromConfig.fileExtensions,

@@ -193,8 +193,7 @@ FileChecker.prototype._getFilesToCheck = function () {
             return Q.all(filesAndFoldersToIgnore.map(function (fileAndFolderToIgnore) {
                 return utils.isDirectory(fileAndFolderToIgnore)
                     .then(function (isDir) {
-                        return {isDir: isDir,
-                                path: fileAndFolderToIgnore};
+                        return {isDir: isDir, path: fileAndFolderToIgnore};
                     });
             }))
                 .then(function (promises) {
@@ -213,8 +212,7 @@ FileChecker.prototype._getFilesToCheck = function () {
                     return filesToCheck.filter(function (fileToCheck) {
                         return ignoredFiles.indexOf(fileToCheck) === -1 &&
                             ignoredDirectories.filter(function (ignoredDirectory) {
-                                return path.join(ignoredDirectory, path.relative(ignoredDirectory, fileToCheck)) ===
-                                    fileToCheck;
+                                return utils.pathIsIn(ignoredDirectory, fileToCheck);
                             }).length === 0;
                     });
                 })

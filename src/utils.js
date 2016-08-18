@@ -513,6 +513,23 @@ function getAllFilesFromDirectories (directories, fileExtensions) {
     });
 }
 
+/**
+ * Check whether the containee path is located under the container path.
+ *
+ * @param {string} container The parent path.
+ * @param {string} containee The child path.
+ * @return {boolean} `true` in case containee is located in `container`.
+ */
+function pathIsIn (container, containee) {
+    var containerSplits = path.resolve(container).split(path.sep);
+    var containeeSplits = path.resolve(containee).split(path.sep);
+    if (containerSplits.length > containeeSplits.length) return false;
+    for (var i = 0; i !== containerSplits.length; ++i) {
+        if (containerSplits[i] !== containeeSplits[i]) return false;
+    }
+    return true;
+}
+
 module.exports.arrayToSet = arrayToSet;
 module.exports.isStringArray = isStringArray;
 module.exports.mergeArrays = mergeArrays;
@@ -533,3 +550,4 @@ module.exports.getAllFilesFromDirectory = getAllFilesFromDirectory;
 module.exports.getAllFilesFromDirectories = getAllFilesFromDirectories;
 module.exports.joinPaths = joinPaths;
 module.exports.arrayContains = arrayContains;
+module.exports.pathIsIn = pathIsIn;
