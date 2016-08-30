@@ -11,7 +11,8 @@ var expectedUsage = 'Usage: ' + scriptName + ' [-h|--help] [-v|--version] [--clo
         '           [--contrib-path] [--ignore-warnings] [-ignore-errors]\n' +
         '           [-c|--config PATH]... [--ignore-compiled-code] [--stop-on-error]\n' +
         '           [--stop-on-warning] [-u|--unit UNIT_NAME]... [--ignore-check-fs]\n' +
-        '           [-n|--next NEXT_ENTRY]...\n\n' +
+        '           [-n|--next NEXT_ENTRY]... [--cache-location PATH]\n' +
+        '           [--disable-caching]\n\n' +
         'Checks and compiles JavaScript files via the Closure Compiler.\n\n' +
         '  -h|--help               Display this message and exit.\n' +
         '  -v|--version            Display version information and exit.\n' +
@@ -55,7 +56,12 @@ var expectedUsage = 'Usage: ' + scriptName + ' [-h|--help] [-v|--version] [--clo
         ' --ignore-check-fs        Ignore the processing of the configuration property\n' +
         '                          "checkFs" which is responsible for checking whether\n' +
         '                          specified files are included in the defined\n' +
-        '                          compilation units.\n\n' +
+        '                          compilation units.\n' +
+        ' --disable-caching        Don\'t cache results of compilation units. Using this\n' +
+        '                          option may increase the run time of the ccbuild\n' +
+        '                          process.\n' +
+        ' --cache-location PATH    Set the location of the caching data. The default path\n' +
+        '                          is $CWD/.ccbuild/.\n\n' +
         'ccbuild exits with the return code 0 in case of successful compilation(s) this\n' +
         'includes warnings as well. In case of compilation errors and file verification\n' +
         'errors the return code is 1.\n';

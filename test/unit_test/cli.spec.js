@@ -182,7 +182,7 @@ describe('CLI class', function () {
     it ('emits the event argsParsed', function (done) {
         var cli = new CLI([process.argv[0], process.argv[1]]);
         cli.on('argsParsed', function (args) {
-            expect(args).toEqual({});
+            expect(args).toEqual({cacheLocation: path.resolve('.ccbuild')});
             done();
         });
     });
@@ -190,7 +190,7 @@ describe('CLI class', function () {
     it('processes --ignore-warnings', function (done) {
         var cli = new CLI([process.argv[0], process.argv[1], '--ignore-warnings']);
         cli.on('argsParsed', function (args) {
-            expect(args).toEqual({ignoreWarnings: true});
+            expect(args).toEqual({ignoreWarnings: true, cacheLocation: path.resolve('.ccbuild')});
             done();
         });
     });
@@ -198,7 +198,7 @@ describe('CLI class', function () {
     it('processes --ignore-errors', function (done) {
         var cli = new CLI([process.argv[0], process.argv[1], '--ignore-errors']);
         cli.on('argsParsed', function (args) {
-            expect(args).toEqual({ignoreErrors: true});
+            expect(args).toEqual({ignoreErrors: true, cacheLocation: path.resolve('.ccbuild')});
             done();
         });
     });
@@ -206,7 +206,7 @@ describe('CLI class', function () {
     it('processes --ignore-compiled-code', function (done) {
         var cli = new CLI([process.argv[0], process.argv[1], '--ignore-compiled-code']);
         cli.on('argsParsed', function (args) {
-            expect(args).toEqual({ignoreCompiledCode: true});
+            expect(args).toEqual({ignoreCompiledCode: true, cacheLocation: path.resolve('.ccbuild')});
             done();
         });
     });
@@ -214,7 +214,7 @@ describe('CLI class', function () {
     it('processes --stop-on-error', function (done) {
         var cli = new CLI([process.argv[0], process.argv[1], '--stop-on-error']);
         cli.on('argsParsed', function (args) {
-            expect(args).toEqual({stopOnError: true});
+            expect(args).toEqual({stopOnError: true, cacheLocation: path.resolve('.ccbuild')});
             done();
         });
     });
@@ -222,7 +222,7 @@ describe('CLI class', function () {
     it('processes --stop-on-warning', function (done) {
         var cli = new CLI([process.argv[0], process.argv[1], '--stop-on-warning']);
         cli.on('argsParsed', function (args) {
-            expect(args).toEqual({stopOnWarning: true});
+            expect(args).toEqual({stopOnWarning: true, cacheLocation: path.resolve('.ccbuild')});
             done();
         });
     });
@@ -230,7 +230,7 @@ describe('CLI class', function () {
     it('processes --config configPath', function (done) {
         var cli = new CLI([process.argv[0], process.argv[1], '--config', 'configPath']);
         cli.on('argsParsed', function (args) {
-            expect(args).toEqual({configs: [path.resolve('configPath')]});
+            expect(args).toEqual({configs: [path.resolve('configPath')], cacheLocation: path.resolve('.ccbuild')});
             done();
         });
     });
@@ -238,7 +238,7 @@ describe('CLI class', function () {
     it('processes -c configPath', function (done) {
         var cli = new CLI([process.argv[0], process.argv[1], '-c', 'configPath']);
         cli.on('argsParsed', function (args) {
-            expect(args).toEqual({configs: [path.resolve('configPath')]});
+            expect(args).toEqual({configs: [path.resolve('configPath')], cacheLocation: path.resolve('.ccbuild')});
             done();
         });
     });
@@ -248,7 +248,8 @@ describe('CLI class', function () {
                            'configPath3']);
         cli.on('argsParsed', function (args) {
             expect(args).toEqual({configs: [path.resolve('configPath1'), path.resolve('configPath2'),
-                                            path.resolve('configPath3')]});
+                                            path.resolve('configPath3')],
+                                  cacheLocation: path.resolve('.ccbuild')});
             done();
         });
     });
@@ -257,7 +258,8 @@ describe('CLI class', function () {
         var cli = new CLI([process.argv[0], process.argv[1], '--config', 'configPath1', '-c', 'configPath2', '-c',
                            'configPath1', '--config', 'configPath2']);
         cli.on('argsParsed', function (args) {
-            expect(args).toEqual({configs: [path.resolve('configPath1'), path.resolve('configPath2')]});
+            expect(args).toEqual({configs: [path.resolve('configPath1'), path.resolve('configPath2')],
+                                  cacheLocation: path.resolve('.ccbuild')});
             done();
         });
     });
@@ -273,7 +275,8 @@ describe('CLI class', function () {
                 ignoreErrors: true,
                 ignoreCompiledCode: true,
                 stopOnError: true,
-                stopOnWarning: true
+                stopOnWarning: true,
+                cacheLocation: path.resolve('.ccbuild')
             });
             done();
         });
@@ -283,7 +286,7 @@ describe('CLI class', function () {
         var cli = new CLI([process.argv[0], process.argv[1], '-u', 'unit1']);
         cli.on('argsError', fail);
         cli.on('argsParsed', function (options) {
-            expect(options).toEqual({filteredUnits: ['unit1']});
+            expect(options).toEqual({filteredUnits: ['unit1'], cacheLocation: path.resolve('.ccbuild')});
             done();
         });
     });
@@ -292,7 +295,7 @@ describe('CLI class', function () {
         var cli = new CLI([process.argv[0], process.argv[1], '--unit', 'unit1']);
         cli.on('argsError', fail);
         cli.on('argsParsed', function (options) {
-            expect(options).toEqual({filteredUnits: ['unit1']});
+            expect(options).toEqual({filteredUnits: ['unit1'], cacheLocation: path.resolve('.ccbuild')});
             done();
         });
     });
@@ -303,7 +306,7 @@ describe('CLI class', function () {
         cli.on('argsError', fail);
         cli.on('argsParsed', function (options) {
             expect(options).toEqual(jasmine.objectContaining({filteredUnits: jasmine.arrayContaining(
-                ['unit1', 'unit2', 'unit3', 'unit4'])}));
+                ['unit1', 'unit2', 'unit3', 'unit4']), cacheLocation: path.resolve('.ccbuild')}));
             expect(options.filteredUnits.length).toBe(4);
             done();
         });
@@ -315,7 +318,7 @@ describe('CLI class', function () {
         cli.on('argsError', fail);
         cli.on('argsParsed', function (options) {
             expect(options).toEqual(jasmine.objectContaining({filteredUnits: jasmine.arrayContaining(
-                ['unit1', 'unit2', 'unit3', 'unit4'])}));
+                ['unit1', 'unit2', 'unit3', 'unit4']), cacheLocation: path.resolve('.ccbuild')}));
             expect(options.filteredUnits.length).toBe(4);
             done();
         });
@@ -343,7 +346,8 @@ describe('CLI class', function () {
         var cli = new CLI([process.argv[0], process.argv[1], '-n', 'next1']);
         cli.on('argsError', fail);
         cli.on('argsParsed', function (options) {
-            expect(options).toEqual({filteredNextEntries: [path.join(process.cwd(), 'next1')]});
+            expect(options).toEqual({filteredNextEntries: [path.join(process.cwd(), 'next1')],
+                                     cacheLocation: path.resolve('.ccbuild')});
             done();
         });
     });
@@ -352,7 +356,8 @@ describe('CLI class', function () {
         var cli = new CLI([process.argv[0], process.argv[1], '--next', 'next1']);
         cli.on('argsError', fail);
         cli.on('argsParsed', function (options) {
-            expect(options).toEqual({filteredNextEntries: [path.join(process.cwd(), 'next1')]});
+            expect(options).toEqual({filteredNextEntries: [path.join(process.cwd(), 'next1')],
+                                     cacheLocation: path.resolve('.ccbuild')});
             done();
         });
     });
@@ -401,5 +406,21 @@ describe('CLI class', function () {
             done();
         });
         cli.on('argsParsed', fail);
+    });
+
+    it('processes --disable-caching', function (done) {
+        var cli = new CLI([process.argv[0], process.argv[1], '--disable-caching']);
+        cli.on('argsParsed', function (options) {
+            expect(options).toEqual({disableCaching: true, cacheLocation: path.resolve('.ccbuild')});
+            done();
+        });
+    });
+
+    it('processes --cache-location', function (done) {
+        var cli = new CLI([process.argv[0], process.argv[1], '--cache-location', '/tmp']);
+        cli.on('argsParsed', function (args) {
+            expect(args).toEqual({cacheLocation: '/tmp'});
+            done();
+        });
     });
 });

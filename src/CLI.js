@@ -87,7 +87,8 @@ CLI.getUsage = function () {
             '           [--contrib-path] [--ignore-warnings] [-ignore-errors]\n' +
             '           [-c|--config PATH]... [--ignore-compiled-code] [--stop-on-error]\n' +
             '           [--stop-on-warning] [-u|--unit UNIT_NAME]... [--ignore-check-fs]\n' +
-            '           [-n|--next NEXT_ENTRY]...\n\n' +
+            '           [-n|--next NEXT_ENTRY]... [--cache-location PATH]\n' +
+            '           [--disable-caching]\n\n' +
             'Checks and compiles JavaScript files via the Closure Compiler.\n\n' +
             '  -h|--help               Display this message and exit.\n' +
             '  -v|--version            Display version information and exit.\n' +
@@ -131,7 +132,12 @@ CLI.getUsage = function () {
             ' --ignore-check-fs        Ignore the processing of the configuration property\n' +
             '                          "checkFs" which is responsible for checking whether\n' +
             '                          specified files are included in the defined\n' +
-            '                          compilation units.\n\n' +
+            '                          compilation units.\n' +
+            ' --disable-caching        Don\'t cache results of compilation units. Using this\n' +
+            '                          option may increase the run time of the ccbuild\n' +
+            '                          process.\n' +
+            ' --cache-location PATH    Set the location of the caching data. The default path\n' +
+            '                          is $CWD/.ccbuild/.\n\n' +
             selfName + ' exits with the return code 0 in case of successful compilation(s) this\n' +
             'includes warnings as well. In case of compilation errors and file verification\n' +
             'errors the return code is 1.\n';
@@ -420,6 +426,23 @@ CLI.prototype._parseCliArgs = function (argv) {
         case '--ignore-check-fs':
             result.ignoreCheckFs = true;
             break;
+        case '--disable-caching':
+            result.disableCaching = true;
+            break;
+        case '--cache-location':
+            if (i + 1 === argv.length) {
+                /**
+                 * States that the parsing process of the CLI arguments failed.
+                 *
+                 * @event CLI#argsError
+                 * @param {Error} err The error that occurred during argumentation parsing.
+                 */
+                this.emit('argsError', new Error('--cache-location requires a PATH parameter'));
+                return;
+            } else {
+                result.cacheLocation = path.resolve(argv[++i]);
+            }
+            break;
         default:
             /**
              * States that the parsing process of the CLI arguments failed.
@@ -440,6 +463,7 @@ CLI.prototype._parseCliArgs = function (argv) {
         });
         result.filteredNextEntries = utils.arrayToSet(result.filteredNextEntries);
     }
+    if (!result.cacheLocation) result.cacheLocation = path.resolve('.ccbuild');
     /**
      * States that the parsing of CLI arguments was finished was set and that the contrib path information is ready.
      *

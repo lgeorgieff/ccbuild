@@ -197,7 +197,7 @@ describe('CCFileCheck class', function () {
     it ('emits the event argsParsed', function (done) {
         var ccfc = new CCFileCheck([process.argv[0], process.argv[1]]);
         ccfc.on('argsParsed', function (args) {
-            expect(args).toEqual({});
+            expect(args).toEqual({cacheLocation: path.resolve('.ccbuild')});
             done();
         });
     });
@@ -205,7 +205,7 @@ describe('CCFileCheck class', function () {
     it('processes --ignore-warnings', function (done) {
         var ccfc = new CCFileCheck([process.argv[0], process.argv[1], '--ignore-warnings']);
         ccfc.on('argsParsed', function (args) {
-            expect(args).toEqual({ignoreWarnings: true});
+            expect(args).toEqual({ignoreWarnings: true, cacheLocation: path.resolve('.ccbuild')});
             done();
         });
     });
@@ -213,7 +213,7 @@ describe('CCFileCheck class', function () {
     it('processes --ignore-errors', function (done) {
         var ccfc = new CCFileCheck([process.argv[0], process.argv[1], '--ignore-errors']);
         ccfc.on('argsParsed', function (args) {
-            expect(args).toEqual({ignoreErrors: true});
+            expect(args).toEqual({ignoreErrors: true, cacheLocation: path.resolve('.ccbuild')});
             done();
         });
     });
@@ -221,7 +221,7 @@ describe('CCFileCheck class', function () {
     it('processes --ignore-compiled-code', function (done) {
         var ccfc = new CCFileCheck([process.argv[0], process.argv[1], '--ignore-compiled-code']);
         ccfc.on('argsParsed', function (args) {
-            expect(args).toEqual({ignoreCompiledCode: true});
+            expect(args).toEqual({ignoreCompiledCode: true, cacheLocation: path.resolve('.ccbuild')});
             done();
         });
     });
@@ -229,7 +229,7 @@ describe('CCFileCheck class', function () {
     it('processes --stop-on-error', function (done) {
         var ccfc = new CCFileCheck([process.argv[0], process.argv[1], '--stop-on-error']);
         ccfc.on('argsParsed', function (args) {
-            expect(args).toEqual({stopOnError: true});
+            expect(args).toEqual({stopOnError: true, cacheLocation: path.resolve('.ccbuild')});
             done();
         });
     });
@@ -237,7 +237,7 @@ describe('CCFileCheck class', function () {
     it('processes --stop-on-warning', function (done) {
         var ccfc = new CCFileCheck([process.argv[0], process.argv[1], '--stop-on-warning']);
         ccfc.on('argsParsed', function (args) {
-            expect(args).toEqual({stopOnWarning: true});
+            expect(args).toEqual({stopOnWarning: true, cacheLocation: path.resolve('.ccbuild')});
             done();
         });
     });
@@ -245,7 +245,7 @@ describe('CCFileCheck class', function () {
     it('processes --config configPath', function (done) {
         var ccfc = new CCFileCheck([process.argv[0], process.argv[1], '--config', 'configPath']);
         ccfc.on('argsParsed', function (args) {
-            expect(args).toEqual({configs: [path.resolve('configPath')]});
+            expect(args).toEqual({configs: [path.resolve('configPath')], cacheLocation: path.resolve('.ccbuild')});
             done();
         });
     });
@@ -260,7 +260,7 @@ describe('CCFileCheck class', function () {
     it('processes -c configPath', function (done) {
         var ccfc = new CCFileCheck([process.argv[0], process.argv[1], '-c', 'configPath']);
         ccfc.on('argsParsed', function (args) {
-            expect(args).toEqual({configs: [path.resolve('configPath')]});
+            expect(args).toEqual({configs: [path.resolve('configPath')], cacheLocation: path.resolve('.ccbuild')});
             done();
         });
     });
@@ -270,7 +270,8 @@ describe('CCFileCheck class', function () {
                                    '-c', 'configPath3']);
         ccfc.on('argsParsed', function (args) {
             expect(args).toEqual({configs: [path.resolve('configPath1'), path.resolve('configPath2'),
-                                            path.resolve('configPath3')]});
+                                            path.resolve('configPath3')],
+                                  cacheLocation: path.resolve('.ccbuild')});
             done();
         });
     });
@@ -279,7 +280,8 @@ describe('CCFileCheck class', function () {
         var ccfc = new CCFileCheck([process.argv[0], process.argv[1], '--config', 'configPath1', '-c', 'configPath2',
                                    '-c', 'configPath1', '--config', 'configPath2']);
         ccfc.on('argsParsed', function (args) {
-            expect(args).toEqual({configs: [path.resolve('configPath1'), path.resolve('configPath2')]});
+            expect(args).toEqual({configs: [path.resolve('configPath1'), path.resolve('configPath2')],
+                                  cacheLocation: path.resolve('.ccbuild')});
             done();
         });
     });
@@ -288,7 +290,8 @@ describe('CCFileCheck class', function () {
         var ccfc = new CCFileCheck([process.argv[0], process.argv[1], '-u', 'unit1', '--unit', 'unit2',
                                    '--unit', 'unit3', '-u', 'unit4']);
         ccfc.on('argsParsed', function (args) {
-            expect(args).toEqual({filteredUnits: ['unit1', 'unit2', 'unit3', 'unit4']});
+            expect(args).toEqual({filteredUnits: ['unit1', 'unit2', 'unit3', 'unit4'],
+                                  cacheLocation: path.resolve('.ccbuild')});
             done();
         });
     });

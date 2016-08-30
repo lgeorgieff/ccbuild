@@ -137,7 +137,7 @@ describe('CCBuild class', function () {
     it ('emits the event argsParsed', function (done) {
         var ccbuild = new CCBuild([process.argv[0], process.argv[1]]);
         ccbuild.on('argsParsed', function (args) {
-            expect(args).toEqual({});
+            expect(args).toEqual({cacheLocation: path.resolve('.ccbuild')});
             done();
         });
     });
@@ -145,7 +145,7 @@ describe('CCBuild class', function () {
     it('processes --ignore-warnings', function (done) {
         var ccbuild = new CCBuild([process.argv[0], process.argv[1], '--ignore-warnings']);
         ccbuild.on('argsParsed', function (args) {
-            expect(args).toEqual({ignoreWarnings: true});
+            expect(args).toEqual({ignoreWarnings: true, cacheLocation: path.resolve('.ccbuild')});
             done();
         });
     });
@@ -153,7 +153,7 @@ describe('CCBuild class', function () {
     it('processes --ignore-errors', function (done) {
         var ccbuild = new CCBuild([process.argv[0], process.argv[1], '--ignore-errors']);
         ccbuild.on('argsParsed', function (args) {
-            expect(args).toEqual({ignoreErrors: true});
+            expect(args).toEqual({ignoreErrors: true, cacheLocation: path.resolve('.ccbuild')});
             done();
         });
     });
@@ -161,7 +161,7 @@ describe('CCBuild class', function () {
     it('processes --ignore-compiled-code', function (done) {
         var ccbuild = new CCBuild([process.argv[0], process.argv[1], '--ignore-compiled-code']);
         ccbuild.on('argsParsed', function (args) {
-            expect(args).toEqual({ignoreCompiledCode: true});
+            expect(args).toEqual({ignoreCompiledCode: true, cacheLocation: path.resolve('.ccbuild')});
             done();
         });
     });
@@ -169,7 +169,7 @@ describe('CCBuild class', function () {
     it('processes --stop-on-error', function (done) {
         var ccbuild = new CCBuild([process.argv[0], process.argv[1], '--stop-on-error']);
         ccbuild.on('argsParsed', function (args) {
-            expect(args).toEqual({stopOnError: true});
+            expect(args).toEqual({stopOnError: true, cacheLocation: path.resolve('.ccbuild')});
             done();
         });
     });
@@ -177,7 +177,7 @@ describe('CCBuild class', function () {
     it('processes --stop-on-warning', function (done) {
         var ccbuild = new CCBuild([process.argv[0], process.argv[1], '--stop-on-warning']);
         ccbuild.on('argsParsed', function (args) {
-            expect(args).toEqual({stopOnWarning: true});
+            expect(args).toEqual({stopOnWarning: true, cacheLocation: path.resolve('.ccbuild')});
             done();
         });
     });
@@ -185,7 +185,7 @@ describe('CCBuild class', function () {
     it('processes --config configPath', function (done) {
         var ccbuild = new CCBuild([process.argv[0], process.argv[1], '--config', 'configPath']);
         ccbuild.on('argsParsed', function (args) {
-            expect(args).toEqual({configs: [path.resolve('configPath')]});
+            expect(args).toEqual({configs: [path.resolve('configPath')], cacheLocation: path.resolve('.ccbuild')});
             done();
         });
     });
@@ -193,7 +193,7 @@ describe('CCBuild class', function () {
     it('processes -c configPath', function (done) {
         var ccbuild = new CCBuild([process.argv[0], process.argv[1], '-c', 'configPath']);
         ccbuild.on('argsParsed', function (args) {
-            expect(args).toEqual({configs: [path.resolve('configPath')]});
+            expect(args).toEqual({configs: [path.resolve('configPath')], cacheLocation: path.resolve('.ccbuild')});
             done();
         });
     });
@@ -203,7 +203,8 @@ describe('CCBuild class', function () {
                                    '-c', 'configPath3']);
         ccbuild.on('argsParsed', function (args) {
             expect(args).toEqual({configs: [path.resolve('configPath1'), path.resolve('configPath2'),
-                                            path.resolve('configPath3')]});
+                                            path.resolve('configPath3')],
+                                  cacheLocation: path.resolve('.ccbuild')});
             done();
         });
     });
@@ -212,7 +213,8 @@ describe('CCBuild class', function () {
         var ccbuild = new CCBuild([process.argv[0], process.argv[1], '--config', 'configPath1', '-c', 'configPath2',
                                    '-c', 'configPath1', '--config', 'configPath2']);
         ccbuild.on('argsParsed', function (args) {
-            expect(args).toEqual({configs: [path.resolve('configPath1'), path.resolve('configPath2')]});
+            expect(args).toEqual({configs: [path.resolve('configPath1'), path.resolve('configPath2')],
+                                  cacheLocation: path.resolve('.ccbuild')});
             done();
         });
     });
@@ -221,7 +223,8 @@ describe('CCBuild class', function () {
         var ccbuild = new CCBuild([process.argv[0], process.argv[1], '-u', 'unit1', '--unit', 'unit2',
                                    '--unit', 'unit3', '-u', 'unit4']);
         ccbuild.on('argsParsed', function (args) {
-            expect(args).toEqual({filteredUnits: ['unit1', 'unit2', 'unit3', 'unit4']});
+            expect(args).toEqual({filteredUnits: ['unit1', 'unit2', 'unit3', 'unit4'],
+                                  cacheLocation: path.resolve('.ccbuild')});
             done();
         });
     });
@@ -238,7 +241,8 @@ describe('CCBuild class', function () {
                 ignoreCompiledCode: true,
                 stopOnError: true,
                 stopOnWarning: true,
-                filteredUnits: ['unit1', 'unit2']
+                filteredUnits: ['unit1', 'unit2'],
+                cacheLocation: path.resolve('.ccbuild')
             });
             done();
         });
