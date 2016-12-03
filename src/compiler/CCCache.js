@@ -4,7 +4,8 @@
  * @ignore
  * @suppress {duplicate}
  */
-var NotFoundInCacheError = require('./NotFoundInCacheError.js');
+var NotFoundInCacheError = /** @type {function (new:NotFoundInCacheError, string, string, string): undefined}*/
+    (require('./NotFoundInCacheError.js'));
 
 /**
  * The constructor function for {@link CCCache}.

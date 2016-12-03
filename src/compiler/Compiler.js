@@ -14,7 +14,7 @@ function Compiler () { }
 /**
  * Invokes the Closure Compiler and returns a Promise holding the compilation results.
  *
- * @abstract
+ * @virtual
  *
  * @returns {QPromise<Object>} A promise holding the compilation result.
  * @param {CompilerConfiguration} compilationUnit The compiler configuration for the current compilation unit.

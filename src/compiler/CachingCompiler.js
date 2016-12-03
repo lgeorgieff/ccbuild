@@ -10,7 +10,7 @@ var util = require('util');
  * @ignore
  * @suppress {duplicate}
  */
-var Compiler = require('./Compiler.js');
+var Compiler = /** @type {function(new:Compiler): undefined} */ (require('./Compiler.js'));
 
 /**
  * The constructor function for {@link CachingCompiler}.
