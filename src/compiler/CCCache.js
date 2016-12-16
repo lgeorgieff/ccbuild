@@ -207,10 +207,12 @@ CCCache.prototype.destroy = function () {
 /**
  * Remove the entry from the bibliography file and remove the actual cached compilation result.
  *
+ * @private
+ *
  * @returns {QPromise<Object>} A promise that is resolved in case of success or rejected otherwise.
  * @param {!CompilerConfiguration} compilationUnit The compiler configuration for the requested compilation unit.
  */
-CCCache.prototype.clean = function (compilationUnit) {
+CCCache.prototype._cleanCompilationUnit = function (compilationUnit) {
     return this._readBibliography()
         .then(function () {
             var compilationUnitHash = this._bibliography[compilationUnit.unitName];
@@ -232,6 +234,66 @@ CCCache.prototype.clean = function (compilationUnit) {
         .then(function (entryFound) {
             delete this._bibliography[compilationUnit.unitName];
         });
+};
+
+/**
+ * Remove all content of the cache folder. It is required that the cache folder contains only file and no folders.
+ *
+ * @private
+ *
+ * @returns {QPromise} A resolved promise in case all content of the cache folder was removes successfully. A rejected
+ *          promise otherwise.
+ */
+CCCache.prototype._cleanAll = function () {
+    var self = this;
+    return (this._readBibliographyPromise || Q.resolve())
+        .then(function () {
+            var deferred = Q.defer();
+            fs.readdir(self._cacheFolder, function (err, fileNames) {
+                if (err) {
+                    deferred.reject('Could not clean the cache folder "' + self._cacheFolder + '" due to ' + err);
+                } else {
+                    var filePaths = files.map(function (fileName) {
+                        return path.join(self.cacheFolder, fileName);
+                    });
+                    deferred.resolve(filePaths);
+                }
+            });
+            return deferred.promise;
+        })
+        .then(function (filePaths) {
+            return filePaths.map(function (filePath) {
+                var deferred = Q.defer();
+                fs.unlink(filePath, function (err) {
+                    if (err) {
+                        deferred.reject(err);
+                    } else {
+                        deferred.resolve();
+                    }
+                });
+                return deferred.promise;
+            });
+        })
+        .then(function (rmPromises) {
+            return Q.all(rmPromises);
+        });
+};
+
+/**
+ * Remove the entry from the bibliography file and remove the actual cached compilation result in case the argument
+ * `compilationUnit` is defined. If the optional parameter `compilationUnit` is not defined, the entire cache is
+ * deleted.
+ *
+ * @returns {QPromise<Object>} A promise that is resolved in case of success or rejected otherwise.
+ * @param {CompilerConfiguration=} compilationUnit An optional argument that defines the compiler configuration for the
+ *        compilation unit to be deleted.
+ */
+CCCache.prototype.clean = function (compilationUnit) {
+    if (compilationUnit) {
+        return this._cleanCompilationUnit(compilationUnit);
+    } else {
+        return this._cleanAll();
+    }
 };
 
 /**
