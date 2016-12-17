@@ -28,7 +28,7 @@ var path = require('path');
  * @ignore
  * @suppress {duplicate}
  */
-var Q = require('Q');
+var Q = require('q');
 
 /**
  * @ignore
@@ -64,16 +64,20 @@ var BIB_FILE_NAME = 'bibliography.json';
  * @throws {Error} Thrown if cacheFolder is an empty string.
  */
 function CCCache (cacheFolder) {
-    if (instances[cacheFolder]) {
-        return instances[cacheFolder];
-    } else {
-        instances[cacheFolder] = this;
-    }
-
-    if (cacheFolder.length === 0) {
+    var normalizedCacheFolderString = cacheFolder.trim();
+    if (normalizedCacheFolderString.length === 0) {
         throw new Error('"cacheFolder" must not be an empty string');
     }
-    this._cacheFolder = cacheFolder;
+
+    var normalizedCacheFolder = path.resolve(normalizedCacheFolderString);
+
+    if (instances[normalizedCacheFolder]) {
+        return instances[normalizedCacheFolder];
+    } else {
+        instances[normalizedCacheFolder] = this;
+    }
+
+    this._cacheFolder = normalizedCacheFolder;
     this._bibliography = {};
     this._readBibliographyPromise = null;
 }
