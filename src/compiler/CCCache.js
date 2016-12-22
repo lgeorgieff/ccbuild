@@ -104,7 +104,7 @@ CCCache.prototype._readBibliography = function () {
             deferred.reject(err);
         } else {
             try {
-                self._bibliography = JSON.parse(data);
+                self._bibliography = err ? {} : JSON.parse(data);
                 deferred.resolve(self._bibliography);
             } catch (parserError) {
                 deferred.reject('Could not read index file of cache "' + self._cacheFolder + '" due to ' + parserError);
@@ -336,7 +336,7 @@ CCCache.prototype._generateHashForItems = function (items) {
     (items || []).forEach(function (dataItem) {
         dataItem.pipe(hash);
     });
-    hash.setEncodding('hex');
+    hash.setEncoding('hex');
 
     var deferred = Q.defer();
     return new Promise(function (resolve, reject) {

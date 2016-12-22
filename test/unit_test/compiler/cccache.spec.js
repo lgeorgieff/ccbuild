@@ -74,7 +74,7 @@ fdescribe('Class CCCache', function () {
         });
     });
 
-    describe('.constructor', function () {
+    describe('.ctor()', function () {
         it('returns a new instance for a new cache folder location', function () {
             var cache1 = new CCCache('/tmp/cache1');
             var cache2 = new CCCache('/tmp/cache2');
@@ -102,6 +102,121 @@ fdescribe('Class CCCache', function () {
             expect(cache40).toBeDefined();
             expect(cache40).not.toBeNull();
             expect(cache40).toBe(cache41);
+        });
+    });
+
+    describe('.write()', function () {
+        beforeEach(function () {
+            mockFs({
+                '/tmp/write/cache1': {
+                }
+            });
+        });
+
+        afterEach(function () {
+            mockFs.restore();
+        });
+
+        it('writes a new compilation unit into the cache if the cache is empty', function (done) {
+            var cache = new CCCache('/tmp/write/cache1/');
+
+            /**
+             * @typedef {{workingDirectory: !string,
+             *            unitName: !string,
+             *            globalSources: !Array<string>,
+             *            unitSources: !Array<string>,
+             *            globalExterns: !Array<string>,
+             *            unitExterns: !Array<string>,
+             *            globalBuildOptions: !Array<string>,
+             *            unitBuildOptions: !Array<string>,
+             *            outputFile: (?string|undefined),
+             *            globalWarningsFilterFile: Array<string>,
+             *            unitWarningsFilterFile: Array<string>}}
+             */
+
+            var compilerConfiguraton = {
+                workingDirectory: '.',
+                unitName: 'unit1',
+                globalSources: [],
+                unitSources: [],
+                globalExterns: [],
+                unitExterns: [],
+                globalBuildOptions: [],
+                unitBuildOptions: [],
+                outputFile: null,
+                globalWarningsFilterFile: [],
+                unitWarningsFilterFile: []
+            };
+            var compilationResult = null;
+            cache.write(compilerConfiguraton, compilationResult)
+                .then(done)
+                .catch(done.fail);
+
+
+
+            var fs = require('fs');
+            console.log('>>');
+            console.dir(fs.readdirSync('/tmp/write/cache1'));
+            console.log('<<');
+        });
+
+        it('deletes an existing compilation unit from the cache an writes a new one into the cache', function () {
+        });
+
+        it('writes a new compilation unit into the cache if the cache is not empty', function () {
+        });
+    });
+
+    describe('.get()', function () {
+        it('throws an error if the compilation unit does not exist', function () {
+        });
+
+        it('return cached compilation result', function () {
+        });
+
+        describe('updates cache in case', function () {
+            it('global source files changed', function () {
+            });
+
+            it('global externs files changed', function () {
+            });
+
+            it('global flagfile changed', function () {
+            });
+
+            it('global options changed', function () {
+            });
+
+            it('unit source files changed', function () {
+            });
+
+            it('unit externs files changed', function () {
+            });
+
+            it('unit flagfile changed', function () {
+            });
+
+            it('unit options changed', function () {
+            });
+        });
+    });
+
+    describe('.clean()', function () {
+        it('cleans a compilation unit', function () {
+        });
+
+        it('cleans a second compilation unit', function () {
+        });
+
+        it('throw an error if the compilation unit does not exist', function () {
+        });
+
+        it('cleans the complete cache', function () {
+        });
+    });
+
+    describe('.destroy()', function () {
+        it('writes changes to index file', function () {
         });
     });
 });
