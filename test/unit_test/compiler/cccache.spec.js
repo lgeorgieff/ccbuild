@@ -152,8 +152,6 @@ fdescribe('Class CCCache', function () {
                 .then(done)
                 .catch(done.fail);
 
-
-
             var fs = require('fs');
             console.log('>>');
             console.dir(fs.readdirSync('/tmp/write/cache1'));

@@ -173,6 +173,7 @@ CCCache.prototype.write = function (compilationUnit, compilationResult) {
                     deferred.reject('Could not write cache for the compilation unit "' + compilationUnit.unitName +
                                     '" due to ' + err);
                 } else {
+                    console.dir(self._bibliography);
                     deferred.resolve();
                 }
             });
@@ -308,7 +309,7 @@ CCCache.prototype.clean = function (compilationUnit) {
  * @param {string} item A string value.
  */
 CCCache.prototype._stringToStream = function (item) {
-    if (item instanceof stream.ReadableStream) {
+    if (item instanceof stream.Readable) {
         return item;
     } else if (typeof (item) === 'string') {
         var s = new stream.Readable();
@@ -317,7 +318,7 @@ CCCache.prototype._stringToStream = function (item) {
         return s;
     } else {
         throw new Error('Error occurred when handling cache at "' + this._cacheFolder + '" "item" must be either a ' +
-                        'string or a ReadableStream');
+                        'string or a Readable');
     }
 };
 
@@ -337,19 +338,18 @@ CCCache.prototype._generateHashForItems = function (items) {
         dataItem.pipe(hash);
     });
     hash.setEncoding('hex');
+    hash.end();
 
     var deferred = Q.defer();
-    return new Promise(function (resolve, reject) {
-        var result = '';
-        hash.on('data', function (data) {
-            result += data;
-        });
-        hash.on('end', function () {
-            deferred.resolve(result);
-        });
-        hash.on('error', function (err) {
-            deferred.reject(err);
-        });
+    var result = '';
+    hash.on('data', function (data) {
+        result += data;
+    });
+    hash.on('end', function () {
+        deferred.resolve(result);
+    });
+    hash.on('error', function (err) {
+        deferred.reject(err);
     });
     return deferred.promise;
 };
@@ -420,15 +420,9 @@ CCCache.prototype._generateHash = function (compilationUnit) {
         .concat(compilationUnit.unitBuildOptions).map(function (option) {
             return self._stringToStream(option);
         });
-
     return this._generateHashForItems(itemsToBeHashed)
         .then(function (hashValue) {
             return hashValue;
-        })
-        .finally(function () {
-            itemsToBeHashed.forEach(function (itemToBeHashed) {
-                itemToBeHashed.close();
-            });
         });
 };
 
