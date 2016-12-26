@@ -228,7 +228,7 @@ CCCache.prototype._cleanCompilationUnit = function (compilationUnit) {
     var self = this;
     return this._readBibliography()
         .then(function () {
-            var compilationUnitHash = this._bibliography[compilationUnit.unitName];
+            var compilationUnitHash = self._bibliography[compilationUnit.unitName];
             if (compilationUnitHash) {
                 var deferred = Q.defer();
                 fs.unlink(path.join(self._cacheFolder, compilationUnitHash + '.json'), function (err) {
@@ -245,7 +245,7 @@ CCCache.prototype._cleanCompilationUnit = function (compilationUnit) {
             }
         })
         .then(function (entryFound) {
-            delete this._bibliography[compilationUnit.unitName];
+            delete self._bibliography[compilationUnit.unitName];
         });
 };
 

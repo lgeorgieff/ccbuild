@@ -121,6 +121,8 @@ fdescribe('Class CCCache', function () {
             mockFs({
                 '/tmp/write/cache1': {
                 },
+                '/tmp/write/cache2': {
+                },
                 '/data': {
                     'globalSource1.js': 'console.log(\'global source 1\');',
                     'globalSource2.js': 'console.log(\'global source 2\');',
@@ -142,28 +144,43 @@ fdescribe('Class CCCache', function () {
             mockFs.restore();
         });
 
+        var compilerConfiguraton1 = {
+            workingDirectory: '.',
+            unitName: 'unit1',
+            globalSources: ['/data/globalSource1.js', '/data/globalSource2.js'],
+            unitSources: ['/data/unitSource1.js', '/data/unitSource2.js'],
+            globalExterns: ['/data/globalExterns1.js', '/data/globalExterns2.js'],
+            unitExterns: ['/data/unitExterns1.js', '/data/unitExterns2.js'],
+            globalBuildOptions: ['globalOption1', 'globalOption2'],
+            unitBuildOptions: ['unitOption1', 'unitOption2'],
+            outputFile: null,
+            globalWarningsFilterFile: ['/data/globalWarningsFilterFile1.txt',
+                                       '/data/globalWarningsFilterFile2.txt'],
+            unitWarningsFilterFile: ['/data/unitWarningsFilterFile1.txt', '/data/unitWarningsFilterFile2.txt']
+        };
+        var compilationResult1 = {stdout: 'console.log(\'Hello World!\')'};
+        var compilerConfiguraton2 = {
+            workingDirectory: '.',
+            unitName: 'unit1',
+            globalSources: ['/data/globalSource1.js'],
+            unitSources: ['/data/unitSource1.js', '/data/unitSource2.js'],
+            globalExterns: ['/data/globalExterns1.js', '/data/globalExterns2.js'],
+            unitExterns: ['/data/unitExterns1.js', '/data/unitExterns2.js'],
+            globalBuildOptions: ['globalOption1', 'globalOption2'],
+            unitBuildOptions: ['unitOption1', 'unitOption2'],
+            outputFile: null,
+            globalWarningsFilterFile: ['/data/globalWarningsFilterFile1.txt',
+                                       '/data/globalWarningsFilterFile2.txt'],
+            unitWarningsFilterFile: ['/data/unitWarningsFilterFile1.txt', '/data/unitWarningsFilterFile2.txt']
+        };
+        var compilationResult2 = {stdout: 'console.log(\'Hello World!!!\')'};
+        
         it('writes a new compilation unit into the cache if the cache is empty', function (done) {
             var cache = new CCCache('/tmp/write/cache1/');
-
-            var compilerConfiguraton = {
-                workingDirectory: '.',
-                unitName: 'unit1',
-                globalSources: ['/data/globalSource1.js', '/data/globalSource2.js'],
-                unitSources: ['/data/unitSource1.js', '/data/unitSource2.js'],
-                globalExterns: ['/data/globalExterns1.js', '/data/globalExterns2.js'],
-                unitExterns: ['/data/unitExterns1.js', '/data/unitExterns2.js'],
-                globalBuildOptions: ['globalOption1', 'globalOption2'],
-                unitBuildOptions: ['unitOption1', 'unitOption2'],
-                outputFile: null,
-                globalWarningsFilterFile: ['/data/globalWarningsFilterFile1.txt',
-                                           '/data/globalWarningsFilterFile2.txt'],
-                unitWarningsFilterFile: ['/data/unitWarningsFilterFile1.txt', '/data/unitWarningsFilterFile2.txt']
-            };
-            var compilationResult = {stdout: 'console.log(\'Hello World!\')'};
-            cache.write(compilerConfiguraton, compilationResult)
-                .then(() => {
+            cache.write(compilerConfiguraton1, compilationResult1)
+                .then(function () {
                     cache.persist()
-                        .then(() => {
+                        .then(function () {
                             expect(fs.readdirSync('/tmp/write/cache1').length).toBe(2);
                             expect(function () {
                                 fs.accessSync('/tmp/write/cache1/bibliography.json', fs.F_OK || fs.R_OK || fs.W_OK);
@@ -185,7 +202,7 @@ fdescribe('Class CCCache', function () {
                                 cachedResult = JSON.parse(fs.readFileSync(path.join('/tmp/write/cache1/',
                                                                                     bib.unit1 + '.json')));
                             }).not.toThrow();
-                            expect(cachedResult).toEqual(compilationResult);
+                            expect(cachedResult).toEqual(compilationResult1);
                             done();
                         })
                         .catch(done.fail);
@@ -193,13 +210,48 @@ fdescribe('Class CCCache', function () {
                 .catch(done.fail);
         });
 
-        it('deletes an existing compilation unit from the cache and writes a new one into the cache', function () {
+        it('deletes an existing compilation unit from the cache and writes a new one into the cache', function (done) {
+            var cache = new CCCache('/tmp/write/cache2/');
+            cache.write(compilerConfiguraton1, compilationResult1)
+                .then(function () {
+                    return cache.persist();
+                })
+                .then(function () {
+                    var hash1 = JSON.parse(fs.readFileSync('/tmp/write/cache2/bibliography.json')).unit1;
+                    var result1 = JSON.parse(fs.readFileSync(path.join('/tmp/write/cache2/', hash1 + '.json'), 'utf8'));
+                    expect(result1).toEqual(compilationResult1);
+                    return cache.write(compilerConfiguraton2, compilationResult2);
+                })
+                .then(function () {
+                    return cache.persist();
+                })
+                .then(function () {
+                    var bib = JSON.parse(fs.readFileSync('/tmp/write/cache2/bibliography.json'));
+                    var result1 = JSON.parse(fs.readFileSync(path.join('/tmp/write/cache2/', bib.unit1 + '.json'), 'utf8'));
+                    expect(Object.keys(bib).length).toBe(1);
+                    expect(bib.unit1).toBeDefined();
+                    expect(bib.unit1).not.toBeNull();
+                    expect(bib.unit1).toEqual(jasmine.any(String));
+                    expect(function () {
+                        fs.accessSync(path.join('/tmp/write/cache2/', bib.unit1 + '.json'),
+                                      fs.F_OK || fs.R_OK || fs.W_OK);
+                    }).not.toThrow();
+                    var cachedResult;
+                    expect(function () {
+                        cachedResult = JSON.parse(fs.readFileSync(path.join('/tmp/write/cache2/',
+                                                                            bib.unit1 + '.json')));
+                    }).not.toThrow();
+                    expect(cachedResult).toEqual(compilationResult2);
+                    expect(fs.readdirSync('/tmp/write/cache2/').length).toBe(2);
+                    done();
+                })
+                .catch(done.fail);
         });
 
         it('writes a new compilation unit into the cache if the cache is not empty', function () {
         });
 
-        it('writes multiple compilation unit into the cache', function () {
+        it('does not write into cache in case the compilation unit did not change', function () {
         });
     });
 
