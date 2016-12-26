@@ -168,15 +168,22 @@ CCCache.prototype.write = function (compilationUnit, compilationResult) {
         .then(function (compilationUnitHash) {
             self._bibliography[compilationUnit.unitName] = compilationUnitHash;
             var deferred = Q.defer();
-            fs.writeFile(path.join(self._cacheFolder, compilationUnitHash + 'json'), 'utf8', function (err) {
-                if (err) {
-                    deferred.reject('Could not write cache for the compilation unit "' + compilationUnit.unitName +
-                                    '" due to ' + err);
-                } else {
-                    console.dir(self._bibliography);
-                    deferred.resolve();
-                }
-            });
+            try {
+                var content = JSON.stringify(compilationResult);
+                fs.writeFile(path.join(self._cacheFolder, compilationUnitHash + '.json'), content, 'utf8',
+                             function (err) {
+                                 if (err) {
+                                     deferred.reject('Could not write cache for the compilation unit "' +
+                                                     compilationUnit.unitName + '" due to ' + err);
+                                 } else {
+                                     deferred.resolve();
+                                 }
+                             });
+            } catch (err) {
+                deferred.reject('Could not write compilation result into cache for the compilation unit "' +
+                                compilationUnit.unitName + '" due to ' + err);
+            }
+
             return deferred.promise;
         });
 };
@@ -187,7 +194,7 @@ CCCache.prototype.write = function (compilationUnit, compilationResult) {
  * @return {QPromise} A promise that is resolved in case the cache is completetly persisted or a rejeted in case of an
  *         error.
  */
-CCCache.prototype.destroy = function () {
+CCCache.prototype.persist = function () {
     var self = this;
     return (this._readBibliographyPromise || Q.resolve())
         .then(function () {
@@ -218,6 +225,7 @@ CCCache.prototype.destroy = function () {
  * @param {!CompilerConfiguration} compilationUnit The compiler configuration for the requested compilation unit.
  */
 CCCache.prototype._cleanCompilationUnit = function (compilationUnit) {
+    var self = this;
     return this._readBibliography()
         .then(function () {
             var compilationUnitHash = this._bibliography[compilationUnit.unitName];
@@ -258,7 +266,7 @@ CCCache.prototype._cleanAll = function () {
                 if (err) {
                     deferred.reject('Could not clean the cache folder "' + self._cacheFolder + '" due to ' + err);
                 } else {
-                    var filePaths = files.map(function (fileName) {
+                    var filePaths = fileNames.map(function (fileName) {
                         return path.join(self.cacheFolder, fileName);
                     });
                     deferred.resolve(filePaths);
@@ -305,7 +313,7 @@ CCCache.prototype.clean = function (compilationUnit) {
  * Create a {@link Readable} stream of the given string.
  *
  * @private
- * @returns {Readable} A stream for the given stirng value
+ * @returns {stream.Readable} A stream for the given stirng value
  * @param {string} item A string value.
  */
 CCCache.prototype._stringToStream = function (item) {
@@ -329,29 +337,31 @@ CCCache.prototype._stringToStream = function (item) {
  *
  * @returns {QPromise<string>} A promise either holding a string in hex representation of a sha-256 hash or holding an
  *          {@link Error} in case of rejection.
- * @param {Array<Readable>} items A list of {@link Readable} streams that are piped into the hashing function and will
+ * @param {Array<stream.Readable>} items A list of {@link Readable} streams that are piped into the hashing function and will
  *        result in the final sha256-hash.
  */
 CCCache.prototype._generateHashForItems = function (items) {
     var hash = crypto.createHash('sha256');
-    (items || []).forEach(function (dataItem) {
-        dataItem.pipe(hash);
-    });
     hash.setEncoding('hex');
-    hash.end();
 
-    var deferred = Q.defer();
-    var result = '';
-    hash.on('data', function (data) {
-        result += data;
+    hash.setMaxListeners(items.length);
+    var streamPromises = (items || []).map(function (dataItem) {
+        dataItem.pipe(hash, {end: false});
+        var deferred = Q.defer();
+        dataItem.on('end', function () {
+            deferred.resolve();
+        });
+        dataItem.on('error', function (err) {
+            deferred.reject(err);
+        });
+        return deferred.promise;
     });
-    hash.on('end', function () {
-        deferred.resolve(result);
-    });
-    hash.on('error', function (err) {
-        deferred.reject(err);
-    });
-    return deferred.promise;
+
+    return Q.all(streamPromises)
+        .then(function () {
+            hash.end();
+            return hash.read();
+        });
 };
 
 /**
@@ -359,7 +369,7 @@ CCCache.prototype._generateHashForItems = function (items) {
  *
  * @private
  *
- * @returns {Array<Readable>} A list of {@link Readable} streams for all given file paths.
+ * @returns {Array<stream.Readable>} A list of {@link Readable} streams for all given file paths.
  * @param {Array<string>} filePaths Paths to files that are returned as {@link Readable} streams.
  */
 CCCache.prototype._getFileStreams = function (filePaths) {
@@ -373,7 +383,7 @@ CCCache.prototype._getFileStreams = function (filePaths) {
  *
  * @private
  *
- * @returns {?Readable} The stream for a flagfile specified via `options`. In case no flagfile is specified in `options`
+ * @returns {?stream.Readable} The stream for a flagfile specified via `options`. In case no flagfile is specified in `options`
  *          `null` is returned.
  * @param {!Array<string>} options The build options for the closure compiler.
  */
@@ -414,12 +424,12 @@ CCCache.prototype._generateHash = function (compilationUnit) {
         allFiles.push(unitFlagfile);
     }
     var itemsToBeHashed = this._getFileStreams(allFiles)
-        .concat(compilationUnit.globalBuildOptions).map(function (option) {
+        .concat(compilationUnit.globalBuildOptions.map(function (option) {
             return self._stringToStream(option);
-        })
-        .concat(compilationUnit.unitBuildOptions).map(function (option) {
+        }))
+        .concat(compilationUnit.unitBuildOptions.map(function (option) {
             return self._stringToStream(option);
-        });
+        }));
     return this._generateHashForItems(itemsToBeHashed)
         .then(function (hashValue) {
             return hashValue;
