@@ -128,8 +128,9 @@ CCCache.prototype.get = function (compilationUnit) {
     var self = this;
     return this._readBibliography()
         .then(function () {
-            var compilationUnitHash = self._generateHash(compilationUnit);
-            var deferred = Q.defer();
+            return self._generateHash(compilationUnit);
+        })
+        .then(function (compilationUnitHash) {
             if (self._bibliography[compilationUnit.unitName] === compilationUnitHash) {
                 return self._getCachedResult(compilationUnit.unitName, compilationUnitHash);
             } else if (self._bibliography[compilationUnit.unitName] !== undefined) {
@@ -138,9 +139,8 @@ CCCache.prototype.get = function (compilationUnit) {
                         return null;
                     });
             } else {
-                deferred.reject(NotFoundInCacheError(compilationUnit.unitName, compilationUnitHash, self._cacheFolder));
+                Q.reject(NotFoundInCacheError(compilationUnit.unitName, compilationUnitHash, self._cacheFolder));
             }
-            return deferred.promise;
         });
 };
 
