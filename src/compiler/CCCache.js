@@ -38,6 +38,13 @@ var NotFoundInCacheError = /** @type {function (new:NotFoundInCacheError, string
     (require('./NotFoundInCacheError.js'));
 
 /**
+ * @ignore
+ * @suppress {duplicate}
+ */
+var OutdatedCacheError = /** @type {function (new:OutdatedCacheError, string, string, string, string): undefined}*/
+    (require('./OutdatedCacheError.js'));
+
+/**
  * Contains for each cache folder location an existing {@link CCCache} instance.
  *
  * @private
@@ -122,7 +129,8 @@ CCCache.prototype._readBibliography = function () {
  * error is returned.
  *
  * @returns {QPromise<Object>} A promise holding the cached compilation result. In case the requested compilation unit
- *          is not cached or is outdated the promise is rejected with a {@link NotFoundInCacheError}.
+ *          is not cached the promise is rejected with a {@link NotFoundInCacheError}. In case the compilation unit is
+ *          cached but outdated the promise is rejected with a {@link OutdatedCacheError}.
  * @param {!CompilerConfiguration} compilationUnit The compiler configuration for the current compilation unit.
  */
 CCCache.prototype.get = function (compilationUnit) {
@@ -132,16 +140,18 @@ CCCache.prototype.get = function (compilationUnit) {
             return self._generateHash(compilationUnit);
         })
         .then(function (compilationUnitHash) {
-            if (self._bibliography[compilationUnit.unitName] === compilationUnitHash) {
+            var cachedHash = self._bibliography[compilationUnit.unitName];
+            if (cachedHash === compilationUnitHash) {
                 return self._getCachedResult(compilationUnit.unitName, compilationUnitHash);
-            } else if (self._bibliography[compilationUnit.unitName] !== undefined) {
+            } else if (cachedHash !== undefined) {
                 return self.clean(compilationUnit)
                     .then(function () {
-                        return Q.reject(NotFoundInCacheError(compilationUnit.unitName, compilationUnitHash,
-                                                             self._cacheFolder));
+                        return Q.reject(new OutdatedCacheError(compilationUnit.unitName, cachedHash,
+                                                               compilationUnitHash, self._cacheFolder));
                     });
             } else {
-                return Q.reject(NotFoundInCacheError(compilationUnit.unitName, compilationUnitHash, self._cacheFolder));
+                return Q.reject(new NotFoundInCacheError(compilationUnit.unitName, compilationUnitHash,
+                                                         self._cacheFolder));
             }
         });
 };
@@ -224,6 +234,9 @@ CCCache.prototype.persist = function () {
  * @private
  *
  * @returns {QPromise<Object>} A promise that is resolved in case of success or rejected otherwise.
+ *          In case an FS error is thrown the promise is rejected with the original error instance.
+ *          In case the compilation unit is not cached the promise is rejected with an {@link NotFoundInCacheError}
+ *          error.
  * @param {!CompilerConfiguration} compilationUnit The compiler configuration for the requested compilation unit.
  */
 CCCache.prototype._cleanCompilationUnit = function (compilationUnit) {
@@ -231,8 +244,8 @@ CCCache.prototype._cleanCompilationUnit = function (compilationUnit) {
     return this._readBibliography()
         .then(function () {
             var compilationUnitHash = self._bibliography[compilationUnit.unitName];
+            var deferred = Q.defer();
             if (compilationUnitHash) {
-                var deferred = Q.defer();
                 fs.unlink(path.join(self._cacheFolder, compilationUnitHash + '.json'), function (err) {
                     if (err) {
                         deferred.reject('Failed to clean the cache for the compilation unit "' +
@@ -243,7 +256,9 @@ CCCache.prototype._cleanCompilationUnit = function (compilationUnit) {
                 });
                 return deferred.promise;
             } else {
-                return false;
+                deferred.reject(new NotFoundInCacheError(compilationUnit.unitName, compilationUnitHash,
+                                                         self._cacheFolder));
+                return deferred.promise;
             }
         })
         .then(function (entryFound) {
@@ -269,7 +284,7 @@ CCCache.prototype._cleanAll = function () {
                     deferred.reject('Could not clean the cache folder "' + self._cacheFolder + '" due to ' + err);
                 } else {
                     var filePaths = fileNames.map(function (fileName) {
-                        return path.join(self.cacheFolder, fileName);
+                        return path.join(self._cacheFolder, fileName);
                     });
                     deferred.resolve(filePaths);
                 }
@@ -291,6 +306,9 @@ CCCache.prototype._cleanAll = function () {
         })
         .then(function (rmPromises) {
             return Q.all(rmPromises);
+        })
+        .then(function () {
+            self._bibliography = {};
         });
 };
 
@@ -300,6 +318,9 @@ CCCache.prototype._cleanAll = function () {
  * deleted.
  *
  * @returns {QPromise<Object>} A promise that is resolved in case of success or rejected otherwise.
+ *          In case an FS error is thrown the promise is rejected with the original error instance.
+ *          In case the compilation unit is not cached the promise is rejected with an {@link NotFoundInCacheError}
+ *          error.
  * @param {CompilerConfiguration=} compilationUnit An optional argument that defines the compiler configuration for the
  *        compilation unit to be deleted.
  */

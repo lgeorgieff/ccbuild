@@ -30,7 +30,13 @@ var CCCache = require('../../../src/compiler/CCCache.js');
  */
 var NotFoundInCacheError = require('../../../src/compiler/NotFoundInCacheError.js');
 
-fdescribe('Class CCCache', function () {
+/**
+ * @ignore
+ * @suppress {dupicate}
+ */
+var OutdatedCacheError = require('../../../src/compiler/OutdatedCacheError.js');
+
+describe('Class CCCache', function () {
     beforeEach(function () {
         mockFs({
             '/tmp/write/cache1': {
@@ -48,6 +54,14 @@ fdescribe('Class CCCache', function () {
             '/tmp/write/cache7': {
             },
             '/tmp/write/cache8': {
+            },
+            '/tmp/write/cache9': {
+            },
+            '/tmp/write/cache10': {
+            },
+            '/tmp/write/cache11': {
+            },
+            '/tmp/write/cache12': {
             },
             '/data': {
                 'globalSource1.js': 'console.log(\'global source 1\');',
@@ -307,8 +321,10 @@ fdescribe('Class CCCache', function () {
                 })
                 .then(function () {
                     var bib = JSON.parse(fs.readFileSync('/tmp/write/cache3/bibliography.json'));
-                    var file1 = JSON.parse(fs.readFileSync(path.join('/tmp/write/cache3/', bib.unit1 + '.json'), 'utf8'));
-                    var file2 = JSON.parse(fs.readFileSync(path.join('/tmp/write/cache3/', bib.unit2 + '.json'), 'utf8'));
+                    var file1 =
+                        JSON.parse(fs.readFileSync(path.join('/tmp/write/cache3/', bib.unit1 + '.json'), 'utf8'));
+                    var file2 =
+                        JSON.parse(fs.readFileSync(path.join('/tmp/write/cache3/', bib.unit2 + '.json'), 'utf8'));
                     expect(Object.keys(bib).length).toBe(2);
                     expect(bib.unit1).toBeDefined();
                     expect(bib.unit1).not.toBeNull();
@@ -389,7 +405,7 @@ fdescribe('Class CCCache', function () {
                 .catch(done.fail);
         });
 
-        describe('updates cache in case', function () {
+        describe('cleans unit in cache in case', function () {
             var compilerConfiguration4 = {
                 workingDirectory: '.',
                 unitName: 'unit1',
@@ -414,14 +430,15 @@ fdescribe('Class CCCache', function () {
                         return cache.persist();
                     })
                     .then(function () {
-                        var hashUnit1 = JSON.parse(fs.readFileSync(path.join(cacheFolderLocation, 'bibliography.json'))).unit1;
-                        return { unit1: hashUnit1,
-                                 compilationResult: JSON.parse(fs.readFileSync(path.join(cacheFolderLocation,
-                                                                                         hashUnit1 + '.json'))) };
+                        var hashUnit1 =
+                            JSON.parse(fs.readFileSync(path.join(cacheFolderLocation, 'bibliography.json'))).unit1;
+                        return {unit1: hashUnit1,
+                                compilationResult: JSON.parse(fs.readFileSync(path.join(cacheFolderLocation,
+                                                                                         hashUnit1 + '.json')))};
                     });
             };
 
-            var testChanges = function (cacheFolderLocation, configurationChanges) {
+            var testChanges = function (configurationChanges) {
                 var compilerConfiguration = Object.assign({}, compilerConfiguration4);
                 Object.assign(compilerConfiguration, configurationChanges);
                 return cache.get(compilerConfiguration);
@@ -430,53 +447,195 @@ fdescribe('Class CCCache', function () {
             it('global source files changed', function (done) {
                 prepareTest('/tmp/write/cache8')
                     .then(function (result) {
-                        console.dir(result);
                         testChanges({globalSources: []})
                             .then(function () {
-                                done.fail('...');
+                                done.fail('Expected to fail due to outdated compiler configuration');
                             })
-                            .catch(done);
+                            .catch(function (err) {
+                                expect(err).toEqual(jasmine.any(OutdatedCacheError));
+                                done();
+                            });
                     })
                     .catch(done.fail);
             });
 
-            it('global externs files changed', function () {
+            it('global externs files changed', function (done) {
+                prepareTest('/tmp/write/cache8')
+                    .then(function (result) {
+                        testChanges({globalExterns: []})
+                            .then(function () {
+                                done.fail('Expected to fail due to outdated compiler configuration');
+                            })
+                            .catch(function (err) {
+                                expect(err).toEqual(jasmine.any(OutdatedCacheError));
+                                done();
+                            });
+                    })
+                    .catch(done.fail);
             });
 
-            it('global flagfile changed', function () {
+            it('global options changed', function (done) {
+                prepareTest('/tmp/write/cache8')
+                    .then(function (result) {
+                        testChanges({globalBuildOptions: []})
+                            .then(function () {
+                                done.fail('Expected to fail due to outdated compiler configuration');
+                            })
+                            .catch(function (err) {
+                                expect(err).toEqual(jasmine.any(OutdatedCacheError));
+                                done();
+                            });
+                    })
+                    .catch(done.fail);
             });
 
-            it('global options changed', function () {
+            it('unit source files changed', function (done) {
+                prepareTest('/tmp/write/cache8')
+                    .then(function (result) {
+                        testChanges({unitSources: []})
+                            .then(function () {
+                                done.fail('Expected to fail due to outdated compiler configuration');
+                            })
+                            .catch(function (err) {
+                                expect(err).toEqual(jasmine.any(OutdatedCacheError));
+                                done();
+                            });
+                    })
+                    .catch(done.fail);
             });
 
-            it('unit source files changed', function () {
+            it('unit externs files changed', function (done) {
+                prepareTest('/tmp/write/cache8')
+                    .then(function (result) {
+                        testChanges({unitExterns: []})
+                            .then(function () {
+                                done.fail('Expected to fail due to outdated compiler configuration');
+                            })
+                            .catch(function (err) {
+                                expect(err).toEqual(jasmine.any(OutdatedCacheError));
+                                done();
+                            });
+                    })
+                    .catch(done.fail);
             });
 
-            it('unit externs files changed', function () {
+            it('unit options changed', function (done) {
+                prepareTest('/tmp/write/cache8')
+                    .then(function (result) {
+                        testChanges({unitBuildOptions: []})
+                            .then(function () {
+                                done.fail('Expected to fail due to outdated compiler configuration');
+                            })
+                            .catch(function (err) {
+                                expect(err).toEqual(jasmine.any(OutdatedCacheError));
+                                done();
+                            });
+                    })
+                    .catch(done.fail);
             });
-
-            it('unit flagfile changed', function () {
-            });
-
-            it('unit options changed', function () {
-            });
-        });
-
-        it('does not update cache in case the compilation unit did not change', function () {
         });
     });
 
     describe('.clean()', function () {
-        it('cleans a compilation unit', function () {
+        it('cleans a compilation unit', function (done) {
+            var cache = new CCCache('/tmp/write/cache9/');
+            cache.write(compilerConfiguration1)
+                .then(function () {
+                    return cache.persist();
+                })
+                .then(function () {
+                    return cache.clean(compilerConfiguration1);
+                })
+                .then(function () {
+                    return cache.persist();
+                })
+                .then(function () {
+                    expect(fs.readdirSync('/tmp/write/cache9/')).toEqual(['bibliography.json']);
+                    expect(JSON.parse(fs.readFileSync('/tmp/write/cache9/bibliography.json'))).toEqual({});
+                    done();
+                })
+                .catch(done.fail);
         });
 
-        it('cleans a second compilation unit', function () {
+        it('cleans a two compilation units', function (done) {
+            var cache = new CCCache('/tmp/write/cache10/');
+            cache.write(compilerConfiguration1)
+                .then(function () {
+                    return cache.write(compilerConfiguration3);
+                })
+                .then(function () {
+                    return cache.persist();
+                })
+                .then(function () {
+                    return cache.clean(compilerConfiguration1);
+                })
+                .then(function () {
+                    return cache.persist();
+                })
+                .then(function () {
+                    var fileNames = fs.readdirSync('/tmp/write/cache10/');
+                    expect(fileNames.length).toBe(2);
+                    expect(fileNames).toEqual(jasmine.arrayContaining(['bibliography.json']));
+                    var bib = JSON.parse(fs.readFileSync('/tmp/write/cache10/bibliography.json'));
+                    expect(Object.keys(bib).length).toBe(1);
+                    expect(fileNames.indexOf(bib.unit2 + '.json')).not.toBe(-1);
+                })
+                .then(function () {
+                    return cache.clean(compilerConfiguration3);
+                })
+                .then(function () {
+                    return cache.persist();
+                })
+                .then(function () {
+                    expect(fs.readdirSync('/tmp/write/cache10/')).toEqual(['bibliography.json']);
+                    expect(JSON.parse(fs.readFileSync('/tmp/write/cache10/bibliography.json'))).toEqual({});
+                    done();
+                })
+                .catch(done.fail);
         });
 
-        it('throw an error if the compilation unit does not exist', function () {
+        it('throws an error if the compilation unit does not exist', function (done) {
+            var cache = new CCCache('/tmp/write/cache11/');
+            cache.write(compilerConfiguration1)
+                .then(function () {
+                    return cache.persist();
+                })
+                .then(function () {
+                    return cache.clean(compilerConfiguration3);
+                })
+                .then(function () {
+                    done.fail('Expected cache.clean() to fail due to non-existing compiler configuration');
+                })
+                .catch(function (err) {
+                    expect(err).toEqual(jasmine.any(NotFoundInCacheError));
+                    done();
+                });
         });
 
-        it('cleans the complete cache', function () {
+        it('cleans the complete cache', function (done) {
+            var cache = new CCCache('/tmp/write/cache12/');
+            cache.write(compilerConfiguration1)
+                .then(function () {
+                    return cache.write(compilerConfiguration3);
+                })
+                .then(function () {
+                    return cache.persist();
+                })
+                .then(function () {
+                    return cache.clean();
+                })
+                .then(function () {
+                    expect(fs.readdirSync('/tmp/write/cache12/').length).toBe(0);
+                })
+                .then(function () {
+                    return cache.persist();
+                })
+                .then(function () {
+                    expect(fs.readdirSync('/tmp/write/cache12/')).toEqual(['bibliography.json']);
+                    expect(JSON.parse(fs.readFileSync('/tmp/write/cache12/bibliography.json'))).toEqual({});
+                    done();
+                })
+                .catch(done.fail);
         });
     });
 });
