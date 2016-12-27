@@ -24,10 +24,44 @@ var mockFs = require('mock-fs');
  */
 var CCCache = require('../../../src/compiler/CCCache.js');
 
+/**
+ * @ignore
+ * @suppress {dupicate}
+ */
+var NotFoundInCacheError = require('../../../src/compiler/NotFoundInCacheError.js');
+
 fdescribe('Class CCCache', function () {
     beforeEach(function () {
         mockFs({
-            '/tmp': {
+            '/tmp/write/cache1': {
+            },
+            '/tmp/write/cache2': {
+            },
+            '/tmp/write/cache3': {
+            },
+            '/tmp/write/cache4': {
+            },
+            '/tmp/write/cache5': {
+            },
+            '/tmp/write/cache6': {
+            },
+            '/tmp/write/cache7': {
+            },
+            '/tmp/write/cache8': {
+            },
+            '/data': {
+                'globalSource1.js': 'console.log(\'global source 1\');',
+                'globalSource2.js': 'console.log(\'global source 2\');',
+                'unitSource1.js': 'console.log(\'unit source 1\');',
+                'unitSource2.js': 'console.log(\'unit source 2\');',
+                'globalExterns1.js': 'var globalExterns1;',
+                'globalExterns2.js': 'var globalExterns2;',
+                'unitExterns1.js': 'var unitExterns1;',
+                'unitExterns2.js': 'var unitExterns2;',
+                'globalWarningsFilterFile1.txt': 'global warnings filter file 1',
+                'globalWarningsFilterFile2.txt': 'global warnings filter file 2',
+                'unitWarningsFilterFile1.txt': 'unit warnings filter file 1',
+                'unitWarningsFilterFile2.txt': 'unit warnings filter file 2'
             }
         });
     });
@@ -35,6 +69,52 @@ fdescribe('Class CCCache', function () {
     afterEach(function () {
         mockFs.restore();
     });
+
+    var compilerConfiguration1 = {
+        workingDirectory: '.',
+        unitName: 'unit1',
+        globalSources: ['/data/globalSource1.js', '/data/globalSource2.js'],
+        unitSources: ['/data/unitSource1.js', '/data/unitSource2.js'],
+        globalExterns: ['/data/globalExterns1.js', '/data/globalExterns2.js'],
+        unitExterns: ['/data/unitExterns1.js', '/data/unitExterns2.js'],
+        globalBuildOptions: ['globalOption1', 'globalOption2'],
+        unitBuildOptions: ['unitOption1', 'unitOption2'],
+        outputFile: null,
+        globalWarningsFilterFile: ['/data/globalWarningsFilterFile1.txt',
+                                   '/data/globalWarningsFilterFile2.txt'],
+        unitWarningsFilterFile: ['/data/unitWarningsFilterFile1.txt', '/data/unitWarningsFilterFile2.txt']
+    };
+    var compilationResult1 = {stdout: 'console.log(\'Hello World!\')'};
+    var compilerConfiguration2 = {
+        workingDirectory: '.',
+        unitName: 'unit1',
+        globalSources: ['/data/globalSource1.js'],
+        unitSources: ['/data/unitSource1.js', '/data/unitSource2.js'],
+        globalExterns: ['/data/globalExterns1.js', '/data/globalExterns2.js'],
+        unitExterns: ['/data/unitExterns1.js', '/data/unitExterns2.js'],
+        globalBuildOptions: ['globalOption1', 'globalOption2'],
+        unitBuildOptions: ['unitOption1', 'unitOption2'],
+        outputFile: null,
+        globalWarningsFilterFile: ['/data/globalWarningsFilterFile1.txt',
+                                   '/data/globalWarningsFilterFile2.txt'],
+        unitWarningsFilterFile: ['/data/unitWarningsFilterFile1.txt', '/data/unitWarningsFilterFile2.txt']
+    };
+    var compilationResult2 = {stdout: 'console.log(\'Hello World!!!\')'};
+    var compilerConfiguration3 = {
+        workingDirectory: '.',
+        unitName: 'unit2',
+        globalSources: ['/data/globalSource1.js'],
+        unitSources: [],
+        globalExterns: ['/data/globalExterns1.js', '/data/globalExterns2.js'],
+        unitExterns: [],
+        globalBuildOptions: [],
+        unitBuildOptions: ['unitOption'],
+        outputFile: null,
+        globalWarningsFilterFile: ['/data/globalWarningsFilterFile1.txt',
+                                   '/data/globalWarningsFilterFile2.txt'],
+        unitWarningsFilterFile: ['/data/unitWarningsFilterFile1.txt', '/data/unitWarningsFilterFile2.txt']
+    };
+    var compilationResult3 = {stdout: 'console.log(\'Hello World!\')'};
 
     describe('cannot be instantiated if', function () {
         it('cacheFolder option is not given', function () {
@@ -112,88 +192,44 @@ fdescribe('Class CCCache', function () {
     });
 
     describe('.persist()', function () {
-        it('writes changes to index file', function () {
+        it('writes changes to index file', function (done) {
+            var cache = new CCCache('/tmp/write/cache5/');
+            expect(fs.readdirSync('/tmp/write/cache5').length).toBe(0);
+            cache.persist()
+                .then(function () {
+                    expect(fs.readdirSync('/tmp/write/cache5').length).toBe(1);
+                    expect(function () {
+                        fs.accessSync('/tmp/write/cache5/bibliography.json', fs.F_OK || fs.R_OK || fs.W_OK);
+                    }).not.toThrow();
+                    var bib;
+                    expect(function () {
+                        bib = JSON.parse(fs.readFileSync('/tmp/write/cache5/bibliography.json'));
+                    }).not.toThrow();
+                    expect(bib).toEqual({});
+                })
+                .then(function () {
+                    return cache.write(compilerConfiguration1, compilationResult1);
+                })
+                .then(function () {
+                    return cache.persist();
+                })
+                .then(function () {
+                    expect(fs.readdirSync('/tmp/write/cache5').length).toBe(2);
+                    expect(function () {
+                        fs.accessSync('/tmp/write/cache5/bibliography.json', fs.F_OK || fs.R_OK || fs.W_OK);
+                    }).not.toThrow();
+                    var bib;
+                    expect(function () {
+                        bib = JSON.parse(fs.readFileSync('/tmp/write/cache5/bibliography.json'));
+                    }).not.toThrow();
+                    expect(Object.keys(bib).length).toBe(1);
+                    done();
+                })
+                .catch(done.fail);
         });
     });
 
     describe('.write()', function () {
-        beforeEach(function () {
-            mockFs({
-                '/tmp/write/cache1': {
-                },
-                '/tmp/write/cache2': {
-                },
-                '/tmp/write/cache3': {
-                },
-                '/tmp/write/cache4': {
-                },
-                '/data': {
-                    'globalSource1.js': 'console.log(\'global source 1\');',
-                    'globalSource2.js': 'console.log(\'global source 2\');',
-                    'unitSource1.js': 'console.log(\'unit source 1\');',
-                    'unitSource2.js': 'console.log(\'unit source 2\');',
-                    'globalExterns1.js': 'var globalExterns1;',
-                    'globalExterns2.js': 'var globalExterns2;',
-                    'unitExterns1.js': 'var unitExterns1;',
-                    'unitExterns2.js': 'var unitExterns2;',
-                    'globalWarningsFilterFile1.txt': 'global warnings filter file 1',
-                    'globalWarningsFilterFile2.txt': 'global warnings filter file 2',
-                    'unitWarningsFilterFile1.txt': 'unit warnings filter file 1',
-                    'unitWarningsFilterFile2.txt': 'unit warnings filter file 2'
-                }
-            });
-        });
-
-        afterEach(function () {
-            mockFs.restore();
-        });
-
-        var compilerConfiguration1 = {
-            workingDirectory: '.',
-            unitName: 'unit1',
-            globalSources: ['/data/globalSource1.js', '/data/globalSource2.js'],
-            unitSources: ['/data/unitSource1.js', '/data/unitSource2.js'],
-            globalExterns: ['/data/globalExterns1.js', '/data/globalExterns2.js'],
-            unitExterns: ['/data/unitExterns1.js', '/data/unitExterns2.js'],
-            globalBuildOptions: ['globalOption1', 'globalOption2'],
-            unitBuildOptions: ['unitOption1', 'unitOption2'],
-            outputFile: null,
-            globalWarningsFilterFile: ['/data/globalWarningsFilterFile1.txt',
-                                       '/data/globalWarningsFilterFile2.txt'],
-            unitWarningsFilterFile: ['/data/unitWarningsFilterFile1.txt', '/data/unitWarningsFilterFile2.txt']
-        };
-        var compilationResult1 = {stdout: 'console.log(\'Hello World!\')'};
-        var compilerConfiguration2 = {
-            workingDirectory: '.',
-            unitName: 'unit1',
-            globalSources: ['/data/globalSource1.js'],
-            unitSources: ['/data/unitSource1.js', '/data/unitSource2.js'],
-            globalExterns: ['/data/globalExterns1.js', '/data/globalExterns2.js'],
-            unitExterns: ['/data/unitExterns1.js', '/data/unitExterns2.js'],
-            globalBuildOptions: ['globalOption1', 'globalOption2'],
-            unitBuildOptions: ['unitOption1', 'unitOption2'],
-            outputFile: null,
-            globalWarningsFilterFile: ['/data/globalWarningsFilterFile1.txt',
-                                       '/data/globalWarningsFilterFile2.txt'],
-            unitWarningsFilterFile: ['/data/unitWarningsFilterFile1.txt', '/data/unitWarningsFilterFile2.txt']
-        };
-        var compilationResult2 = {stdout: 'console.log(\'Hello World!!!\')'};
-        var compilerConfiguration3 = {
-            workingDirectory: '.',
-            unitName: 'unit2',
-            globalSources: ['/data/globalSource1.js'],
-            unitSources: [],
-            globalExterns: ['/data/globalExterns1.js', '/data/globalExterns2.js'],
-            unitExterns: [],
-            globalBuildOptions: [],
-            unitBuildOptions: ['unitOption'],
-            outputFile: null,
-            globalWarningsFilterFile: ['/data/globalWarningsFilterFile1.txt',
-                                       '/data/globalWarningsFilterFile2.txt'],
-            unitWarningsFilterFile: ['/data/unitWarningsFilterFile1.txt', '/data/unitWarningsFilterFile2.txt']
-        };
-        var compilationResult3 = {stdout: 'console.log(\'Hello World!\')'};
-
         it('writes a new compilation unit into the cache if the cache is empty', function (done) {
             var cache = new CCCache('/tmp/write/cache1/');
             cache.write(compilerConfiguration1, compilationResult1)
@@ -201,13 +237,7 @@ fdescribe('Class CCCache', function () {
                     cache.persist()
                         .then(function () {
                             expect(fs.readdirSync('/tmp/write/cache1').length).toBe(2);
-                            expect(function () {
-                                fs.accessSync('/tmp/write/cache1/bibliography.json', fs.F_OK || fs.R_OK || fs.W_OK);
-                            }).not.toThrow();
-                            var bib;
-                            expect(function () {
-                                bib = JSON.parse(fs.readFileSync('/tmp/write/cache1/bibliography.json'));
-                            }).not.toThrow();
+                            var bib = JSON.parse(fs.readFileSync('/tmp/write/cache1/bibliography.json'));
                             expect(Object.keys(bib).length).toBe(1);
                             expect(bib.unit1).toBeDefined();
                             expect(bib.unit1).not.toBeNull();
@@ -313,14 +343,101 @@ fdescribe('Class CCCache', function () {
     });
 
     describe('.get()', function () {
-        it('throws an error if the compilation unit does not exist', function () {
+        it('rejects with NotFoundInCacheError if the compilation unit does not exist', function () {
+            var cache = new CCCache('/tmp/write/cache4/');
+            cache.get(compilerConfiguration1)
+                .then(function () {
+                    done.fail('Expected cache::get for ' + compilerConfiguration1 + ' to reject with ' +
+                              'NotFoundInCacheError');
+                })
+                .catch(function (err) {
+                    if (err instanceof NotFoundInCacheError) {
+                        done();
+                    } else {
+                        done.fail('Expected cache::get for ' + compilerConfiguration1 + ' to reject with ' +
+                                  'NotFoundInCacheError');
+                    }
+                });
         });
 
-        it('returns cached compilation result', function () {
+        it('returns cached compilation result', function (done) {
+            var cache = new CCCache('/tmp/write/cache6/');
+            cache.write(compilerConfiguration1, compilationResult1)
+                .then(function () {
+                    return cache.get(compilerConfiguration1);
+                })
+                .then(function (cachedCompilationResult) {
+                    expect(cachedCompilationResult).toEqual(compilationResult1);
+                    done();
+                })
+                .catch(done.fail);
+        });
+
+        it('returns cached compilation result after persist() was called', function (done) {
+            var cache = new CCCache('/tmp/write/cache7/');
+            cache.write(compilerConfiguration1, compilationResult1)
+                .then(function () {
+                    return cache.persist();
+                })
+                .then(function () {
+                    return cache.get(compilerConfiguration1);
+                })
+                .then(function (cachedCompilationResult) {
+                    expect(cachedCompilationResult).toEqual(compilationResult1);
+                    done();
+                })
+                .catch(done.fail);
         });
 
         describe('updates cache in case', function () {
-            it('global source files changed', function () {
+            var compilerConfiguration4 = {
+                workingDirectory: '.',
+                unitName: 'unit1',
+                globalSources: ['/data/globalSource1.js', '/data/globalSource2.js'],
+                unitSources: ['/data/unitSource1.js', '/data/unitSource2.js'],
+                globalExterns: ['/data/globalExterns1.js', '/data/globalExterns2.js'],
+                unitExterns: ['/data/unitExterns1.js', '/data/unitExterns2.js'],
+                globalBuildOptions: ['globalOption1', 'globalOption2'],
+                unitBuildOptions: ['unitOption1', 'unitOption2'],
+                outputFile: null,
+                globalWarningsFilterFile: ['/data/globalWarningsFilterFile1.txt',
+                                           '/data/globalWarningsFilterFile2.txt'],
+                unitWarningsFilterFile: ['/data/unitWarningsFilterFile1.txt', '/data/unitWarningsFilterFile2.txt']
+            };
+            var compilationResult4 = {stdout: 'console.log(\'Hello World!\')'};
+            var cache;
+
+            var prepareTest = function (cacheFolderLocation, compilationChanges, compilationResult) {
+                cache = new CCCache(cacheFolderLocation);
+                return cache.write(compilerConfiguration4, compilationResult4)
+                    .then(function () {
+                        return cache.persist();
+                    })
+                    .then(function () {
+                        var hashUnit1 = JSON.parse(fs.readFileSync(path.join(cacheFolderLocation, 'bibliography.json'))).unit1;
+                        return { unit1: hashUnit1,
+                                 compilationResult: JSON.parse(fs.readFileSync(path.join(cacheFolderLocation,
+                                                                                         hashUnit1 + '.json'))) };
+                    });
+            };
+
+            var testChanges = function (cacheFolderLocation, configurationChanges) {
+                var compilerConfiguration = Object.assign({}, compilerConfiguration4);
+                Object.assign(compilerConfiguration, configurationChanges);
+                return cache.get(compilerConfiguration);
+            };
+
+            it('global source files changed', function (done) {
+                prepareTest('/tmp/write/cache8')
+                    .then(function (result) {
+                        console.dir(result);
+                        testChanges({globalSources: []})
+                            .then(function () {
+                                done.fail('...');
+                            })
+                            .catch(done);
+                    })
+                    .catch(done.fail);
             });
 
             it('global externs files changed', function () {

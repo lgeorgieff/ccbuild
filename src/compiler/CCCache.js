@@ -118,10 +118,11 @@ CCCache.prototype._readBibliography = function () {
 
 /**
  * Tries to get a cached compilation result. In case there is nothing cached yet for the given compilation unit an error
- * is returned. In case the data held in the cache is outdated, the cache for this compilation unit is cleaned.
+ * is returned. In case the data held in the cache is outdated, the cache for this compilation unit is cleaned and an
+ * error is returned.
  *
  * @returns {QPromise<Object>} A promise holding the cached compilation result. In case the requested compilation unit
- *          is not cached the promise is rejected with a {@link NotFoundInCacheError}.
+ *          is not cached or is outdated the promise is rejected with a {@link NotFoundInCacheError}.
  * @param {!CompilerConfiguration} compilationUnit The compiler configuration for the current compilation unit.
  */
 CCCache.prototype.get = function (compilationUnit) {
@@ -136,10 +137,11 @@ CCCache.prototype.get = function (compilationUnit) {
             } else if (self._bibliography[compilationUnit.unitName] !== undefined) {
                 return self.clean(compilationUnit)
                     .then(function () {
-                        return null;
+                        return Q.reject(NotFoundInCacheError(compilationUnit.unitName, compilationUnitHash,
+                                                             self._cacheFolder));
                     });
             } else {
-                Q.reject(NotFoundInCacheError(compilationUnit.unitName, compilationUnitHash, self._cacheFolder));
+                return Q.reject(NotFoundInCacheError(compilationUnit.unitName, compilationUnitHash, self._cacheFolder));
             }
         });
 };
