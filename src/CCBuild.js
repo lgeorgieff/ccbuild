@@ -52,6 +52,26 @@ var configurationReader = require('./configurationReader.js');
  * @ignore
  * @suppress {duplicate}
  */
+var Compiler = /** @type {function(new:Compiler): undefined} */ (require('./compiler/Compiler.js'));
+
+/**
+ * @ignore
+ * @suppress {duplicate}
+ */
+var CachingCompiler = /** @type {function(new:CachingCompiler): undefined} */
+    (require('./compiler/CachingCompiler.js'));
+
+/**
+ * @ignore
+ * @suppress {duplicate}
+ */
+var ClosureCompiler = /** @type {function(new:ClosureCompiler): undefined} */
+    (require('./compiler/ClosureCompiler.js'));
+
+/**
+ * @ignore
+ * @suppress {duplicate}
+ */
 var CLI = /** @type {function(new:CLI, Array<string>)}*/ (require('./CLI.js'));
 
 /**
@@ -424,7 +444,7 @@ CCBuild.prototype._compile = function (compilerConfiguration) {
 
     var compilerArguments;
     try {
-        compilerArguments = configurationReader.getCompilerArguments(compilerConfiguration);
+        compilerArguments = Compiler.getCompilerArguments(compilerConfiguration);
     } catch (err) {
         self.emit('configError', compilerConfiguration.unitName, err);
         deferred.reject({compilationUnit: compilerConfiguration.unitName, error: err});

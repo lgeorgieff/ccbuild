@@ -82,50 +82,6 @@ function getLocalConfigFiles () {
 }
 
 /**
- * @typedef {{workingDirectory: !string,
- *            unitName: !string,
- *            globalSources: !Array<string>,
- *            unitSources: !Array<string>,
- *            globalExterns: !Array<string>,
- *            unitExterns: !Array<string>,
- *            globalBuildOptions: !Array<string>,
- *            unitBuildOptions: !Array<string>,
- *            outputFile: (?string|undefined),
- *            globalWarningsFilterFile: Array<string>,
- *            unitWarningsFilterFile: Array<string>}}
- */
-var CompilerConfiguration;
-
-/**
- * Transforms the passed unit configuration to a valid configuration for the Closure Compiler.
- *
- * @returns {Array<string>} An array of strings that describes all the compiler arguments based on the passed
- *          configuration for the compilation unit.
- * @param {CompilerConfiguration} unitConfiguration An object containing the entire configuration settings for one
- *        compilation unit.
- * @throws {Error} In case the configuration is not valid.
- */
-function getCompilerArguments (unitConfiguration) {
-    var buildOptions = utils.mergeArguments(unitConfiguration.globalBuildOptions, unitConfiguration.unitBuildOptions);
-    var externs = utils.mergeArrays(unitConfiguration.globalExterns, unitConfiguration.unitExterns,
-                                    utils.getValuesFromArgumentsArray(buildOptions, '--externs'));
-    var sources = utils.mergeArrays(unitConfiguration.globalSources, unitConfiguration.unitSources,
-                                    utils.getValuesFromArgumentsArray(buildOptions, '--js'));
-
-    var outputFile = utils.getValuesFromArgumentsArray(buildOptions, '--js_output_file');
-    if (outputFile.length !== 0) outputFile.unshift('--js_output_file');
-    if (outputFile.length !== 0 && unitConfiguration.outputFile) {
-        throw new Error('"--js_output_file" must not be set in "buildOptions" when "outputFile" property is used!');
-    }
-    if (unitConfiguration.outputFile) outputFile.push('--js_output_file', unitConfiguration.outputFile);
-    if (externs.length !== 0) externs = utils.valuesToArgumentsArray(externs, '--externs');
-    if (sources.length !== 0) sources = utils.valuesToArgumentsArray(sources, '--js');
-    var cleanedBuildOptions =
-            utils.removeTuplesFromArray(buildOptions, utils.listToTuples(externs.concat(sources).concat(outputFile)));
-    return cleanedBuildOptions.concat(externs).concat(sources).concat(outputFile);
-}
-
-/**
  * Merges a configuration file with its parent configuration file according to the settings in `inheritSources`,
  * `inheritExterns` and `inheritBuildOptions`.
  *
@@ -214,4 +170,3 @@ function readAndParseConfiguration (configPath, parentConfig, variableManager) {
 
 module.exports.getLocalConfigFiles = getLocalConfigFiles;
 module.exports.readAndParseConfiguration = readAndParseConfiguration;
-module.exports.getCompilerArguments = getCompilerArguments;

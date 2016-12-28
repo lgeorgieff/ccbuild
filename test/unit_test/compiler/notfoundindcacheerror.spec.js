@@ -7,7 +7,7 @@
 var NotFoundInCacheError = /** @type {function(new:NotFoundInCacheError, string, string, string): undefined} */
     (require('../../../src/compiler/NotFoundInCacheError.js'));
 
-fdescribe('Class NotFoundInCacheError', function () {
+describe('Class NotFoundInCacheError', function () {
     describe('can be instantiated', function () {
         it('with correct parameters', function () {
             var err;

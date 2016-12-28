@@ -4,7 +4,7 @@
  * @ignore
  * @suppress {duplicate}
  */
-var utils = require('./utils');
+var utils = require('../utils');
 
 /**
  * @typedef {{workingDirectory: !string,
