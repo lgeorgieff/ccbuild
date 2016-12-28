@@ -10,6 +10,18 @@ var util = require('util');
  * @ignore
  * @suppress {duplicate}
  */
+var CC = require('google-closure-compiler');
+
+/**
+ * @ignore
+ * @suppress {duplicate}
+ */
+var Q = require('q');
+
+/**
+ * @ignore
+ * @suppress {duplicate}
+ */
 var Compiler = /** @type {function(new:Compiler): undefined} */ (require('./Compiler.js'));
 
 /**
@@ -30,13 +42,24 @@ util.inherits(ClosureCompiler, Compiler);
  *
  * @override
  *
- * @returns {QPromise<Object>} A promise holding the compilation result.
+ * @returns {QPromise<CompilationResult>} A promise holding the compilation result.
  * @param {!CompilerConfiguration} compilationUnit The compiler configuration for the current compilation unit.
  *
  * @throws {Error} Thrown if compilationUnit is of a wrong type.
  */
 ClosureCompiler.prototype.compile = function (compilationUnit) {
-    return null;
+    var compilerArguments = Compiler.getCompilerArguments(compilationUnit);
+    var compiler = new CC.compiler(compilerArguments);
+
+    var deferred = Q.defer();
+    compiler.run(function (code, stdout, stderr) {
+        deferred.resolve({code: code, stdout: stdout, stderr: stderr});
+    });
+
+    return deferred.promise;
 };
 
 module.exports = ClosureCompiler;
+
+
+
