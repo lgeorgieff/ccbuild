@@ -60,6 +60,3 @@ ClosureCompiler.prototype.compile = function (compilationUnit) {
 };
 
 module.exports = ClosureCompiler;
-
-
-
