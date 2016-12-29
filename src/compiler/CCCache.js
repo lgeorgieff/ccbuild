@@ -493,4 +493,13 @@ CCCache.prototype._getCachedResult = function (compilationUnitName, compilationU
     return deferred.promise;
 };
 
+/**
+ * Get the normalized cache folder this object is bound to.
+ *
+ * @returns {string} The normalized cache folder.
+ */
+CCCache.prototype.getCacheFolder = function () {
+    return this._cacheFolder;
+};
+
 module.exports = CCCache;

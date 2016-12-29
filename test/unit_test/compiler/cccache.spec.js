@@ -205,6 +205,13 @@ describe('Class CCCache', function () {
         });
     });
 
+    describe('.getCacheFolder()', function () {
+        it('returns normalized path to cache folder', function () {
+            var cache1 = new CCCache('/tmp/../some/thing/in/between/cache1');
+            expect(cache1.getCacheFolder()).toBe('/some/thing/in/between/cache1');
+        });
+    });
+
     describe('.persist()', function () {
         it('writes changes to index file', function (done) {
             var cache = new CCCache('/tmp/write/cache5/');
