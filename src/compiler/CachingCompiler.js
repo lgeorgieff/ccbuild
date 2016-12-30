@@ -4,6 +4,24 @@
  * @ignore
  * @suppress {duplicate}
  */
+var fs = require('fs');
+
+/**
+ * @ignore
+ * @suppress {duplicate}
+ */
+var mkdirp = require('mkdirp');
+
+/**
+ * @ignore
+ * @suppress {duplicate}
+ */
+var Q = require('q');
+
+/**
+ * @ignore
+ * @suppress {duplicate}
+ */
 var util = require('util');
 
 /**
@@ -59,22 +77,68 @@ util.inherits(CachingCompiler, Compiler);
 CachingCompiler.prototype.compile = function (compilationUnit) {
     var self = this;
     var compilationResult;
-    return this._cache.get(compilationUnit)
+    return this._createCacheFolderIfRequired()
+        .then(function () {
+            return self._cache.get(compilationUnit);
+        })
         .catch(function (err) {
-            self._closureCompiler.compile(compilationUnit)
+            return self._closureCompiler.compile(compilationUnit)
                 .then(function (_compilationResult) {
                     compilationResult = _compilationResult;
                 })
                 .then(function () {
-                    return self._cache.write(compilationResult);
-                })
-                .then(function () {
-                    return self._cache.persist();
-                })
-                .then(function () {
-                    return compilationResult;
+                    return self._cache.write(compilationResult)
+                        .then(function () {
+                            return self._cache.persist();
+                        })
+                        .then(function () {
+                            return compilationResult;
+                        })
+                        .catch(function (err) {
+                            return compilationResult;
+                        });
                 });
         });
+};
+
+/**
+ * Create the cache folder in case it does not exist yet.
+ *
+ * @private
+ *
+ * @returns {QPromise} A resolved promise in case the cache folder was created successful or did already exist.
+ *                     A rejected promise holding an error object in case the cache folder could not be created.
+ */
+CachingCompiler.prototype._createCacheFolderIfRequired = function () {
+    var self = this;
+    var deferred = Q.defer();
+    mkdirp(this._cache.getCacheFolder(), {mode: 0o775}, function (errMkdirp) {
+        if (errMkdirp && errMkdirp.code === 'EEXIST') {
+            fs.stat(self._cache.getCacheFolder(), function (errStat, stats) {
+                if (errStat) {
+                    deferred.reject(errStat);
+                } else {
+                    if (!stats.isDirectory()) {
+                        deferred.reject(new Error('The cache folder ' + self._cache.getCacheFolder() + ' is not a ' +
+                                                  'directory'));
+                    } else {
+                        fs.access(self._cache.getCacheFolder(), fs.R_OK | fs.W_OK | fs.X_OK, function (errAccess) {
+                            if (errAccess) {
+                                deferred.reject(errAccess);
+                            } else {
+                                deferred.resolve();
+                            }
+                        });
+                    }
+                }
+            });
+        } else if (errMkdirp) {
+            deferred.reject(errMkdirp);
+        } else {
+            deferred.resolve();
+        }
+    });
+    return deferred.promise;
 };
 
 module.exports = CachingCompiler;
