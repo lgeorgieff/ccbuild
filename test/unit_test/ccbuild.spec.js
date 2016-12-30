@@ -22,6 +22,12 @@ var mockFs = require('mock-fs');
  * @ignore
  * @suppress {duplicate}
  */
+var Q = require('q');
+
+/**
+ * @ignore
+ * @suppress {duplicate}
+ */
 var proxyquire = require('proxyquire');
 
 /**
@@ -32,7 +38,7 @@ var fs = require('fs');
 
 var compilerPath = 'compiler/path';
 var contribPath = 'contrib/path';
-function CC (compilerArguments) { }
+function CC (compilerArguments) {} // TODO: clean up mock
 CC.prototype.run = function (cb) {};
 CC.COMPILER_PATH = compilerPath;
 CC.CONTRIB_PATH = contribPath;
@@ -48,12 +54,19 @@ var rpjMock = function (packageJson, cb) {
     cb(undefined, PACKAGE_JSON);
 };
 
+var CachingCompilerMock = function (cacheFolder) {};
+CachingCompilerMock.prototype.compile = function (args) {};
+
+var ClosureCompilerMock = function () {};
+ClosureCompilerMock.prototype.compile = function (args) {};
+
 /**
  * @ignore
  * @suppress {duplicate}
  */
 var CCBuild = /** @type {function(new:CCBuild, Array<string>)} */ (proxyquire('../../src/CCBuild.js', {
-    'google-closure-compiler': CCMock,
+    './compiler/CachingCompiler.js': CachingCompilerMock,
+    './compiler/ClosureCompiler.js': ClosureCompilerMock,
     './CLI.js': proxyquire('../../src/CLI.js', {
         'google-closure-compiler': CCMock,
         'read-package-json': rpjMock
@@ -248,7 +261,7 @@ describe('CCBuild class', function () {
         });
     });
 
-    describe('with google-closure-compiler-mock', function () {
+    describe('with compiler-mock', function () {
         var runMock;
 
         beforeEach(function () {
@@ -311,7 +324,7 @@ describe('CCBuild class', function () {
         });
 
         describe('with fs-mock', function () {
-            beforeAll(function () {
+            beforeEach(function () {
                 var config2 = {
                     sources: ['./data/source4.js'],
                     buildOptions: [
@@ -419,14 +432,27 @@ describe('CCBuild class', function () {
                 mockFs(fakeFs);
             });
 
-            afterAll(function () {
+            afterEach(function () {
                 mockFs.restore();
             });
 
+            beforeEach(function () {
+                CachingCompilerMock.prototype.compile = jasmine.createSpy('CachingCompiler::compile').and
+                    .callFake(function (cb) {
+                        return Q.resolve({code: 0, stdout: 'console.log(\'Hello World!\');', stderr: ''});
+                    });
+
+                ClosureCompilerMock.prototype.compile = jasmine.createSpy('ClosureCompiler::compile').and
+                    .callFake(function (cb) {
+                        return Q.resolve({code: 0, stdout: 'console.log(\'Hello World!\');', stderr: ''});
+                    });
+            });
+
             it('emits done after finished with config -- 1 errornous compilation unit', function (done) {
-                runMock = jasmine.createSpy('compiler.run').and.callFake(function (cb) {
-                    cb(1, '', 'an error');
-                });
+                CachingCompilerMock.prototype.compile = jasmine.createSpy('CachingCompiler::compile').and
+                    .callFake(function (cb) {
+                        return Q.resolve({code: 1, stdout: '', stderr: 'an error'});
+                    });
 
                 var configPath = path.join(__dirname, 'config2.ccbuild');
                 var ccbuild = new CCBuild([process.argv[0], process.argv[1], '--config', configPath]);
@@ -435,24 +461,35 @@ describe('CCBuild class', function () {
                 ccbuild.on('done', function () {
                     expect(compilationErrordHandler.calls.count()).toBe(1);
                     expect(compilationErrordHandler).toHaveBeenCalledWith('unit1', jasmine.any(Error));
-                    expect(CCMock.compiler.calls.count()).toBe(1);
-                    expect(CCMock.compiler).toHaveBeenCalledWith(jasmine.arrayContaining([
-                        '--compilation_level', 'ADVANCED_OPTIMIZATIONS',
-                        '--warning_level', 'VERBOSE',
-                        '--env', 'CUSTOM',
-                        '--flagfile', './data/test_flagfile',
-                        '--js', path.join('test', 'unit_test', 'data', 'source4.js')]));
+                    expect(ClosureCompilerMock.prototype.compile).not.toHaveBeenCalled();
+                    expect(CachingCompilerMock.prototype.compile.calls.count()).toBe(1);
+                    expect(CachingCompilerMock.prototype.compile).toHaveBeenCalledWith(jasmine.objectContaining({
+                        unitName: 'unit1',
+                        globalSources: ['test/unit_test/data/source4.js'],
+                        unitSources: [],
+                        globalExterns: [],
+                        unitExterns: [],
+                        globalBuildOptions: jasmine.arrayContaining(['--compilation_level', 'ADVANCED_OPTIMIZATIONS',
+                        '--warning_level', 'VERBOSE', '--env', 'CUSTOM', '--flagfile', './data/test_flagfile']),
+                        unitBuildOptions: [],
+                        outputFile: undefined,
+                        globalWarningsFilterFile: [],
+                        unitWarningsFilterFile: []}));
                     done();
                 });
             });
 
             it('emits done after finished with config -- 3 compilation units incl. error', function (done) {
                 var callCount = 0;
-                runMock = jasmine.createSpy('compiler.run').and.callFake(function (cb) {
-                    if (callCount < 2) cb(0, '', '');
-                    if (callCount >= 2) cb(1, '', 'an error');
-                    ++callCount;
-                });
+                CachingCompilerMock.prototype.compile = jasmine.createSpy('CachingCompiler::compile').and
+                    .callFake(function (cb) {
+                        ++callCount;
+                        if (callCount <= 2) {
+                            return Q.resolve({code: 0, stdout: 'console.log(\'Hello World!\');', stderr: ''});
+                        } else {
+                            return Q.resolve({code: 1, stdout: '', stderr: 'an error'});
+                        }
+                    });
 
                 var configPath = path.join(__dirname, 'config3.ccbuild');
                 var ccbuild = new CCBuild([process.argv[0], process.argv[1], '--config', configPath]);
@@ -467,15 +504,13 @@ describe('CCBuild class', function () {
                         .toHaveBeenCalledWith(jasmine.any(String), jasmine.any(String), jasmine.any(String));
                     expect(compilationErrorHandler.calls.count()).toBe(1);
                     expect(compilationErrorHandler).toHaveBeenCalledWith(jasmine.any(String), jasmine.any(Error));
+                    expect(CachingCompilerMock.prototype.compile.calls.count()).toBe(3);
+                    expect(ClosureCompilerMock.prototype.compile).not.toHaveBeenCalled();
                     done();
                 });
             });
 
             it('emits done after finished with multiple configs -- 4 compilation units', function (done) {
-                runMock = jasmine.createSpy('compiler.run').and.callFake(function (cb) {
-                    cb(0, '', '');
-                });
-
                 var configPath1 = path.join(__dirname, 'config4.ccbuild');
 
                 var ccbuild = new CCBuild([process.argv[0], process.argv[1], '--config', configPath1]);
@@ -487,16 +522,14 @@ describe('CCBuild class', function () {
                     expect(compiledHandler).toHaveBeenCalledWith('unit2', jasmine.any(String), jasmine.any(String));
                     expect(compiledHandler).toHaveBeenCalledWith('unit3', jasmine.any(String), jasmine.any(String));
                     expect(compiledHandler).toHaveBeenCalledWith('unit4', jasmine.any(String), jasmine.any(String));
+                    expect(CachingCompilerMock.prototype.compile.calls.count()).toBe(4);
+                    expect(ClosureCompilerMock.prototype.compile).not.toHaveBeenCalled();
                     done();
                 });
             });
 
             it('emits done after finished with multiple configs -- 4 compilation units & 1x --next NEXT_ENTRY',
-               function (done) {
-                   runMock = jasmine.createSpy('compiler.run').and.callFake(function (cb) {
-                       cb(0, '', '');
-                   });
-
+                function (done) {
                    var configPath1 = path.join(__dirname, 'config4.ccbuild');
 
                    var ccbuild = new CCBuild([process.argv[0], process.argv[1], '--config', configPath1,
@@ -506,16 +539,14 @@ describe('CCBuild class', function () {
                    ccbuild.on('done', function () {
                        expect(compiledHandler.calls.count()).toBe(1);
                        expect(compiledHandler).toHaveBeenCalledWith('unit1', jasmine.any(String), jasmine.any(String));
+                       expect(CachingCompilerMock.prototype.compile.calls.count()).toBe(1);
+                       expect(ClosureCompilerMock.prototype.compile).not.toHaveBeenCalled();
                        done();
                    });
                });
 
             it('emits done after finished with multiple configs -- 4 compilation units & 2x --next NEXT_ENTRY',
                function (done) {
-                   runMock = jasmine.createSpy('compiler.run').and.callFake(function (cb) {
-                       cb(0, '', '');
-                   });
-
                    var configPath1 = path.join(__dirname, 'config4.ccbuild');
 
                    var ccbuild = new CCBuild([process.argv[0], process.argv[1], '--config', configPath1,
@@ -527,16 +558,14 @@ describe('CCBuild class', function () {
                        expect(compiledHandler.calls.count()).toBe(2);
                        expect(compiledHandler).toHaveBeenCalledWith('unit1', jasmine.any(String), jasmine.any(String));
                        expect(compiledHandler).toHaveBeenCalledWith('unit2', jasmine.any(String), jasmine.any(String));
+                       expect(CachingCompilerMock.prototype.compile.calls.count()).toBe(2);
+                       expect(ClosureCompilerMock.prototype.compile).not.toHaveBeenCalled();
                        done();
                    });
                });
 
             it('emits done after finished with multiple configs -- 4 compilation units & 3x --next NEXT_ENTRY',
                function (done) {
-                   runMock = jasmine.createSpy('compiler.run').and.callFake(function (cb) {
-                       cb(0, '', '');
-                   });
-
                    var configPath1 = path.join('test', 'unit_test', 'config4.ccbuild');
 
                    var ccbuild = new CCBuild([process.argv[0], process.argv[1], '--config', configPath1,
@@ -551,18 +580,24 @@ describe('CCBuild class', function () {
                        expect(compiledHandler).toHaveBeenCalledWith('unit2', jasmine.any(String), jasmine.any(String));
                        expect(compiledHandler).toHaveBeenCalledWith('unit3', jasmine.any(String), jasmine.any(String));
                        expect(compiledHandler).toHaveBeenCalledWith('unit4', jasmine.any(String), jasmine.any(String));
+                       expect(CachingCompilerMock.prototype.compile.calls.count()).toBe(4);
+                       expect(ClosureCompilerMock.prototype.compile).not.toHaveBeenCalled();
                        done();
                    });
                });
 
             it('emits done after finished with multiple configs -- 4 compilation units incl. errors', function (done) {
                 var callCount = 0;
-                runMock = jasmine.createSpy('compiler.run').and.callFake(function (cb) {
-                    if (callCount < 2) cb(0, '', '');
-                    if (callCount >= 2) cb(1, '', 'an error');
-                    ++callCount;
-                });
-
+                CachingCompilerMock.prototype.compile = jasmine.createSpy('CachingCompiler::compile').and
+                    .callFake(function (cb) {
+                        ++callCount;
+                        if (callCount <= 2) {
+                            return Q.resolve({code: 0, stdout: 'console.log(\'Hello World!\');', stderr: ''});
+                        } else {
+                            return Q.resolve({code: 1, stdout: '', stderr: 'an error'});
+                        }
+                    });
+                
                 var configPath1 = path.join(__dirname, 'config4.ccbuild');
 
                 var ccbuild = new CCBuild([process.argv[0], process.argv[1], '--config', configPath1]);
@@ -573,9 +608,41 @@ describe('CCBuild class', function () {
                 ccbuild.on('done', function () {
                     expect(compiledHandler.calls.count()).toBe(2);
                     expect(compilationErrorHandler.calls.count()).toBe(2);
+                    expect(CachingCompilerMock.prototype.compile.calls.count()).toBe(4);
+                    expect(ClosureCompilerMock.prototype.compile).not.toHaveBeenCalled();
                     done();
                 });
             });
+
+            it('emits done after finished with multiple configs -- 4 compilation units incl. errors - without caching',
+               function (done) {
+                   var callCount = 0;
+                   ClosureCompilerMock.prototype.compile = jasmine.createSpy('CachingCompiler::compile').and
+                       .callFake(function (cb) {
+                           ++callCount;
+                           if (callCount <= 2) {
+                               return Q.resolve({code: 0, stdout: 'console.log(\'Hello World!\');', stderr: ''});
+                           } else {
+                               return Q.resolve({code: 1, stdout: '', stderr: 'an error'});
+                           }
+                       });
+                   
+                   var configPath1 = path.join(__dirname, 'config4.ccbuild');
+
+                   var ccbuild = new CCBuild([process.argv[0], process.argv[1], '--config', configPath1,
+                                              '--disable-caching']);
+                   var compiledHandler = jasmine.createSpy('compiledHandler');
+                   ccbuild.on('compiled', compiledHandler);
+                   var compilationErrorHandler = jasmine.createSpy('compilationErrorHandler');
+                   ccbuild.on('compilationError', compilationErrorHandler);
+                   ccbuild.on('done', function () {
+                       expect(compiledHandler.calls.count()).toBe(2);
+                       expect(compilationErrorHandler.calls.count()).toBe(2);
+                       expect(ClosureCompilerMock.prototype.compile.calls.count()).toBe(4);
+                       expect(CachingCompilerMock.prototype.compile).not.toHaveBeenCalled();
+                       done();
+                   });
+               });
         });
     });
 });

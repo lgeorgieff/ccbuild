@@ -396,9 +396,15 @@ CCCache.prototype._generateHashForItems = function (items) {
  * @param {Array<string>} filePaths Paths to files that are returned as {@link Readable} streams.
  */
 CCCache.prototype._getFileStreams = function (filePaths) {
-    return (filePaths || []).map(function (filePath) {
-        return fs.createReadStream(filePath, {encoding: 'utf8'});
-    });
+    return (filePaths || [])
+        .map(function (filePath) {
+            return fs.createReadStream(filePath, {encoding: 'utf8'});
+        })
+        .map(function (readStream) {
+            readStream.on('error', function (err) {
+                readStream.close();
+            });
+        });
 };
 
 /**
@@ -431,32 +437,37 @@ CCCache.prototype._getFlagfileStream = function (options) {
  * @param {!CompilerConfiguration} compilationUnit The compiler configuration for the requested compilation unit.
  */
 CCCache.prototype._generateHash = function (compilationUnit) {
-    var self = this;
-    var allFiles = compilationUnit.globalSources
+    try {
+        var self = this;
+        var allFiles = compilationUnit.globalSources
         .concat(compilationUnit.unitSources)
         .concat(compilationUnit.globalExterns)
         .concat(compilationUnit.unitExterns)
         .concat(compilationUnit.globalWarningsFilterFile)
         .concat(compilationUnit.unitWarningsFilterFile);
-    var globalFlagfile = this._getFlagfileStream(compilationUnit.globalBuildOptions);
-    if (globalFlagfile) {
-        allFiles.push(globalFlagfile);
+
+        var itemsToBeHashed = this._getFileStreams(allFiles)
+            .concat(compilationUnit.globalBuildOptions.map(function (option) {
+                return self._stringToStream(option);
+            }))
+            .concat(compilationUnit.unitBuildOptions.map(function (option) {
+                return self._stringToStream(option);
+            }));
+        var globalFlagfile = this._getFlagfileStream(compilationUnit.globalBuildOptions);
+        var unitFlagfile = this._getFlagfileStream(compilationUnit.unitBuildOptions);
+        if (globalFlagfile) {
+            itemsToBeHashed.push(globalFlagfile);
+        }
+        if (unitFlagfile) {
+            itemsToBeHashed.push(unitFlagfile);
+        }
+        return this._generateHashForItems(itemsToBeHashed)
+            .then(function (hashValue) {
+                return hashValue;
+            });
+    } catch (err) {
+        return Q.reject(err);
     }
-    var unitFlagfile = this._getFlagfileStream(compilationUnit.unitBuildOptions);
-    if (unitFlagfile) {
-        allFiles.push(unitFlagfile);
-    }
-    var itemsToBeHashed = this._getFileStreams(allFiles)
-        .concat(compilationUnit.globalBuildOptions.map(function (option) {
-            return self._stringToStream(option);
-        }))
-        .concat(compilationUnit.unitBuildOptions.map(function (option) {
-            return self._stringToStream(option);
-        }));
-    return this._generateHashForItems(itemsToBeHashed)
-        .then(function (hashValue) {
-            return hashValue;
-        });
 };
 
 /**

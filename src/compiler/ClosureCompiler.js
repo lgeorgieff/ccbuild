@@ -45,7 +45,7 @@ util.inherits(ClosureCompiler, Compiler);
  * @returns {QPromise<CompilationResult>} A promise holding the compilation result.
  * @param {!CompilerConfiguration} compilationUnit The compiler configuration for the current compilation unit.
  *
- * @throws {Error} Thrown if compilationUnit is of a wrong type.
+ * @throws {Error} In case the configuration of the compilation unit is not valid.
  */
 ClosureCompiler.prototype.compile = function (compilationUnit) {
     var compilerArguments = Compiler.getCompilerArguments(compilationUnit);
