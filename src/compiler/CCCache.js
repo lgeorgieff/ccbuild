@@ -160,8 +160,8 @@ CCCache.prototype.get = function (compilationUnit) {
  * Write the generated JavaScript code into the cache. In case the compilaton unit is already cached it will be
  * overwritten.
  *
- * @returns {QPromise<Object>} A promise holding the cached compilation result. In case the requested compilation unit
- *          is not cached the promise is rejected with a {@link NotFoundInCacheError}.
+ * @returns {QPromise} A resolved promise in case of success. In case the requested compilation unit is not cached the
+ *          promise is rejected with a {@link NotFoundInCacheError}.
  * @param {!CompilerConfiguration} compilationUnit The compiler configuration for the requested compilation unit.
  * @param {Object} compilationResult The result of the Google Closure Compiler that will be cached.
  */
