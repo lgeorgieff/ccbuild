@@ -310,7 +310,7 @@ function isFile (filePath) {
 }
 
 /**
- * Check whether the passed file path refers to a file or not.
+ * Check whether the passed file path refers to a folder or not.
  *
  * @returns {QPromise} A promise holding a boolean value that indicates whether the passed directory path refers to a
  *          directory or not.
