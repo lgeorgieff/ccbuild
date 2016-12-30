@@ -87,7 +87,7 @@ CachingCompiler.prototype.compile = function (compilationUnit) {
                     compilationResult = _compilationResult;
                 })
                 .then(function () {
-                    return self._cache.write(compilationResult)
+                    return self._cache.write(compilationUnit, compilationResult)
                         .then(function () {
                             return self._cache.persist();
                         })
