@@ -401,7 +401,7 @@ CCCache.prototype._getFileStreams = function (filePaths) {
             return fs.createReadStream(filePath, {encoding: 'utf8'});
         })
         .map(function (readStream) {
-            readStream.on('error', function (err) {
+            return readStream.on('error', function (err) {
                 readStream.close();
             });
         });
