@@ -73,7 +73,7 @@ describe('bin', function () {
         var configPath = path.join(__dirname, 'config1.ccbuild');
         fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
         // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
-        child_process.exec('node ./src/bin.js --config ./test/system_test/config1.ccbuild',
+        child_process.exec('node ./src/bin.js --disable-caching --config ./test/system_test/config1.ccbuild',
                            function (err, stdout, stderr) {
                                if (err) {
                                    done.fail(err);
@@ -120,7 +120,8 @@ describe('bin', function () {
         var configPath = path.join(__dirname, 'config1.ccbuild');
         fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
         // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
-        child_process.exec('node ./src/bin.js --ignore-warnings --config ./test/system_test/config1.ccbuild',
+        child_process.exec('node ./src/bin.js --disable-caching --ignore-warnings --config ' +
+                           './test/system_test/config1.ccbuild',
                            function (err, stdout, stderr) {
                                if (err) {
                                    done.fail(err);
@@ -160,7 +161,7 @@ describe('bin', function () {
         var configPath = path.join(__dirname, 'config1.ccbuild');
         fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
         // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
-        child_process.exec('node ./src/bin.js --config ./test/system_test/config1.ccbuild',
+        child_process.exec('node ./src/bin.js --disable-caching --config ./test/system_test/config1.ccbuild',
                            function (err, stdout, stderr) {
                                if (!err) {
                                    done.fail(new Error('Expected that compilation process will fail!'));
@@ -196,7 +197,8 @@ describe('bin', function () {
         var configPath = path.join(__dirname, 'config1.ccbuild');
         fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
         // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
-        child_process.exec('node ./src/bin.js --ignore-errors --config ./test/system_test/config1.ccbuild',
+        child_process.exec('node ./src/bin.js --disable-caching --ignore-errors --config ' +
+                           './test/system_test/config1.ccbuild',
                            function (err, stdout, stderr) {
                                if (!err) {
                                    done.fail(new Error('Expected that compilation process will fail!'));
@@ -232,7 +234,8 @@ describe('bin', function () {
         var configPath = path.join(__dirname, 'config1.ccbuild');
         fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
         // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
-        child_process.exec('node ./src/bin.js --ignore-errors --config ./test/system_test/config1.ccbuild',
+        child_process.exec('node ./src/bin.js --disable-caching --ignore-errors --config ' +
+                           './test/system_test/config1.ccbuild',
                            function (err, stdout, stderr) {
                                if (!err) {
                                    done.fail(new Error('Expected that compilation process will fail!'));
@@ -292,7 +295,7 @@ describe('bin', function () {
         var configPath3 = path.join(__dirname, 'config3.ccbuild');
         fs.writeFileSync(configPath3, JSON.stringify(config3, null, 2));
         // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
-        child_process.exec('node ../../src/bin.js', {cwd: __dirname},
+        child_process.exec('node ../../src/bin.js --disable-caching', {cwd: __dirname},
                            function (err, stdout, stderr) {
                                if (err) {
                                    done.fail(err);
@@ -358,7 +361,8 @@ describe('bin', function () {
         var configPath3 = path.join(__dirname, 'config3');
         fs.writeFileSync(configPath3, JSON.stringify(config3, null, 2));
         // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
-        child_process.exec('node ../../src/bin.js -c ' + configPath2 + ' --config ' + configPath3, {cwd: __dirname},
+        child_process.exec('node ../../src/bin.js --disable-caching -c ' + configPath2 + ' --config ' + configPath3,
+                           {cwd: __dirname},
                            function (err, stdout, stderr) {
                                if (err) {
                                    done.fail(err);
@@ -421,7 +425,7 @@ describe('bin', function () {
         fs.writeFileSync(configPath3, JSON.stringify(config3, null, 2));
 
         // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
-        child_process.exec('node ./src/bin.js -c ' + configPath1,
+        child_process.exec('node ./src/bin.js --disable-caching -c ' + configPath1,
                            function (err, stdout, stderr) {
                                if (err) {
                                    done.fail(err);
@@ -482,7 +486,7 @@ describe('bin', function () {
         fs.writeFileSync(configPath3, JSON.stringify(config3, null, 2));
 
         // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
-        child_process.exec('node ./src/bin.js -c ' + configPath1,
+        child_process.exec('node ./src/bin.js --disable-caching -c ' + configPath1,
                            function (err, stdout, stderr) {
                                if (!err) {
                                    done.fail(new Error('Expected that compilation process will fail!'));
@@ -567,7 +571,7 @@ describe('bin', function () {
         fs.writeFileSync(configPath3, JSON.stringify(config3, null, 2));
 
         // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
-        child_process.exec('node ./src/bin.js -c ' + configPath1,
+        child_process.exec('node ./src/bin.js --disable-caching -c ' + configPath1,
                            function (err, stdout, stderr) {
                                if (err) {
                                    done.fail(err);
@@ -661,7 +665,7 @@ describe('bin', function () {
         fs.writeFileSync(configPath3, JSON.stringify(config3, null, 2));
 
         // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
-        child_process.exec('node ./src/bin.js -c ' + configPath1,
+        child_process.exec('node ./src/bin.js --disable-caching -c ' + configPath1,
                            function (err, stdout, stderr) {
                                if (!err) {
                                    done.fail(new Error('Expected that compilation process will fail!'));
@@ -753,7 +757,7 @@ describe('bin', function () {
         fs.writeFileSync(configPath3, JSON.stringify(config3, null, 2));
 
         // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
-        child_process.exec('node ./src/bin.js -c ' + configPath1,
+        child_process.exec('node ./src/bin.js --disable-caching -c ' + configPath1,
                            function (err, stdout, stderr) {
                                if (!err) {
                                    done.fail(new Error('Expected that compilation process will fail!'));
@@ -801,7 +805,8 @@ describe('bin', function () {
         var configPath = path.join(__dirname, 'config1.ccbuild');
         fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
         // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
-        child_process.exec('node ./src/bin.js --config ./test/system_test/config1.ccbuild --ignore-compiled-code',
+        child_process.exec('node ./src/bin.js --disable-caching --config ./test/system_test/config1.ccbuild ' +
+                           '--ignore-compiled-code',
                            function (err, stdout, stderr) {
                                if (err) {
                                    done.fail(err);
@@ -842,7 +847,8 @@ describe('bin', function () {
         var configPath = path.join(__dirname, 'config1.ccbuild');
         fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
         // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
-        child_process.exec('node ./src/bin.js --config ./test/system_test/config1.ccbuild --ignore-compiled-code',
+        child_process.exec('node ./src/bin.js --disable-caching --config ./test/system_test/config1.ccbuild ' +
+                           '--ignore-compiled-code',
                            function (err, stdout, stderr) {
                                if (err) {
                                    done.fail(err);
@@ -884,8 +890,8 @@ describe('bin', function () {
         var configPath = path.join(__dirname, 'config1.ccbuild');
         fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
         // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
-        child_process.exec('node ./src/bin.js --config ./test/system_test/config1.ccbuild --ignore-compiled-code ' +
-                           '--ignore-warnings',
+        child_process.exec('node ./src/bin.js --disable-caching --config ./test/system_test/config1.ccbuild ' +
+                           '--ignore-compiled-code --ignore-warnings',
                            function (err, stdout, stderr) {
                                if (err) {
                                    done.fail(err);
@@ -925,7 +931,8 @@ describe('bin', function () {
         var configPath = path.join(__dirname, 'config1.ccbuild');
         fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
         // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
-        child_process.exec('node ./src/bin.js --config ./test/system_test/config1.ccbuild --ignore-compiled-code',
+        child_process.exec('node ./src/bin.js --disable-caching --config ./test/system_test/config1.ccbuild ' +
+                           '--ignore-compiled-code',
                            function (err, stdout, stderr) {
                                if (!err) {
                                    done.fail(new Error('Expected that compilation process will fail!'));
@@ -964,7 +971,8 @@ describe('bin', function () {
         var configPath = path.join(__dirname, 'config1.ccbuild');
         fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
         // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
-        child_process.exec('node ./src/bin.js --config ./test/system_test/config1.ccbuild --ignore-compiled-code',
+        child_process.exec('node ./src/bin.js --disable-caching --config ./test/system_test/config1.ccbuild ' +
+                           '--ignore-compiled-code',
                            function (err, stdout, stderr) {
                                if (!err) {
                                    done.fail(new Error('Expected that compilation process will fail!'));
@@ -1006,7 +1014,8 @@ describe('bin', function () {
         var configPath = path.join(__dirname, 'config1.ccbuild');
         fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
         // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
-        child_process.exec('node ./src/bin.js --config ./test/system_test/config1.ccbuild --stop-on-error',
+        child_process.exec('node ./src/bin.js --disable-caching --config ./test/system_test/config1.ccbuild ' +
+                           '--stop-on-error',
                            function (err, stdout, stderr) {
                                if (err) {
                                    done.fail(err);
@@ -1053,7 +1062,7 @@ describe('bin', function () {
         var configPath = path.join(__dirname, 'config1.ccbuild');
         fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
         // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
-        child_process.exec('node ./src/bin.js --config ' + configPath,
+        child_process.exec('node ./src/bin.js --disable-caching --config ' + configPath,
                            function (err, stdout, stderr) {
                                if (err) {
                                    done.fail(err);
@@ -1103,7 +1112,8 @@ describe('bin', function () {
         var configPath = path.join(__dirname, 'config1.ccbuild');
         fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
         // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
-        child_process.exec('node ./src/bin.js --ignore-compiled-code --config ./test/system_test/config1.ccbuild',
+        child_process.exec('node ./src/bin.js --disable-caching --ignore-compiled-code --config ' +
+                           './test/system_test/config1.ccbuild',
                            function (err, stdout, stderr) {
                                if (err) {
                                    done.fail(err);
@@ -1203,7 +1213,7 @@ describe('bin', function () {
         fs.writeFileSync(configPath3, JSON.stringify(config3, null, 2));
 
         // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
-        child_process.exec('node ./src/bin.js -c ' + configPath1,
+        child_process.exec('node ./src/bin.js --disable-caching -c ' + configPath1,
                            function (err, stdout, stderr) {
                                if (err) {
                                    done.fail(err);
@@ -1261,7 +1271,7 @@ describe('bin', function () {
         var configPath = path.join(__dirname, 'config1.ccbuild');
         fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
         // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
-        child_process.exec('node ./src/bin.js --config ./test/system_test/config1.ccbuild',
+        child_process.exec('node ./src/bin.js --disable-caching --config ./test/system_test/config1.ccbuild',
                            function (err, stdout, stderr) {
                                if (err) {
                                    let hd1 = '=== unit1 =============================================================' +
@@ -1355,7 +1365,8 @@ describe('bin', function () {
         fs.writeFileSync(configPath3, JSON.stringify(config3, null, 2));
 
         // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
-        child_process.exec('node ./src/bin.js -c ' + configPath1 + ' -u unit1 --unit unit4 --unit unit3',
+        child_process.exec('node ./src/bin.js --disable-caching -c ' + configPath1 + ' -u unit1 --unit unit4 ' +
+                           '--unit unit3',
                            function (err, stdout, stderr) {
                                if (err) {
                                    done.fail(err);
@@ -1402,7 +1413,7 @@ describe('bin', function () {
         var configPath = path.join(__dirname, 'config1.ccbuild');
         fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
         // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
-        child_process.exec('node ./src/bin.js --config ./test/system_test/config1.ccbuild',
+        child_process.exec('node ./src/bin.js --disable-caching --config ./test/system_test/config1.ccbuild',
                            function (err, stdout, stderr) {
                                if (err) {
                                    let hd1 = '=== unit1 =============================================================' +
@@ -1501,7 +1512,7 @@ describe('bin', function () {
         fs.writeFileSync(configPath3, JSON.stringify(config3, null, 2));
 
         // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
-        child_process.exec('node ./src/bin.js --ignore-compiled-code -c ' + configPath1,
+        child_process.exec('node ./src/bin.js --disable-caching --ignore-compiled-code -c ' + configPath1,
                            function (err, stdout, stderr) {
                                if (err) {
                                    done.fail(err);
@@ -1598,7 +1609,7 @@ describe('bin', function () {
         fs.writeFileSync(configPath3, JSON.stringify(config3, null, 2));
 
         // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
-        child_process.exec('node ./src/bin.js --ignore-compiled-code -c ' + configPath1,
+        child_process.exec('node ./src/bin.js --disable-caching --ignore-compiled-code -c ' + configPath1,
                            function (err, stdout, stderr) {
                                if (err) {
                                    expect(stderr.indexOf('source3.js')).not.toBe(-1);
@@ -1697,8 +1708,8 @@ describe('bin', function () {
         fs.writeFileSync(configPath3, JSON.stringify(config3, null, 2));
 
         // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
-        child_process.exec('node ./src/bin.js --ignore-compiled-code --ignore-warnings --ignore-errors ' +
-                           '-c ' + configPath1,
+        child_process.exec('node ./src/bin.js --disable-caching --ignore-compiled-code --ignore-warnings ' +
+                           '--ignore-errors -c ' + configPath1,
                            function (err, stdout, stderr) {
                                if (err) {
                                    expect(stderr.length).toBe(0);
@@ -1725,7 +1736,8 @@ describe('bin', function () {
         var configPath = path.join(__dirname, 'config1.ccbuild');
         fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
         // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
-        child_process.exec('node ./src/bin.js --ignore-check-fs --config ./test/system_test/config1.ccbuild',
+        child_process.exec('node ./src/bin.js --disable-caching --ignore-check-fs --config ' +
+                           './test/system_test/config1.ccbuild',
                            function (err, stdout, stderr) {
                                if (err) {
                                    done.fail(err);
@@ -1749,7 +1761,8 @@ describe('bin', function () {
         var configPath = path.join(__dirname, 'config1.ccbuild');
         fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
         // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
-        child_process.exec('node ./src/bin.js --stop-on-error --config ./test/system_test/config1.ccbuild',
+        child_process.exec('node ./src/bin.js --disable-caching --stop-on-error --config ' +
+                           './test/system_test/config1.ccbuild',
                            function (err, stdout, stderr) {
                                if (err) {
                                    var filesToCheck = ['externs1.js', 'externs2.js', 'externs3.js', 'source1.js',
@@ -1794,7 +1807,8 @@ describe('bin', function () {
         var configPath = path.join(__dirname, 'config1.ccbuild');
         fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
         // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
-        child_process.exec('node ./src/bin.js --config ./test/system_test/config1.ccbuild --stop-on-warning',
+        child_process.exec('node ./src/bin.js --disable-caching --config ./test/system_test/config1.ccbuild ' +
+                           '--stop-on-warning',
                            function (err, stdout, stderr) {
                                if (err) {
                                    done();
@@ -1827,7 +1841,8 @@ describe('bin', function () {
         var configPath = path.join(__dirname, 'config1.ccbuild');
         fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
         // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
-        child_process.exec('node ./src/bin.js --config ./test/system_test/config1.ccbuild --stop-on-warning',
+        child_process.exec('node ./src/bin.js --disable-caching --config ./test/system_test/config1.ccbuild ' +
+                           '--stop-on-warning',
                            function (err, stdout, stderr) {
                                if (err) {
                                    done.fail(err);

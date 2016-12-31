@@ -423,7 +423,7 @@ CCCache.prototype._getFlagfileStream = function (options) {
         }
     }
     if (i < options.length - 1) {
-        return this._getFileStreams([options[i + 1]]);
+        return this._getFileStreams([options[i + 1]])[0];
     }
     return null;
 };
