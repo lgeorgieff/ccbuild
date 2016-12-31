@@ -597,7 +597,7 @@ describe('CCBuild class', function () {
                             return Q.resolve({code: 1, stdout: '', stderr: 'an error'});
                         }
                     });
-                
+
                 var configPath1 = path.join(__dirname, 'config4.ccbuild');
 
                 var ccbuild = new CCBuild([process.argv[0], process.argv[1], '--config', configPath1]);
@@ -626,7 +626,7 @@ describe('CCBuild class', function () {
                                return Q.resolve({code: 1, stdout: '', stderr: 'an error'});
                            }
                        });
-                   
+
                    var configPath1 = path.join(__dirname, 'config4.ccbuild');
 
                    var ccbuild = new CCBuild([process.argv[0], process.argv[1], '--config', configPath1,
