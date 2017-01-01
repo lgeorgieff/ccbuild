@@ -1920,14 +1920,15 @@ describe('bin', function () {
                                            cbFail(err);
                                        } else {
                                            expect(stdout.length).toBeGreaterThan(0);
-                                           expect(stdout.indexOf('=== unit1 =================================================' +
-                                                                 '====================\n')).toBe(-1);
-                                           expect(stdout.indexOf('=== unit2 =================================================' +
-                                                                 '====================\n')).not.toBe(-1);
-                                           expect(stdout.indexOf('=== unit3 =================================================' +
-                                                                 '====================\n')).not.toBe(-1);
+                                           expect(stdout.indexOf('=== unit1 =========================================' +
+                                                                 '============================\n')).toBe(-1);
+                                           expect(stdout.indexOf('=== unit2 =========================================' +
+                                                                 '============================\n')).not.toBe(-1);
+                                           expect(stdout.indexOf('=== unit3 =========================================' +
+                                                                 '============================\n')).not.toBe(-1);
                                            expect(stderr.length).toBeGreaterThan(0);
-                                           expect(fs.statSync(path.join(__dirname, './.ccbuild')).isDirectory()).toBeTruthy();
+                                           expect(fs.statSync(path.join(__dirname, './.ccbuild')).isDirectory())
+                                               .toBeTruthy();
                                            var files = fs.readdirSync(path.join(__dirname, './.ccbuild'));
                                            expect(files.length).toBe(3);
                                            expect(files).toEqual(jasmine.arrayContaining(
@@ -1940,7 +1941,7 @@ describe('bin', function () {
             test(function () {
                 test(done, done.fail);
             }, done.fail);
-            
+
             this.resourcesToDelete.push(configPath1, configPath2, configPath3);
         });
     });
