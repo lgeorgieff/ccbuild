@@ -367,24 +367,38 @@ CCCache.prototype._generateHashForItems = function (items) {
     var hash = crypto.createHash('sha256');
     hash.setEncoding('hex');
 
-    hash.setMaxListeners(items.length);
-    var streamPromises = (items || []).map(function (dataItem) {
-        dataItem.pipe(hash, {end: false});
-        var deferred = Q.defer();
-        dataItem.on('end', function () {
-            deferred.resolve();
-        });
-        dataItem.on('error', function (err) {
-            deferred.reject(err);
-        });
-        return deferred.promise;
-    });
-
-    return Q.all(streamPromises)
-        .then(function () {
+    var deferred = Q.defer();
+    
+    var populateHasher = function (itemsToBeHashed) {
+        if (itemsToBeHashed.length === 1) {
             hash.end();
-            return hash.read();
-        });
+            return deferred.resolve(hash.read());
+        } else if (itemsToBeHashed.length === 1) {
+            itemsToBeHashed[0].on('data', function (data) {
+                hash.update(data, 'utf8');
+            });
+            itemsToBeHashed[0].on('end', function () {
+                hash.end();
+                deferred.resolve(hash.read());
+            });
+            itemsToBeHashed[0].on('error', function (err) {
+                deferred.reject(err);
+            });
+        } else {
+            itemsToBeHashed[0].on('data', function (data) {
+                hash.update(data, 'utf8');
+            });
+            itemsToBeHashed[0].on('end', function () {
+                populateHasher(itemsToBeHashed.slice(1));
+            });
+            itemsToBeHashed[0].on('error', function (err) {
+                deferred.reject(err);
+            });
+        }
+    };
+    populateHasher(items.slice());
+
+    return deferred.promise;
 };
 
 /**
