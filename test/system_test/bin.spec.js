@@ -379,7 +379,7 @@ describe('bin', function () {
                                }
                            });
         // jscs:enable requireCamelCaseOrUpperCaseIdentifiers
-        //this.resourcesToDelete.push(configPath1, configPath2, configPath3);
+        this.resourcesToDelete.push(configPath1, configPath2, configPath3);
     });
 
     it('compile with mulit-level inheritance -- success ', function (done) {
@@ -1852,5 +1852,96 @@ describe('bin', function () {
                            });
         // jscs:enable requireCamelCaseOrUpperCaseIdentifiers
         this.resourcesToDelete.push(configPath);
+    });
+
+    describe('with caching enabled', function () {
+        var config1 = {
+            sources: ['./data/source1.js'],
+            externs: ['data/externs1.js'],
+            buildOptions: [
+                '--compilation_level', 'ADVANCED_OPTIMIZATIONS',
+                '--warning_level', 'VERBOSE',
+                '--env', 'CUSTOM',
+                '--flagfile', './data/test_flagfile'
+            ],
+            compilationUnits: {
+                unit1: {
+                }
+            }
+        };
+        var config2 = {
+            sources: config1.sources,
+            externs: config1.externs,
+            buildOptions: config1.buildOptions,
+            compilationUnits: {
+                unit2: {
+                    sources: ['data/source2.js'],
+                    externs: ['./data/externs2.js']
+                }
+            }
+        };
+        var config3 = {
+            sources: config1.sources,
+            externs: config1.externs,
+            buildOptions: config1.buildOptions,
+            compilationUnits: {
+                unit3: {
+                    sources: ['./data/source3.js', './data/source4.js'],
+                    externs: ['./data/externs2.js', 'data/externs3.js']
+                }
+            }
+        };
+        var configPath1 = path.join(__dirname, 'config1.ccbuild');
+        var configPath2 = path.join(__dirname, 'config2');
+        var configPath3 = path.join(__dirname, 'config3');
+
+        beforeEach(function () {
+            fs.writeFileSync(configPath1, JSON.stringify(config1, null, 2));
+            fs.writeFileSync(configPath2, JSON.stringify(config2, null, 2));
+            fs.writeFileSync(configPath3, JSON.stringify(config3, null, 2));
+        });
+
+        it('compile with config and default config', function (done) {
+            // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
+            try {
+                fs.readdirSync(path.join(__dirname, './.ccbuild'))
+                    .forEach(function (fileName) {
+                        fs.unlinkSync(path.join(__dirname, './.ccbuild', fileName));
+                    });
+                fs.rmdirSync(path.join(__dirname, './.ccbuild'));
+            } catch (err) {
+                expect(err).toBeNull();
+            }
+            var test = function (cbOk, cbFail) {
+                child_process.exec('node ../../src/bin.js -c ' + configPath2 + ' --config ' + configPath3,
+                                   {cwd: __dirname},
+                                   function (err, stdout, stderr) {
+                                       if (err) {
+                                           cbFail(err);
+                                       } else {
+                                           expect(stdout.length).toBeGreaterThan(0);
+                                           expect(stdout.indexOf('=== unit1 =================================================' +
+                                                                 '====================\n')).toBe(-1);
+                                           expect(stdout.indexOf('=== unit2 =================================================' +
+                                                                 '====================\n')).not.toBe(-1);
+                                           expect(stdout.indexOf('=== unit3 =================================================' +
+                                                                 '====================\n')).not.toBe(-1);
+                                           expect(stderr.length).toBeGreaterThan(0);
+                                           expect(fs.statSync(path.join(__dirname, './.ccbuild')).isDirectory()).toBeTruthy();
+                                           var files = fs.readdirSync(path.join(__dirname, './.ccbuild'));
+                                           expect(files.length).toBe(3);
+                                           expect(files).toEqual(jasmine.arrayContaining(
+                                               ['bibliography.json']));
+                                           cbOk();
+                                       }
+                                   });
+            };
+            // jscs:enable requireCamelCaseOrUpperCaseIdentifiers
+            test(function () {
+                test(done, done.fail);
+            }, done.fail);
+            
+            this.resourcesToDelete.push(configPath1, configPath2, configPath3);
+        });
     });
 });
