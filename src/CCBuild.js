@@ -251,11 +251,12 @@ CCBuild.prototype._processConfigs = function (cliArgs, rootVariableManager) {
      */
     var compileUnit = function (compilationUnit) {
         return function (done) {
-            self._compile(cliArgs, compilationUnit).then(function (args) {
-                done();
-            }).catch(function (args) {
-                done();
-            });
+            self._compile(cliArgs, compilationUnit)
+                .then(function (args) {
+                    done();
+                }).catch(function (args) {
+                    done();
+                });
         };
     };
 
@@ -407,6 +408,7 @@ CCBuild.prototype._processConfigs = function (cliArgs, rootVariableManager) {
         }).reduce(function (accumulator, currentValue) {
             return accumulator.concat(currentValue);
         }, []).map(compileUnit);
+
         async.series(queuedCompilationUnits, function () {
             /**
              * States that the processing of all config files and the compilation of all defined compilation units is

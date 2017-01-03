@@ -366,37 +366,39 @@ CCCache.prototype._stringToStream = function (item) {
 CCCache.prototype._generateHashForItems = function (items) {
     var hash = crypto.createHash('sha256');
     hash.setEncoding('hex');
-
     var deferred = Q.defer();
-    
     var populateHasher = function (itemsToBeHashed) {
-        if (itemsToBeHashed.length === 1) {
+        if (itemsToBeHashed.length === 0) {
             hash.end();
-            return deferred.resolve(hash.read());
-        } else if (itemsToBeHashed.length === 1) {
-            itemsToBeHashed[0].on('data', function (data) {
-                hash.update(data, 'utf8');
-            });
-            itemsToBeHashed[0].on('end', function () {
-                hash.end();
-                deferred.resolve(hash.read());
-            });
-            itemsToBeHashed[0].on('error', function (err) {
-                deferred.reject(err);
-            });
+            deferred.resolve(hash.read());
         } else {
-            itemsToBeHashed[0].on('data', function (data) {
-                hash.update(data, 'utf8');
-            });
-            itemsToBeHashed[0].on('end', function () {
-                populateHasher(itemsToBeHashed.slice(1));
-            });
-            itemsToBeHashed[0].on('error', function (err) {
-                deferred.reject(err);
-            });
+            if (itemsToBeHashed[0].closedDueToError !== undefined) {
+                deferred.reject(itemsToBeHashed[0].closedDueToError);
+            } else if (itemsToBeHashed.length === 1) {
+                itemsToBeHashed[0].on('data', function (data) {
+                    hash.update(data, 'utf8');
+                });
+                itemsToBeHashed[0].on('end', function () {
+                    hash.end();
+                    deferred.resolve(hash.read());
+                });
+                itemsToBeHashed[0].on('error', function (err) {
+                    deferred.reject(err);
+                });
+            } else {
+                itemsToBeHashed[0].on('data', function (data) {
+                    hash.update(data, 'utf8');
+                });
+                itemsToBeHashed[0].on('end', function () {
+                    populateHasher(itemsToBeHashed.slice(1));
+                });
+                itemsToBeHashed[0].on('error', function (err) {
+                    deferred.reject(err);
+                });
+            }
         }
     };
-    populateHasher(items.slice());
+    populateHasher(items);
 
     return deferred.promise;
 };
@@ -416,6 +418,7 @@ CCCache.prototype._getFileStreams = function (filePaths) {
         })
         .map(function (readStream) {
             return readStream.on('error', function (err) {
+                this.closedDueToError = err;
                 readStream.close();
             });
         });
