@@ -54,7 +54,7 @@ describe('config_reader', function () {
         }
     });
 
-    xit('getLocalConfigFiles', function (done) {
+    it('getLocalConfigFiles', function (done) {
         var configFilePaths = ['.ccbuild', 'ccbuild.ccbuild', 'config.ccbuild', 'config', 'ccbuild', 'conig.ccbuildx',
                                'conig.build'];
         var loadedConfigFilePaths = ['.ccbuild', 'ccbuild.ccbuild', 'config.ccbuild']

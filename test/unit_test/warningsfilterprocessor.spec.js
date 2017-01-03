@@ -77,7 +77,7 @@ describe('The module WarningsFilterProcessor', function () {
         var filter2 = 'some filter 2\nsome filter 3\nsome filter 4';
         var filter3 = 'some filter 5\nsome filter 6\nsome filter 7';
 
-        beforeAll(function () {
+        beforeEach(function () {
             mockFs({
                 'some/path/1.txt': filter1,
                 'some/path/2.txt': filter2,
@@ -85,7 +85,7 @@ describe('The module WarningsFilterProcessor', function () {
             });
         });
 
-        afterAll(function () {
+        afterEach(function () {
             mockFs.restore();
         });
 

@@ -71,7 +71,7 @@ describe('Class FileChecker', function () {
         path.join('dir-2', 'dir-2-2', 'dir-2-2-2', 'dir-2-2-2-2', 'file8.txt')
     ];
 
-    beforeAll(function () {
+    beforeEach(function () {
         var fakeFs = {
             'dir-1': {
                 'file1.js': '',
@@ -190,7 +190,7 @@ describe('Class FileChecker', function () {
         mockFs(fakeFs);
     });
 
-    afterAll(mockFs.restore);
+    afterEach(mockFs.restore);
 
     describe('contructor', function () {
         it('throws an error in case no option is present in constructor', function () {
@@ -590,7 +590,7 @@ describe('Class FileChecker', function () {
     });
 
     describe('with no access to file system', function () {
-        beforeAll(function () {
+        beforeEach(function () {
             var fakeFs = {
                 'dir-3': mockFs.directory({mode: parseInt('222', 8),
                                            items: {
@@ -599,6 +599,8 @@ describe('Class FileChecker', function () {
             };
             mockFs(fakeFs);
         });
+
+        afterEach(mockFs.restore);
 
         it('signals error in case a folder cannot be accessed', function (done) {
             var fc = new FileChecker(

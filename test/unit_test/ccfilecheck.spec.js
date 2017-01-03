@@ -297,7 +297,7 @@ describe('CCFileCheck class', function () {
     });
 
     describe('with file system access', function () {
-        beforeAll(function () {
+        beforeEach(function () {
             var config1 = {};
             var config2 = {
                 checkFs: {
@@ -391,7 +391,7 @@ describe('CCFileCheck class', function () {
             mockFs(fakeFs);
         });
 
-        afterAll(mockFs.restore);
+        afterEach(mockFs.restore);
 
         it('signals done in case no config files are present', function (done) {
             var ccfc = new CCFileCheck([process.argv[0], process.argv[1]]);

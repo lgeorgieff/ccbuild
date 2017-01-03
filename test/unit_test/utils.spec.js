@@ -268,7 +268,7 @@ describe('utils\' isX', function () {
     var pathToBrokenSymlink = path.join('relative', 'path', 'to', 'symlink', 'broken');
     var pathToBrokenSymlinkMock = 'relative/path/to/symlink/broken';
 
-    beforeAll(function () {
+    beforeEach(function () {
         var fakeFs = {};
         fakeFs[relativePathToDirMock] = {};
         fakeFs[relativePathToFileMock] = 'some text';
@@ -280,7 +280,7 @@ describe('utils\' isX', function () {
         mockFs(fakeFs);
     });
 
-    afterAll(mockFs.restore);
+    afterEach(mockFs.restore);
 
     describe('utils.isFile', function () {
         it('returns false for relative directory path', function (done) {
@@ -404,7 +404,7 @@ describe('utils\' isX', function () {
 });
 
 describe('utils\' glob expressions', function () {
-    beforeAll(function () {
+    beforeEach(function () {
         var fakeFs = {
             'source1.js': '',
             'source2.js': '',
@@ -443,7 +443,7 @@ describe('utils\' glob expressions', function () {
         mockFs(fakeFs);
     });
 
-    afterAll(mockFs.restore);
+    afterEach(mockFs.restore);
 
     describe('utils.globFiles', function () {
         it('returns an empty array if no match is found', function (done) {
@@ -640,7 +640,7 @@ describe('utils\' list all files utility', function () {
         path.join('dir-2', 'dir-2-2', 'dir-2-2-2', 'dir-2-2-2-2', 'file8.txt')
     ];
 
-    beforeAll(function () {
+    beforeEach(function () {
         var fakeFs = {
             'dir-1': {
                 'file1.js': '',
@@ -759,7 +759,7 @@ describe('utils\' list all files utility', function () {
         mockFs(fakeFs);
     });
 
-    afterAll(mockFs.restore);
+    afterEach(mockFs.restore);
 
     describe('utils.getAllFilesFromDirectory', function () {
         it('signals error if directory does not exist', function (done) {
