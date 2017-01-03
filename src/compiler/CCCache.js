@@ -87,6 +87,7 @@ function CCCache (cacheFolder) {
     this._cacheFolder = normalizedCacheFolder;
     this._bibliography = {};
     this._readBibliographyPromise = null;
+    this._persistPromise = Q.resolve();
 }
 
 /**
@@ -208,24 +209,28 @@ CCCache.prototype.write = function (compilationUnit, compilationResult) {
  */
 CCCache.prototype.persist = function () {
     var self = this;
-    return (this._readBibliographyPromise || Q.resolve())
-        .then(function () {
-            var deferred = Q.defer();
-            try {
-                var content = JSON.stringify(self._bibliography);
-                fs.writeFile(path.join(self._cacheFolder, BIB_FILE_NAME), content, 'utf8', function (err) {
-                    if (err) {
-                        deferred.reject('Could not persist index file for cache due to' + err);
-                    } else {
-                        deferred.resolve();
-                    }
-                });
-            } catch (err) {
-                deferred.reject('Could not persist inde file for cache due to' + err);
-            }
 
-            return deferred.promise;
+    this._persistPromise = this._persistPromise
+        .then(function () {
+            return self._readBibliography()
+                .then(function () {
+                    var deferred = Q.defer();
+                    try {
+                        var content = JSON.stringify(self._bibliography);
+                        fs.writeFile(path.join(self._cacheFolder, BIB_FILE_NAME), content, 'utf8', function (err) {
+                            if (err) {
+                                deferred.reject('Could not persist index file for cache due to' + err);
+                            } else {
+                                deferred.resolve();
+                            }
+                        });
+                    } catch (err) {
+                        deferred.reject('Could not persist inde file for cache due to' + err);
+                    }
+                    return deferred.promise;
+                });
         });
+    return this._persistPromise;
 };
 
 /**
