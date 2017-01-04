@@ -345,9 +345,7 @@ CCCache.prototype.clean = function (compilationUnit) {
  * @param {string} item A string value.
  */
 CCCache.prototype._stringToStream = function (item) {
-    if (item instanceof stream.Readable) {
-        return item;
-    } else if (typeof (item) === 'string') {
+    if (typeof (item) === 'string') {
         var s = new stream.Readable();
         s.push(item);
         s.push(null);
