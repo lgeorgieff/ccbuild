@@ -5,8 +5,14 @@ var Q = {};
  */
 function QDeferred () {};
 
+/**
+ * @param {...*} args
+ */
 QDeferred.prototype.reject = function (args) {};
 
+/**
+ * @param {...*} args
+ */
 QDeferred.prototype.resolve = function (args) {};
 
 /**
