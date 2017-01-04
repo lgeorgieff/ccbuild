@@ -92,8 +92,8 @@ var GCCMessage = /** @type {function(new:GCCMessage, string)}*/ (require('./GCCM
  * @ignore
  * @suppress {duplicate}
  */
-var WarningsFilterProcessor =
-        /** @type {function(number): WarningsFilterProcessor} */ (require('./WarningsFilterProcessor.js'));
+var getWarningsFilterProcessor =
+    /** @type {function(number): WarningsFilterProcessor} */ (require('./WarningsFilterProcessor.js'));
 
 /**
  * Instantiates a CCBuild object.
@@ -456,7 +456,7 @@ CCBuild.prototype._compile = function (cliArgs, compilerConfiguration) {
 
     compilerPromise
         .then(function (compilationResult) {
-            var warningsFilterProcessor = WarningsFilterProcessor(compilationResult.code);
+            var warningsFilterProcessor = getWarningsFilterProcessor(compilationResult.code);
             var currentWarningsFilterFiles = compilerConfiguration.globalWarningsFilterFile
                 .concat(compilerConfiguration.unitWarningsFilterFile);
             return Q
