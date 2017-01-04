@@ -22,6 +22,12 @@ var util = require('util');
  * @ignore
  * @suppress {duplicate}
  */
+var rimraf = require('rimraf');
+
+/**
+ * @ignore
+ * @suppress {duplicate}
+ */
 var ConfigurationNormalizer = require('../../src/ConfigurationNormalizer.js');
 
 /**
@@ -41,12 +47,21 @@ describe('config_reader', function () {
         this.resourcesToDelete = [];
     });
 
+    beforeEach(function () {
+        try {
+            rimraf.sync('./.ccbuild');
+        } catch (err) {
+            // Either there is no data left, since it was deleted successfully in the try block or the data neve
+            // existed and there is an ENOENT error thrown whcih can be ignored.
+            expect(err.code).toBe('ENOENT');
+        }
+    });
+
     afterEach(function () {
         if (util.isArray(this.resourcesToDelete)) {
             this.resourcesToDelete.forEach(function (resource) {
                 try {
-                    if (fs.statSync(resource).isDirectory()) fs.rmdirSync(resource);
-                    else fs.unlinkSync(resource);
+                    rimraf.sync(resource);
                 } catch (err) {
                     console.error(err);
                 }

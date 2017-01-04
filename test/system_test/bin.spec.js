@@ -16,6 +16,12 @@ var fs = require('fs');
  * @ignore
  * @suppress {duplicate}
  */
+var rimraf = require('rimraf');
+
+/**
+ * @ignore
+ * @suppress {duplicate}
+ */
 var util = require('util');
 
 // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
@@ -33,12 +39,21 @@ describe('bin', function () {
         this.resourcesToDelete = [];
     });
 
+    beforeEach(function () {
+        try {
+            rimraf.sync(path.join(__dirname, './.ccbuild'));
+        } catch (err) {
+            // Either there is no data left, since it was deleted successfully in the try block or the data neve
+            // existed and there is an ENOENT error thrown whcih can be ignored.
+            expect(err.code).toBe('ENOENT');
+        }
+    });
+
     afterEach(function () {
         if (util.isArray(this.resourcesToDelete)) {
             this.resourcesToDelete.forEach(function (resource) {
                 try {
-                    if (fs.statSync(resource).isDirectory()) fs.rmdirSync(resource);
-                    else fs.unlinkSync(resource);
+                    rimraf.sync(resource);
                 } catch (err) {
                     console.error(err);
                 }
@@ -312,9 +327,7 @@ describe('bin', function () {
                                }
                            });
         // jscs:enable requireCamelCaseOrUpperCaseIdentifiers
-        this.resourcesToDelete.push(configPath1);
-        this.resourcesToDelete.push(configPath2);
-        this.resourcesToDelete.push(configPath3);
+        this.resourcesToDelete.push(configPath1, configPath2, configPath3);
     });
 
     it('compile with config and default config', function (done) {
@@ -438,9 +451,7 @@ describe('bin', function () {
                                }
                            });
         // jscs:enable requireCamelCaseOrUpperCaseIdentifiers
-        this.resourcesToDelete.push(configPath1);
-        this.resourcesToDelete.push(configPath2);
-        this.resourcesToDelete.push(configPath3);
+        this.resourcesToDelete.push(configPath1, configPath2, configPath3);
     });
 
     it('compile with mulit-level inheritance -- error ', function (done) {
@@ -590,10 +601,7 @@ describe('bin', function () {
                                }
                            });
         // jscs:enable requireCamelCaseOrUpperCaseIdentifiers
-        this.resourcesToDelete.push(configPath1);
-        this.resourcesToDelete.push(configPath2);
-        this.resourcesToDelete.push(configPath3);
-        this.resourcesToDelete.push(temporaryConfigDirectory);
+        this.resourcesToDelete.push(configPath1, configPath2, configPath3, temporaryConfigDirectory);
     });
 
     it('compile with config hierarchy -- error', function (done) {
@@ -684,10 +692,7 @@ describe('bin', function () {
                                }
                            });
         // jscs:enable requireCamelCaseOrUpperCaseIdentifiers
-        this.resourcesToDelete.push(configPath1);
-        this.resourcesToDelete.push(configPath2);
-        this.resourcesToDelete.push(configPath3);
-        this.resourcesToDelete.push(temporaryConfigDirectory);
+        this.resourcesToDelete.push(configPath1, configPath2, configPath3, temporaryConfigDirectory);
     });
 
     it('compile with circular config hierarchy', function (done) {
@@ -776,10 +781,7 @@ describe('bin', function () {
                                }
                            });
         // jscs:enable requireCamelCaseOrUpperCaseIdentifiers
-        this.resourcesToDelete.push(configPath1);
-        this.resourcesToDelete.push(configPath2);
-        this.resourcesToDelete.push(configPath3);
-        this.resourcesToDelete.push(temporaryConfigDirectory);
+        this.resourcesToDelete.push(configPath1, configPath2, configPath3, temporaryConfigDirectory);
     });
 
     it('compile with --ignore-compiled-code -- success', function (done) {
@@ -1521,10 +1523,7 @@ describe('bin', function () {
                                }
                            });
         // jscs:enable requireCamelCaseOrUpperCaseIdentifiers
-        this.resourcesToDelete.push(configPath1);
-        this.resourcesToDelete.push(configPath2);
-        this.resourcesToDelete.push(configPath3);
-        this.resourcesToDelete.push(temporaryConfigDirectory);
+        this.resourcesToDelete.push(configPath1, configPath2, configPath3, temporaryConfigDirectory);
     });
 
     it('checkFs inside config hierarchy -- verificationError', function (done) {
@@ -1620,10 +1619,7 @@ describe('bin', function () {
                                }
                            });
         // jscs:enable requireCamelCaseOrUpperCaseIdentifiers
-        this.resourcesToDelete.push(configPath1);
-        this.resourcesToDelete.push(configPath2);
-        this.resourcesToDelete.push(configPath3);
-        this.resourcesToDelete.push(temporaryConfigDirectory);
+        this.resourcesToDelete.push(configPath1, configPath2, configPath3, temporaryConfigDirectory);
     });
 
     it('checkFs inside config hierarchy -- verificationError & --ignore-errors & --ignore-warnings', function (done) {
@@ -1719,10 +1715,7 @@ describe('bin', function () {
                                }
                            });
         // jscs:enable requireCamelCaseOrUpperCaseIdentifiers
-        this.resourcesToDelete.push(configPath1);
-        this.resourcesToDelete.push(configPath2);
-        this.resourcesToDelete.push(configPath3);
-        this.resourcesToDelete.push(temporaryConfigDirectory);
+        this.resourcesToDelete.push(configPath1, configPath2, configPath3, temporaryConfigDirectory);
     });
 
     it('checkFs -- --ignore-check-fs', function (done) {
@@ -1895,6 +1888,20 @@ describe('bin', function () {
         var configPath2 = path.join(__dirname, 'config2');
         var configPath3 = path.join(__dirname, 'config3');
 
+        var cleanCacheFolder = function () {
+            try {
+                rimraf.sync(path.join(__dirname, './.ccbuild'));
+            } catch (err) {
+                // Either there is no data left, since it was deleted successfully in the try block or the data neve
+                // existed and there is an ENOENT error thrown whcih can be ignored.
+                expect(err.code).toBe('ENOENT');
+            }
+        };
+
+        beforeEach(cleanCacheFolder);
+
+        afterEach(cleanCacheFolder);
+
         beforeEach(function () {
             fs.writeFileSync(configPath1, JSON.stringify(config1, null, 2));
             fs.writeFileSync(configPath2, JSON.stringify(config2, null, 2));
@@ -1903,15 +1910,6 @@ describe('bin', function () {
 
         it('compile with config and default config', function (done) {
             // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
-            try {
-                fs.readdirSync(path.join(__dirname, './.ccbuild'))
-                    .forEach(function (fileName) {
-                        fs.unlinkSync(path.join(__dirname, './.ccbuild', fileName));
-                    });
-                fs.rmdirSync(path.join(__dirname, './.ccbuild'));
-            } catch (err) {
-                expect(err).toBeNull();
-            }
             var test = function (cbOk, cbFail) {
                 child_process.exec('node ../../src/bin.js -c ' + configPath2 + ' --config ' + configPath3,
                                    {cwd: __dirname},

@@ -43,7 +43,8 @@
     "jscs": "^2.4.0",
     "jsdoc": "^3.4.0",
     "mock-fs": "^3.8.0",
-    "proxyquire": "^1.7.4"
+    "proxyquire": "^1.7.4",
+    "rimraf": "^2.5.4"
   },
   "scripts": {
     "postinstall": "npm run install_fixes && npm run compile_closure_compiler && npm run install_git_hooks",

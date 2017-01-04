@@ -22,6 +22,12 @@ var util = require('util');
  * @ignore
  * @suppress {duplicate}
  */
+var rimraf = require('rimraf');
+
+/**
+ * @ignore
+ * @suppress {duplicate}
+ */
 var CC = require('google-closure-compiler');
 
 /**
@@ -39,6 +45,16 @@ var cliUtils = require('../utils/cliUtils.js');
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 60000;
 
 describe('CCBuild class', function () {
+    beforeEach(function () {
+        try {
+            rimraf.sync(path.join(__dirname, './.ccbuild'));
+        } catch (err) {
+            // Either there is no data left, since it was deleted successfully in the try block or the data neve
+            // existed and there is an ENOENT error thrown whcih can be ignored.
+            expect(err.code).toBe('ENOENT');
+        }
+    });
+
     beforeEach(function () {
         this.resourcesToDelete = [];
     });
