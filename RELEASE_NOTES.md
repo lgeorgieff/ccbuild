@@ -1,3 +1,6 @@
+# Version 2.2.1
+* Adapt usage information to latest changes
+
 # Version 2.2.0
 * Implement a build cache that prevents recompiling unchanged compilation units
 * Refactor unit and system tests in clean up fixtures
