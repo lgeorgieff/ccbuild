@@ -45,7 +45,7 @@ function Compiler () { }
  * @virtual
  *
  * @returns {QPromise<CompilationResult>} A promise holding the compilation result.
- * @param {CompilerConfiguration} compilationUnit The compiler configuration for the current compilation unit.
+ * @param {!CompilerConfiguration} compilationUnit The compiler configuration for the current compilation unit.
  *
  * @throws {Error} Thrown if compilationUnit is of a wrong type.
  */

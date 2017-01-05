@@ -10,19 +10,19 @@ var fs = require('fs');
  * @ignore
  * @suppress {duplicate}
  */
-var mkdirp = require('mkdirp');
+var util = require('util');
+
+/**
+ * @ignore
+ * @suppress {duplicate}
+ */
+var mkdirp = /** @type {function(string, Object, function(Error))} */ (require('mkdirp'));
 
 /**
  * @ignore
  * @suppress {duplicate}
  */
 var Q = require('q');
-
-/**
- * @ignore
- * @suppress {duplicate}
- */
-var util = require('util');
 
 /**
  * @ignore
@@ -113,7 +113,7 @@ CachingCompiler.prototype._createCacheFolderIfRequired = function () {
     var self = this;
     var deferred = Q.defer();
     mkdirp(this._cache.getCacheFolder(), {mode: 0o775}, function (errMkdirp) {
-        if (errMkdirp && errMkdirp.code === 'EEXIST') {
+        if (errMkdirp && /** @type {{code: string}} */ (errMkdirp).code === 'EEXIST') {
             fs.stat(self._cache.getCacheFolder(), function (errStat, stats) {
                 if (errStat) {
                     deferred.reject(errStat);

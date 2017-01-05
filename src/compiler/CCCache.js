@@ -106,13 +106,13 @@ CCCache.prototype._readBibliography = function () {
     var self = this;
     var deferred = Q.defer();
     fs.readFile(path.join(this._cacheFolder, BIB_FILE_NAME), 'utf8', function (err, data) {
-        if (err && err.code !== 'ENOENT') {
+        if (err && /** @type {{code: string}} */(err).code !== 'ENOENT') {
             // The operation was only considered as failed when the file could not be read but did exist.
             // In it did not exist, it will be created during the next write operation.
             deferred.reject(err);
         } else {
             try {
-                self._bibliography = err ? {} : JSON.parse(data);
+                self._bibliography = err ? {} : JSON.parse(/** @type {string} */ (data));
                 deferred.resolve(self._bibliography);
             } catch (parserError) {
                 deferred.reject('Could not read index file of cache "' + self._cacheFolder + '" due to ' + parserError);
@@ -417,7 +417,7 @@ CCCache.prototype._generateHashForItems = function (items) {
 CCCache.prototype._getFileStreams = function (filePaths) {
     return (filePaths || [])
         .map(function (filePath) {
-            return fs.createReadStream(filePath, {encoding: 'utf8'});
+            return fs.createReadStream(filePath, /** @type {?} */ ({encoding: 'utf8'}));
         })
         .map(function (readStream) {
             return readStream.on('error', function (err) {
@@ -508,13 +508,13 @@ CCCache.prototype._getCachedResult = function (compilationUnitName, compilationU
 
     var deferred = Q.defer();
     fs.readFile(cachePath, 'utf8', function (err, data) {
-        if (err && err.code === 'ENOENT') {
+        if (err && /** @type {{code: string}} */(err).code === 'ENOENT') {
             deferred.reject(new NotFoundInCacheError(compilationUnitName, compilationUnitHash, this._cacheFolder));
         } else if (err) {
             deferred.reject(new Error(err));
         } else {
             try {
-                deferred.resolve(JSON.parse(data));
+                deferred.resolve(JSON.parse(/** @type {string} */ (data)));
             } catch (err) {
                 deferred.reject(new Error('Could not parse the cached file ' + cachePath + ': ' + err));
             }
