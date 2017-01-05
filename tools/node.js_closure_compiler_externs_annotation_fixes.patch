@@ -191,6 +191,48 @@ index bdd012a..64619a1 100644
  var events = {};
  
  /**
+diff --git a/fs.js b/fs.js
+index be64556..12cf3d2 100644
+--- a/fs.js
++++ b/fs.js
+@@ -475,6 +475,13 @@ fs.exists = function(path, callback) {};
+ fs.existsSync = function(path) {};
+ 
+ /**
++ * @param {string} path
++ * @param {number} mode
++ * @param {function(Error)} cb
++ */
++fs.access = function (path, mode, cb) {};
++
++/**
+  * @constructor
+  */
+ fs.Stats = function() {};
+@@ -623,3 +630,23 @@ fs.FSWatcher = function() {};
+ /**
+  */
+ fs.FSWatcher.prototype.close = function() {};
++
++/**
++ * @type {number}
++ */
++fs.F_OK;
++
++/**
++ * @type {number}
++ */
++fs.R_OK;
++
++/**
++ * @type {number}
++ */
++fs.W_OK;
++
++/**
++ * @type {number}
++ */
++fs.X_OK;
 diff --git a/net.js b/net.js
 index 57bf9d0..5a2f68e 100644
 --- a/net.js
@@ -324,6 +366,49 @@ index 02f0bc6..2466826 100644
  var repl = {};
  
  /**
+diff --git a/stream.js b/stream.js
+index c0a645c..3010ba5 100644
+--- a/stream.js
++++ b/stream.js
+@@ -116,7 +116,6 @@ stream.Readable = function(options) {};
+ stream.Readable.prototype.readable;
+ 
+ /**
+- * @protected
+  * @param {string|buffer.Buffer|null} chunk
+  * @return {boolean}
+  */
+@@ -214,6 +213,30 @@ stream.Duplex = function(options) {};
+  */
+ stream.Duplex.prototype.allowHalfOpen;
+ 
++/** */
++stream.Duplex.prototype.cork = function () {};
++
++/**
++ * @param {(string|buffer.Buffer)=} chunk
++ * @param {string=} encoding
++ * @param {function(*=)=} cb
++ */
++stream.Duplex.prototype.end = function (chunk, encoding, cb) {};
++
++/** */
++stream.Duplex.prototype.uncork = function () {};
++
++/**
++ * @param {string} encoding
++ */
++stream.Duplex.prototype.setDefaultEncoding = function (encoding) {};
++
++/**
++ * @param {string|buffer.Buffer} chunk
++ * @param {string=} encoding
++ * @param {function(*=)=} cb
++ */
++stream.Duplex.prototype.write = function (chunk, encoding, cb) {};
+ 
+ /**
+  * @param {Object=} options
 diff --git a/tls.js b/tls.js
 index 0d3980f..10520c2 100644
 --- a/tls.js
