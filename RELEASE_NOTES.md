@@ -1,3 +1,8 @@
+# Version 2.2.0
+* Implement a build cache that prevents recompiling unchanged compilation units
+* Refactor unit and system tests in clean up fixtures
+* Enable all pending unit tests
+
 # Version 2.1.8
 * Fix a bug with the checkFs implementation when using ignore
 
