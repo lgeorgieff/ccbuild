@@ -100,13 +100,13 @@ CLI.getUsage = function () {
             '  -c|--config PATH        Path to the configuration file ' + selfName + ' should\n' +
             '                          use. If no configuration is specified ' + selfName + '\n' +
             '                          checks the current directory for all files with the\n' +
-            '                          file extension ".nbuild". For every matched\n' +
+            '                          file extension ".ccbuild". For every matched\n' +
             '                          configuration file ' + selfName + ' performs a run.\n' +
             '                          You may specify multiple configurations.\n' +
             ' --config-help            Display a help message for the configuration file\n' +
             '                          format and exit.\n' +
             ' --ignore-warnings        Compilation warnings are not shown on stderr.\n' +
-            ' --ignore-errrors         Compilation errors are not shown on stderr.\n' +
+            ' --ignore-errors          Compilation errors are not shown on stderr.\n' +
             ' --ignore-compiled-code   The compiled code is not shown on stdout.\n' +
             ' --stop-on-error          All compilation processes are stopped in case a\n' +
             '                          compilation error occurs. ' + selfName + ' will\n' +

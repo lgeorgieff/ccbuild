@@ -8,7 +8,8 @@ Usage: ccbuild [-h|--help] [-v|--version] [--closure-help]
            [--contrib-path] [--ignore-warnings] [-ignore-errors]
            [-c|--config PATH]... [--ignore-compiled-code] [--stop-on-error]
            [--stop-on-warning] [-u|--unit UNIT_NAME]... [--ignore-check-fs]
-           [-n|--next NEXT_ENTRY]...
+           [-n|--next NEXT_ENTRY]... [--cache-location PATH]
+           [--disable-caching]
 
 Checks and compiles JavaScript files via the Closure Compiler.
 
@@ -19,24 +20,23 @@ Checks and compiles JavaScript files via the Closure Compiler.
   --compiler-path         Display the path to the Closure Compiler and exit.
   --contrib-path          Display the path to the contrib directory of the
                           Closure Compiler and exit.
-  -c|--config PATH        Path to the configuration file ccbuild
-                          should use. If no configuration is specified
-                          ccbuild checks the current directory for
-                          all files with the file extension ".ccbuild". For
-                          every matched configuration file ccbuild
-                          performs a run.
-                          You may specify multiple configurations
+  -c|--config PATH        Path to the configuration file ccbuild should
+                          use. If no configuration is specified ccbuild
+                          checks the current directory for all files with the
+                          file extension ".ccbuild". For every matched
+                          configuration file ccbuild performs a run.
+                          You may specify multiple configurations.
  --config-help            Display a help message for the configuration file
                           format and exit.
  --ignore-warnings        Compilation warnings are not shown on stderr.
  --ignore-errors          Compilation errors are not shown on stderr.
  --ignore-compiled-code   The compiled code is not shown on stdout.
  --stop-on-error          All compilation processes are stopped in case a
-                          compilation error occurs. ccbuild will exit with
-                          the exit code 1.
+                          compilation error occurs. ccbuild will
+                          exit with the exit code 1.
  --stop-on-warning        All compilation processes are stopped in case a
-                          compilation warning occurs. ccbuild will exit with
-                          the exit code 1.
+                          compilation warning occurs. ccbuild will
+                          exit with the exit code 1.
  -u|--unit UNIT_NAME      Filter the compilation units that are taken into
                           account for the compilation process. All other units
                           are ignored.
@@ -56,6 +56,11 @@ Checks and compiles JavaScript files via the Closure Compiler.
                           "checkFs" which is responsible for checking whether
                           specified files are included in the defined
                           compilation units.
+ --disable-caching        Don't cache results of compilation units. Using this
+                          option may increase the run time of the ccbuild
+                          process.
+ --cache-location PATH    Set the location of the caching data. The default path
+                          is $CWD/.ccbuild/.
 
 ccbuild exits with the return code 0 in case of successful compilation(s) this
 includes warnings as well. In case of compilation errors and file verification
