@@ -41,10 +41,10 @@
   },
   "dependencies": {
     "async": "^2.4.1",
+    "glob": "^7.1.2",
     "google-closure-compiler": "^20160315.2.0",
     "mkdirp": "^0.5.1",
     "q": "^1.4.1",
-    "glob": "^7.0.3",
     "read-package-json": "^2.0.3"
   },
   "devDependencies": {
