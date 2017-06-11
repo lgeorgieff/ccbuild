@@ -1,3 +1,17 @@
+# Version 2.2.2
+* Update the dependencies
+  * google-closure-compiler to version ^20170521.0.0
+  * read-package-json to version ^2.0.5
+  * q to version ^1.5.0
+  * glob to version ^7.1.2
+  * async to version ^2.4.1
+* Update the devDependencies
+  * rimraf to version ^2.6.1
+  * proxyquire to version ^1.8.0
+  * jsdoc to version ^3.4.3
+  * jasmine to version ^2.6.0
+  * mock-fs to version ^4.4.1
+
 # Version 2.2.1
 * Adapt usage information to latest changes
 
