@@ -53,7 +53,7 @@
     "jsdoc": "^3.4.3",
     "mock-fs": "^4.4.1",
     "proxyquire": "^1.8.0",
-    "rimraf": "^2.5.4"
+    "rimraf": "^2.6.1"
   },
   "scripts": {
     "test": "npm run test_unit && npm run test_system",
