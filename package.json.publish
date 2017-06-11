@@ -45,7 +45,7 @@
     "google-closure-compiler": "^20160315.2.0",
     "mkdirp": "^0.5.1",
     "q": "^1.5.0",
-    "read-package-json": "^2.0.3"
+    "read-package-json": "^2.0.5"
   },
   "devDependencies": {
     "jasmine": "^2.6.0",
