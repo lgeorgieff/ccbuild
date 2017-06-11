@@ -41,7 +41,7 @@
   "devDependencies": {
     "jasmine": "^2.6.0",
     "jscs": "^2.4.0",
-    "jsdoc": "^3.4.0",
+    "jsdoc": "^3.4.3",
     "mock-fs": "^4.4.1",
     "proxyquire": "^1.7.4",
     "rimraf": "^2.5.4"
